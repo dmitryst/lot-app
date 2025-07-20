@@ -89,3 +89,40 @@
 .buyButton:hover {
   background-color: #005bb5;
 }
+
+/* Контейнер для кнопок-фильтров */
+.filterContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+/* Общий стиль для кнопки фильтра */
+.filterButton {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  background-color: #f0f0f0;
+  border-color: #aaa;
+}
+
+/* Стиль для активной кнопки фильтра */
+.activeFilter {
+  padding: 8px 16px;
+  border: 1px solid #0070f3;
+  border-radius: 20px;
+  background-color: #0070f3;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
