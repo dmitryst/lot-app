@@ -1,0 +1,91 @@
+/* Стили для контейнера, в котором лежат все карточки */
+.lotsGrid {
+  display: grid;
+  gap: 24px; /* Расстояние между карточками */
+}
+
+/* Стили для одной карточки лота */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid #e2e8f0;
+}
+
+/* Эффект при наведении на карточку */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок-описание лота */
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  color: #2d3748;
+}
+
+/* Детали лота (цена, шаг, депозит) */
+.card p {
+  margin: 8px 0;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.card p b {
+  color: #2d3748;
+}
+
+/* Контейнер для тегов категорий */
+.categoriesContainer {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Расстояние между тегами */
+}
+
+/* Стиль для одного тега категории */
+.categoryTag {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Делаем карточку flex-контейнером, чтобы футер прижался к низу */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Основной контент карточки будет занимать всё доступное пространство */
+.cardContent {
+  flex-grow: 1;
+}
+
+/* Футер карточки */
+.cardFooter {
+  margin-top: 24px; /* Отступ от контента */
+  text-align: right;
+}
+
+/* Кнопка "Купить" */
+.buyButton {
+  display: inline-block;
+  background-color: #0070f3;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.buyButton:hover {
+  background-color: #005bb5;
+}
