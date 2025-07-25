@@ -30,6 +30,13 @@ const PREDEFINED_CATEGORIES = [
 
 const BIDDING_TYPES = ['Открытый аукцион', 'Публичное предложение'];
 
+const formatNumberWithSpaces = (value: string) => {
+  if (!value) return '';
+  // Удаляем все нечисловые символы и добавляем пробелы как разделители
+  const cleanValue = value.replace(/\D/g, '');
+  return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
 export default function Page() {
   // --- Состояния компонента ---
   const [allLots, setAllLots] = useState<Lot[]>([]);         // Все лоты с сервера
@@ -93,6 +100,16 @@ export default function Page() {
 
   }, [selectedCategory, selectedBiddingType, priceFrom, priceTo, allLots]);
 
+  // --- УНИВЕРСАЛЬНЫЙ ОБРАБОТЧИК ДЛЯ ПОЛЕЙ ЦЕНЫ ---
+  const handlePriceInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    // Сохраняем в состояние только цифры
+    const rawValue = e.target.value.replace(/\D/g, '');
+    setter(rawValue);
+  };
+
   return (
     <main className={styles.mainLayout}>
       {/* --- САЙДБАР С ФИЛЬТРАМИ --- */}
@@ -126,19 +143,21 @@ export default function Page() {
           <h3 className={styles.filterTitle}>Начальная цена, ₽</h3>
           <div className={styles.priceFilterInputs}>
             <input
-              type="number"
+              type="text"
               placeholder="от"
-              value={priceFrom}
-              onChange={(e) => setPriceFrom(e.target.value)}
+              value={formatNumberWithSpaces(priceFrom)}
+              onChange={(e) => handlePriceInputChange(e, setPriceFrom)}
               className={styles.priceInput}
+              autoComplete="off"
             />
             <span className={styles.priceSeparator}>–</span>
             <input
-              type="number"
+              type="text"
               placeholder="до"
-              value={priceTo}
-              onChange={(e) => setPriceTo(e.target.value)}
+              value={formatNumberWithSpaces(priceTo)}
+              onChange={(e) => handlePriceInputChange(e, setPriceTo)}
               className={styles.priceInput}
+              autoComplete="off"
             />
           </div>
         </div>
