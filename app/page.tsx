@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import LotCard from '../components/LotCard';
 import styles from './page.module.css';
+import { Lot } from '../types';
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -17,24 +18,6 @@ const IconArrowDown = () => (
     <path d="m19 12-7 7-7-7" />
   </svg>
 );
-
-
-// Определяем тип Lot (можно вынести в types.ts)
-type Lot = {
-  Id: string;
-  Url: string;
-  StartPrice: string;
-  Step: string;
-  Deposit: string;
-  Description: string;
-  BiddingType: string;
-  ViewingProcedure: string;
-  categories: {
-    Id: number;
-    Name: string;
-    LotId: string;
-  }[];
-};
 
 // --- СПИСОК КАТЕГОРИЙ, ЗАДАННЫЙ В КОДЕ ---
 const PREDEFINED_CATEGORIES = [

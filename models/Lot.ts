@@ -19,9 +19,18 @@ Lot.init(
   {
     Id: { type: DataTypes.STRING, primaryKey: true },
     Url: DataTypes.STRING,
-    StartPrice: DataTypes.STRING,
-    Step: DataTypes.STRING,
-    Deposit: DataTypes.STRING,
+    StartPrice: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+    },
+    Step: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+    },
+    Deposit: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+    },
     Description: DataTypes.STRING,
     BiddingType: DataTypes.STRING,
     ViewingProcedure: DataTypes.STRING,

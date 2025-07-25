@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import styles from '../app/page.module.css'; // Импортируем стили из главной страницы
+import styles from '../app/page.module.css';
+import { Lot } from '../types';
+import { formatMoney } from '../utils/format';
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -12,19 +14,6 @@ const IconArrowDown = () => (
     <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
   </svg>
 );
-
-// --- ТИП ДЛЯ ЛОТА (можно вынести в общий файл, например, types/index.ts) ---
-type Lot = {
-  Id: string;
-  Url: string;
-  StartPrice: string;
-  Step: string;
-  Deposit: string;
-  Description: string;
-  BiddingType: string;
-  ViewingProcedure: string;
-  categories: { Id: number; Name: string; LotId: string; }[];
-};
 
 // --- ПРОПСЫ КОМПОНЕНТА ---
 interface LotCardProps {
@@ -45,11 +34,11 @@ export default function LotCard({ lot }: LotCardProps) {
           ) : (
             <span className={styles.iconUp}><IconArrowUp /></span>
           )}
-          <p><b>Стартовая цена:</b> {lot.StartPrice} </p>
+          <p><b>Начальная цена:</b> {formatMoney(lot.StartPrice)}</p>
         </div>
         
-        <p><b>Шаг цены:</b> {lot.Step} </p>
-        <p><b>Задаток:</b> {lot.Deposit} </p>
+        <p><b>Шаг цены:</b> {formatMoney(lot.Step)}</p>
+        <p><b>Задаток:</b> {formatMoney(lot.Deposit)}</p>
         <p><b>Порядок ознакомления:</b> {lot.ViewingProcedure}</p>
         
         {lot.categories && lot.categories.length > 0 && (

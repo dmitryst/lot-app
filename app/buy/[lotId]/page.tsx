@@ -4,21 +4,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './buy.module.css'; // Стили для этой страницы
 import cardStyles from '../../page.module.css'; // Переиспользуем стили карточки
-
-// Тип для лота (можно вынести в отдельный файл types.ts)
-type Lot = {
-  Id: string;
-  Url: string;
-  StartPrice: string;
-  Step: string;
-  Deposit: string;
-  Description: string;
-  ViewingProcedure: string;
-  categories: {
-    Id: number;
-    Name: string;
-  }[];
-};
+import LotCard from '../../../components/LotCard';
 
 export default function BuyLotPage() {
   const params = useParams();
@@ -58,21 +44,7 @@ export default function BuyLotPage() {
     <div className={styles.container}>
       <Link href="/" className={styles.backLink}>← Вернуться к списку лотов</Link>
       
-      {/* Карточка лота */}
-      <div className={`${cardStyles.card} ${styles.lotCard}`}>
-        <h2>{lot.Description}</h2>
-        <p><b>Стартовая цена:</b> {lot.StartPrice} </p>
-        <p><b>Шаг цены:</b> {lot.Step} </p>
-        <p><b>Задаток:</b> {lot.Deposit} </p>
-        <p><b>Порядок ознакомления:</b> {lot.ViewingProcedure}</p>
-        {lot.categories?.length > 0 && (
-          <div className={cardStyles.categoriesContainer}>
-            {lot.categories.map((cat) => (
-              <span key={cat.Id} className={cardStyles.categoryTag}>{cat.Name}</span>
-            ))}
-          </div>
-        )}
-      </div>
+      <LotCard key={lot.Id} lot={lot} />
 
       {/* Информация о покупке */}
       <div className={styles.purchaseInfo}>
