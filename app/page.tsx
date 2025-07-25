@@ -39,6 +39,8 @@ export default function Page() {
   // --- Состояния для фильтров ---
   const [selectedCategory, setSelectedCategory] = useState<string>('Все'); // Выбранная категория
   const [selectedBiddingType, setSelectedBiddingType] = useState<string>('Все');
+  const [priceFrom, setPriceFrom] = useState<string>('');
+  const [priceTo, setPriceTo] = useState<string>('');
 
   // --- Загрузка только лотов при первом рендере ---
   useEffect(() => {
@@ -71,9 +73,25 @@ export default function Page() {
       tempLots = tempLots.filter(lot => lot.BiddingType === selectedBiddingType);
     }
 
+    // 3. Фильтр по цене
+    const from = parseFloat(priceFrom);
+    const to = parseFloat(priceTo);
+
+    if (!isNaN(from) || !isNaN(to)) {
+      tempLots = tempLots.filter(lot => {
+        const lotPrice = lot.StartPrice ? parseFloat(lot.StartPrice) : null;
+        if (lotPrice === null) return false; // Исключаем лоты без цены
+
+        const fromCondition = isNaN(from) || lotPrice >= from;
+        const toCondition = isNaN(to) || lotPrice <= to;
+        
+        return fromCondition && toCondition;
+      });
+    }
+
     setFilteredLots(tempLots);
 
-  }, [selectedCategory, selectedBiddingType, allLots]);
+  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo, allLots]);
 
   return (
     <main className={styles.mainLayout}>
@@ -100,6 +118,28 @@ export default function Page() {
                 {type}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* --- ФИЛЬТР ПО ЦЕНЕ --- */}
+        <div className={styles.filterGroup}>
+          <h3 className={styles.filterTitle}>Начальная цена, ₽</h3>
+          <div className={styles.priceFilterInputs}>
+            <input
+              type="number"
+              placeholder="от"
+              value={priceFrom}
+              onChange={(e) => setPriceFrom(e.target.value)}
+              className={styles.priceInput}
+            />
+            <span className={styles.priceSeparator}>–</span>
+            <input
+              type="number"
+              placeholder="до"
+              value={priceTo}
+              onChange={(e) => setPriceTo(e.target.value)}
+              className={styles.priceInput}
+            />
           </div>
         </div>
       </aside>

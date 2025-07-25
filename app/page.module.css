@@ -232,3 +232,31 @@
   display: grid;
   gap: 24px;
 }
+
+/* Контейнер для полей ввода цены */
+.priceFilterInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Стилизация полей ввода */
+.priceInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  -moz-appearance: textfield; /* Убираем стрелки в Firefox */
+}
+
+/* Убираем стрелки в Chrome, Safari, Edge */
+.priceInput::-webkit-outer-spin-button,
+.priceInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.priceSeparator {
+  color: #999;
+}
