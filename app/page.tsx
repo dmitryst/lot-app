@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import LotCard from '../components/LotCard';
 import styles from './page.module.css';
 
 // --- ИКОНКИ ---
@@ -45,12 +45,17 @@ const PREDEFINED_CATEGORIES = [
   'Прочее',
 ];
 
+const BIDDING_TYPES = ['Открытый аукцион', 'Публичное предложение'];
+
 export default function Page() {
   // --- Состояния компонента ---
   const [allLots, setAllLots] = useState<Lot[]>([]);         // Все лоты с сервера
   const [filteredLots, setFilteredLots] = useState<Lot[]>([]); // Лоты для отображения
-  const [selectedCategory, setSelectedCategory] = useState<string>('Все'); // Выбранная категория
   const [loading, setLoading] = useState(true);
+
+  // --- Состояния для фильтров ---
+  const [selectedCategory, setSelectedCategory] = useState<string>('Все'); // Выбранная категория
+  const [selectedBiddingType, setSelectedBiddingType] = useState<string>('Все');
 
   // --- Загрузка только лотов при первом рендере ---
   useEffect(() => {
@@ -67,89 +72,69 @@ export default function Page() {
       .finally(() => setLoading(false));
   }, []);
 
-  // --- Логика фильтрации при изменении выбранной категории ---
+  // --- Логика фильтрации при изменении выбранной категории, вида торгов ---
   useEffect(() => {
-    if (selectedCategory === 'Все') {
-      setFilteredLots(allLots);
-    } else {
-      const filtered = allLots.filter(lot =>
-        // Проверяем, есть ли у лота категория с нужным именем
+    let tempLots = allLots;
+
+    // 1. Фильтруем по категории
+    if (selectedCategory !== 'Все') {
+      tempLots = tempLots.filter(lot =>
         lot.categories.some(cat => cat.Name === selectedCategory)
       );
-      setFilteredLots(filtered);
     }
-  }, [selectedCategory, allLots]);
+
+    // 2. Фильтруем по виду торгов
+    if (selectedBiddingType !== 'Все') {
+      tempLots = tempLots.filter(lot => lot.BiddingType === selectedBiddingType);
+    }
+
+    setFilteredLots(tempLots);
+
+  }, [selectedCategory, selectedBiddingType, allLots]);
 
   return (
-    <main>
-      {/* Блок фильтров */}
-      <div className={styles.filterContainer}>
-        <button
-          onClick={() => setSelectedCategory('Все')}
-          className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}
-        >
-          Все категории
-        </button>
-        {PREDEFINED_CATEGORIES.map(category => (
-          <button
-            key={category} // Теперь ключ - это сама строка, она уникальна
-            onClick={() => setSelectedCategory(category)}
-            className={selectedCategory === category ? styles.activeFilter : styles.filterButton}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* Отображение лотов */}
-      {loading ? (
-        <p style={{ textAlign: 'center' }}>Загрузка лотов...</p>
-      ) : (
-        <div className={styles.lotsGrid}>
-          {filteredLots.length > 0 ? (
-            filteredLots.map((lot) => (
-              <div key={lot.Id} className={styles.card}>
-                <div className={styles.cardContent}>
-                  <a href={lot.Url} target="_blank" rel="noopener noreferrer">
-                    <h2>{lot.Description}</h2>
-                  </a>
-
-                  <div className={styles.priceLine}>
-                  {lot.BiddingType === 'Публичное предложение' ? (
-                    <span className={styles.iconDown}><IconArrowDown /></span>
-                  ) : (
-                    <span className={styles.iconUp}><IconArrowUp /></span>
-                  )}
-                  <p><b>Стартовая цена:</b> {lot.StartPrice} ₽</p>
-                </div>
-
-                  <p><b>Шаг цены:</b> {lot.Step} </p>
-                  <p><b>Задаток:</b> {lot.Deposit} </p>
-                  <p><b>Порядок ознакомления:</b> {lot.ViewingProcedure}</p>
-                  
-                  {lot.categories?.length > 0 && (
-                    <div className={styles.categoriesContainer}>
-                      {lot.categories.map((cat) => (
-                        <span key={cat.Id} className={styles.categoryTag}>
-                          {cat.Name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                <div className={styles.cardFooter}>
-                  <Link href={`/buy/${lot.Id}`} className={styles.buyButton}>
-                    Купить через агента
-                  </Link>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p style={{ textAlign: 'center' }}>Лоты в данной категории не найдены.</p>
-          )}
+    <main className={styles.mainLayout}>
+      {/* --- САЙДБАР С ФИЛЬТРАМИ --- */}
+      <aside className={styles.sidebar}>
+        <div className={styles.filterGroup}>
+          <h3 className={styles.filterTitle}>Категории</h3>
+          <div className={styles.filterOptions}>
+            <button onClick={() => setSelectedCategory('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+            {PREDEFINED_CATEGORIES.map(category => (
+              <button key={category} onClick={() => setSelectedCategory(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
-      )}
+
+        <div className={styles.filterGroup}>
+          <h3 className={styles.filterTitle}>Вид торгов</h3>
+          <div className={styles.filterOptions}>
+            <button onClick={() => setSelectedBiddingType('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+            {BIDDING_TYPES.map(type => (
+              <button key={type} onClick={() => setSelectedBiddingType(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      {/* --- ОСНОВНОЙ КОНТЕНТ (СПИСОК ЛОТОВ) --- */}
+      <div className={styles.contentArea}>
+        {loading ? (
+          <p>Загрузка лотов...</p>
+        ) : filteredLots.length > 0 ? (
+          <div className={styles.lotsGrid}>
+            {filteredLots.map((lot) => (
+              <LotCard key={lot.Id} lot={lot} />
+            ))}
+          </div>
+        ) : (
+          <p>По вашему запросу лотов не найдено.</p>
+        )}
+      </div>
     </main>
   );
 }
