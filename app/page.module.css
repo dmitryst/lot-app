@@ -126,3 +126,29 @@
   font-size: 0.9rem;
   cursor: pointer;
 }
+
+/* Контейнер для цены и иконки */
+.priceLine {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Расстояние между иконкой и текстом */
+}
+
+/* Убираем лишний отступ у параграфа с ценой */
+.priceLine p {
+  margin: 8px 0; /* Такой же, как у остальных параграфов */
+}
+
+/* Стиль для иконки "цена вверх" (зеленая) */
+.iconUp {
+  color: #28a745;
+  display: flex;
+  align-items: center;
+}
+
+/* Стиль для иконки "цена вниз" (красная) */
+.iconDown {
+  color: #dc3545;
+  display: flex;
+  align-items: center;
+}

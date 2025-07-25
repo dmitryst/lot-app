@@ -3,6 +3,22 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
+// --- ИКОНКИ ---
+const IconArrowUp = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 19V5" />
+    <path d="m5 12 7-7 7 7" />
+  </svg>
+);
+
+const IconArrowDown = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 5v14" />
+    <path d="m19 12-7 7-7-7" />
+  </svg>
+);
+
+
 // Определяем тип Lot (можно вынести в types.ts)
 type Lot = {
   Id: string;
@@ -11,6 +27,7 @@ type Lot = {
   Step: string;
   Deposit: string;
   Description: string;
+  BiddingType: string;
   ViewingProcedure: string;
   categories: {
     Id: number;
@@ -96,7 +113,16 @@ export default function Page() {
                   <a href={lot.Url} target="_blank" rel="noopener noreferrer">
                     <h2>{lot.Description}</h2>
                   </a>
-                  <p><b>Стартовая цена:</b> {lot.StartPrice} </p>
+
+                  <div className={styles.priceLine}>
+                  {lot.BiddingType === 'Публичное предложение' ? (
+                    <span className={styles.iconDown}><IconArrowDown /></span>
+                  ) : (
+                    <span className={styles.iconUp}><IconArrowUp /></span>
+                  )}
+                  <p><b>Стартовая цена:</b> {lot.StartPrice} ₽</p>
+                </div>
+
                   <p><b>Шаг цены:</b> {lot.Step} </p>
                   <p><b>Задаток:</b> {lot.Deposit} </p>
                   <p><b>Порядок ознакомления:</b> {lot.ViewingProcedure}</p>

@@ -9,6 +9,7 @@ export class Lot extends Model {
   public Step!: string;
   public Deposit!: string;
   public Description!: string;
+  public BiddingType!: string;
   public ViewingProcedure!: string;
 
   public categories?: LotCategory[];
@@ -22,6 +23,7 @@ Lot.init(
     Step: DataTypes.STRING,
     Deposit: DataTypes.STRING,
     Description: DataTypes.STRING,
+    BiddingType: DataTypes.STRING,
     ViewingProcedure: DataTypes.STRING,
   },
   {
