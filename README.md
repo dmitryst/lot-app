@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Приложение Lot App
 
-## Getting Started
+Это веб-приложение на Next.js для отображения и фильтрации аукционных лотов. Приложение упаковано в Docker для обеспечения консистентности окружения и простоты развертывания.
 
-First, run the development server:
+## ⚙️ Технологический стек
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+-   **Frontend:** Next.js, React, TypeScript
+-   **Backend:** Next.js API Routes
+-   **База данных:** PostgreSQL
+-   **ORM:** Sequelize
+-   **Окружение:** Docker, Docker Compose
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Начало работы
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Предварительные требования
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Перед началом убедитесь, что у вас установлены:
 
-## Learn More
+-   **Node.js** (рекомендуется версия v18 или выше)
+-   **npm** (обычно устанавливается вместе с Node.js)
+-   **Docker** и **Docker Compose**
 
-To learn more about Next.js, take a look at the following resources:
+*Вам не нужно устанавливать PostgreSQL локально, если вы планируете использовать только Docker, так как он будет запущен в своем собственном контейнере.*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 1. Установка
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Клонируйте репозиторий:**
+    ```
+    git clone <URL вашего репозитория>
+    cd <название-папки-проекта>
+    ```
 
-## Deploy on Vercel
+2.  **Установите зависимости (для работы с VS Code и локальной разработки):**
+    ```
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 2. Конфигурация
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Приложение использует переменные окружения для подключения к базе данных.
+
+1.  Создайте в корне проекта файл с именем `.env`.
+2.  Скопируйте в него содержимое ниже. **Этот файл никогда не должен попадать в Git.**
+
+    ```
+    # Переменные для подключения к базе данных PostgreSQL
+    POSTGRES_DB=lot_db
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=your_secret_password_here
+    POSTGRES_HOST=postgres
+    ```
+
+## 🛠️ Запуск приложения
+
+Вы можете запустить приложение двумя способами.
+
+### Способ 1: Через Docker (Рекомендуемый)
+
+Этот способ запускает и приложение, и базу данных в изолированных контейнерах. Это идеальный вариант для получения окружения, максимально приближенного к production.
+
+1.  Убедитесь, что в вашем `.env` файле `POSTGRES_HOST` установлен как `postgres`.
+    ```
+    POSTGRES_HOST=postgres
+    ```
+
+2.  Соберите и запустите все сервисы с помощью Docker Compose:
+    ```
+    docker-compose up --build
+    ```
+    *Флаг `--build` необходим при первом запуске или если вы внесли изменения в `Dockerfile` или код приложения.*
+
+3.  Приложение будет доступно по адресу [http://localhost:3000](http://localhost:3000).
+
+### Способ 2: Локальный Dev Server (Для активной разработки)
+
+Этот способ идеально подходит для разработки, так как он поддерживает **горячую перезагрузку (Hot Reloading)** — изменения в коде мгновенно отображаются в браузере.
+
+1.  Убедитесь, что у вас **локально установлен и запущен PostgreSQL сервер**.
+2.  В вашем `.env` файле измените `POSTGRES_HOST` на `localhost`.
+    ```
+    POSTGRES_HOST=localhost
+    ```
+
+3.  Запустите dev-сервер Next.js:
+    ```
+    npm run dev
+    ```
+
+4.  Откройте в браузере [http://localhost:3000](http://localhost:3000).
+
