@@ -1,10 +1,12 @@
+// app/buy/[lotId]/page.tsx
+
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './buy.module.css'; // Стили для этой страницы
-import cardStyles from '../../page.module.css'; // Переиспользуем стили карточки
 import LotCard from '../../../components/LotCard';
+import { Lot } from '../../../types';
 
 export default function BuyLotPage() {
   const params = useParams();

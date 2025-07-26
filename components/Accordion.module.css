@@ -1,0 +1,39 @@
+.accordion {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-start; /* не растаскиваем элементы (иконку) по краям карточки */
+  align-items: center;
+  gap: 8px; /* <-- Добавляем небольшой отступ между текстом и иконкой */
+  cursor: pointer; /* меняет курсор на "руку" */
+  user-select: none; /* Чтобы текст не выделялся при клике */
+  color: #4a5568;
+  transition: color 0.2s; /* Плавный переход цвета */
+}
+
+/* Делаем заголовок ярче при наведении */
+.header:hover {
+  color: #0070f3; /* Яркий цвет при наведении */
+}
+
+.content {
+  padding-top: 12px;
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap; /* Сохраняет переносы строк из базы данных */
+}
+
+/* Стили для самой иконки */
+.chevron {
+  transition: transform 0.2s ease-in-out; /* Плавный поворот */
+  color: #718096;
+}
+
+.header:hover .chevron {
+  color: #0070f3; /* Иконка тоже меняет цвет при наведении */
+}

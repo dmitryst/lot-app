@@ -2,6 +2,7 @@ import Link from 'next/link';
 import styles from '../app/page.module.css';
 import { Lot } from '../types';
 import { formatMoney } from '../utils/format';
+import Accordion from './Accordion';
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -39,7 +40,12 @@ export default function LotCard({ lot }: LotCardProps) {
         
         <p><b>Шаг цены:</b> {formatMoney(lot.Step)}</p>
         <p><b>Задаток:</b> {formatMoney(lot.Deposit)}</p>
-        <p><b>Порядок ознакомления:</b> {lot.ViewingProcedure}</p>
+
+        {lot.ViewingProcedure && (
+          <Accordion title="Порядок ознакомления">
+            {lot.ViewingProcedure}
+          </Accordion>
+        )}
         
         {lot.categories && lot.categories.length > 0 && (
           <div className={styles.categoriesContainer}>
