@@ -127,30 +127,35 @@
   cursor: pointer;
 }
 
-/* Контейнер для цены и иконки */
-.priceLine {
+/* КЛАСС для параграфов с ценой */
+.priceDetail {
   display: flex;
   align-items: center;
-  gap: 8px; /* Расстояние между иконкой и текстом */
+  flex-wrap: wrap; /* Позволяет переноситься, если не влезает */
+  gap: 0 8px; /* Отступ 8px по горизонтали, 0 по вертикали */
+  margin: 8px 0;
 }
 
-/* Убираем лишний отступ у параграфа с ценой */
-.priceLine p {
-  margin: 8px 0; /* Такой же, как у остальных параграфов */
+/* КЛАСС для самой цены */
+.priceValue {
+  font-weight: 600; /* Делаем жирнее */
+  font-size: 1.05rem; /* Немного увеличиваем размер */
+  color: #1a202c; /* Делаем темнее, чем основной текст */
 }
 
-/* Стиль для иконки "цена вверх" (зеленая) */
+/* Изменяем позиционирование иконок */
+.iconUp, .iconDown {
+  display: flex;
+  align-items: center;
+  /* margin-left: 8px; был раньше, теперь используем gap в .priceDetail */
+}
+
 .iconUp {
   color: #28a745;
-  display: flex;
-  align-items: center;
 }
 
-/* Стиль для иконки "цена вниз" (красная) */
 .iconDown {
   color: #dc3545;
-  display: flex;
-  align-items: center;
 }
 
 /* --- НОВЫЙ ДВУХКОЛОНОЧНЫЙ МАКЕТ --- */
