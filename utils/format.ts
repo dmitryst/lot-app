@@ -1,6 +1,6 @@
 export function formatMoney(value: string | number | null): string {
   if (value === null || value === undefined) {
-    return '-';
+    return 'Цена не найдена';
   }
 
   // Преобразуем значение в число, если оно является строкой
