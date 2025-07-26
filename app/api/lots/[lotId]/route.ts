@@ -1,18 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { sequelize } from '@/lib/db';
 import { Lot } from '@/models/Lot';
 import { LotCategory } from '@/models/LotCategory';
 
-// Типизация параметров из URL
-interface RouteParams {
-  params: {
-    lotId: string;
-  };
-}
-
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(request: NextRequest) {
   try {
-    const { lotId } = params;
+    const { pathname } = request.nextUrl;
+    // Разделяем путь по '/' (например, ['', 'api', 'lots', '123'])
+    const segments = pathname.split('/');
+    // Берем последний сегмент, который и является нашим ID
+    const lotId = segments[segments.length - 1];
+
     await sequelize.authenticate();
 
     // Ищем лот по его первичному ключу (Id)
