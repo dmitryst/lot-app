@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: ./lot-app
       # Передаем переменные из .env в качестве аргументов на этап сборки
       args:
         - POSTGRES_DB=${POSTGRES_DB}
