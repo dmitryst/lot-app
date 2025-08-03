@@ -1,3 +1,7 @@
+networks:
+  lot-app-net:
+    driver: bridge
+
 services:
   app:
     build:
@@ -17,6 +21,8 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+    networks:
+      - lot-app-net
 
   postgres:
     image: postgres:16
@@ -36,6 +42,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - lot-app-net
 
   parser:
     build:
@@ -53,6 +61,8 @@ services:
       # Парсер будет ждать, пока postgres не станет 'healthy'
       postgres:
         condition: service_healthy
+    networks:
+      - lot-app-net
 
 volumes:
   pgdata:
