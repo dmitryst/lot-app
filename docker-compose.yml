@@ -63,6 +63,7 @@ services:
         condition: service_healthy
     networks:
       - lot-app-net
+    shm_size: 256m
 
 volumes:
   pgdata:
