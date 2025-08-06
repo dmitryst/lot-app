@@ -18,6 +18,7 @@ ARG POSTGRES_DB
 ARG POSTGRES_USER
 ARG POSTGRES_PASSWORD
 ARG POSTGRES_HOST
+ARG POSTGRES_PORT
 ARG NODE_ENV=production
 
 # Устанавливаем эти аргументы как переменные окружения для этого этапа
@@ -25,7 +26,17 @@ ENV POSTGRES_DB=$POSTGRES_DB
 ENV POSTGRES_USER=$POSTGRES_USER
 ENV POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 ENV POSTGRES_HOST=$POSTGRES_HOST
+ENV POSTGRES_PORT=$POSTGRES_PORT
 ENV NODE_ENV=$NODE_ENV
+
+# Выводим переменные окружения на этапе сборки
+RUN echo "--- Build-time environment variables ---" && \
+    echo "NODE_ENV: $NODE_ENV" && \
+    echo "POSTGRES_DB: $POSTGRES_DB" && \
+    echo "POSTGRES_USER: $POSTGRES_USER" && \
+    echo "POSTGRES_HOST: $POSTGRES_HOST" && \
+    echo "POSTGRES_PORT: $POSTGRES_PORT" && \
+    echo "----------------------------------------"
 
 # Копируем зависимости с предыдущего этапа
 COPY --from=deps /app/node_modules ./node_modules
