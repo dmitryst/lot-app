@@ -62,7 +62,7 @@ export default function Page() {
 
     // 2. Фильтруем по виду торгов
     if (selectedBiddingType !== 'Все') {
-      tempLots = tempLots.filter(lot => lot.BiddingType === selectedBiddingType);
+      tempLots = tempLots.filter(lot => lot.Bidding.Type === selectedBiddingType);
     }
 
     // 3. Фильтр по цене

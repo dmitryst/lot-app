@@ -1,43 +1,43 @@
-import { DataTypes, Model, HasManyCreateAssociationMixin } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../lib/db';
+import { Bidding } from './Bidding';
 import { LotCategory } from './LotCategory';
 
-export class Lot extends Model {
-  public Id!: string;
-  public Url!: string;
-  public StartPrice!: string;
-  public Step!: string;
-  public Deposit!: string;
-  public Description!: string;
-  public BiddingType!: string;
-  public ViewingProcedure!: string;
-
-  public categories?: LotCategory[];
+interface LotAttributes {
+  Id: string;
+  LotNumber?: string;
+  StartPrice?: number;
+  Step?: number;
+  Deposit?: number;
+  Description?: string;
+  CreatedAt: Date;
+  BiddingId: string;
 }
+
+export class Lot extends Model<LotAttributes> {}
 
 Lot.init(
   {
-    Id: { type: DataTypes.STRING, primaryKey: true },
-    Url: DataTypes.STRING,
-    StartPrice: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
+    Id: { type: DataTypes.UUID, primaryKey: true },
+    LotNumber: { type: DataTypes.TEXT },
+    StartPrice: { type: DataTypes.DECIMAL },
+    Step: { type: DataTypes.DECIMAL },
+    Deposit: { type: DataTypes.DECIMAL },
+    Description: { type: DataTypes.TEXT },
+    CreatedAt: { type: DataTypes.DATE, allowNull: false },
+    BiddingId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Bidding',
+        key: 'Id',
+      },
     },
-    Step: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-    },
-    Deposit: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-    },
-    Description: DataTypes.STRING,
-    BiddingType: DataTypes.STRING,
-    ViewingProcedure: DataTypes.STRING,
   },
   {
-    tableName: 'Lots',
     sequelize,
+    modelName: 'Lot',
+    tableName: 'Lots',
     timestamps: false,
   }
 );

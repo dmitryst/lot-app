@@ -70,22 +70,5 @@ services:
   #     - lot-app-net
   #   shm_size: 512m
 
-  migration-runner:
-    build:
-      context: ./parser/Lots.Data
-      dockerfile: Dockerfile
-    container_name: migration-runner
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - lot-app-net
-    environment:
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
-    # 1. Переопределяем точку входа, чтобы она указывала на саму утилиту dotnet
-    entrypoint: [ "dotnet" ]
-    # 2. Теперь command правильно дополнит entrypoint, чтобы получилась команда "dotnet ef database update"
-    command: [ "ef", "database", "update" ]
-
 volumes:
   pgdata:

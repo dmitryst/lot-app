@@ -30,9 +30,9 @@ export default function LotCard({ lot }: LotCardProps) {
                 </a>
 
                 <p className={styles.priceDetail}>
-                    <b>Начальная цена:</b>
+                    Начальная цена:
                     <span className={styles.priceValue}>{formatMoney(lot.StartPrice)}</span>
-                    {lot.BiddingType === 'Публичное предложение' ? (
+                    {lot.Bidding.Type === 'Публичное предложение' ? (
                         <span className={styles.iconDown}><IconArrowDown /></span>
                     ) : (
                         <span className={styles.iconUp}><IconArrowUp /></span>
@@ -41,21 +41,21 @@ export default function LotCard({ lot }: LotCardProps) {
 
                 {lot.Step && (
                     <p className={styles.priceDetail}>
-                        <b>Шаг цены:</b>
+                        Шаг цены:
                         <span className={styles.priceValue}>{formatMoney(lot.Step)}</span>
                     </p>
                 )}
 
                 {lot.Deposit && (
                     <p className={styles.priceDetail}>
-                        <b>Задаток:</b>
+                        Задаток:
                         <span className={styles.priceValue}>{formatMoney(lot.Deposit)}</span>
                     </p>
                 )}
 
-                {lot.ViewingProcedure && (
+                {lot.Bidding.ViewingProcedure && (
                     <Accordion title="Порядок ознакомления">
-                        {lot.ViewingProcedure}
+                        {lot.Bidding.ViewingProcedure}
                     </Accordion>
                 )}
 

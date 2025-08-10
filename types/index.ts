@@ -1,15 +1,19 @@
+type BiddingInfo = {
+  Type: string;
+  ViewingProcedure?: string;
+};
+
 export type Lot = {
   Id: string;
-  Url: string;
+  Url?: string;
   StartPrice: string | null;
+  Description: string;
   Step: string | null;
   Deposit: string | null;
-  Description: string;
-  BiddingType: string;
-  ViewingProcedure: string;
+  isFavorite: boolean;
+  Bidding: BiddingInfo;
   categories: {
     Id: number;
     Name: string;
-    LotId: string;
   }[];
 };

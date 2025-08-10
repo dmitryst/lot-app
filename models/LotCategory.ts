@@ -10,16 +10,28 @@ export class LotCategory extends Model {
 
 LotCategory.init(
   {
-    Id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    Name: DataTypes.STRING,
-    LotId: DataTypes.STRING,
+    Id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    Name: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    LotId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Lots',
+        key: 'Id',
+      },
+    },
   },
   {
-    tableName: 'LotCategories',
     sequelize,
+    modelName: 'LotCategory',
+    tableName: 'LotCategories',
     timestamps: false,
   }
 );
-
-Lot.hasMany(LotCategory, { foreignKey: 'LotId', sourceKey: 'Id', as: 'categories' });
-LotCategory.belongsTo(Lot, { foreignKey: 'LotId', targetKey: 'Id' });

@@ -1,7 +1,9 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { sequelize } from '@/lib/db';
 import { Lot } from '@/models/Lot';
+import { Bidding } from '@/models/Bidding';
 import { LotCategory } from '@/models/LotCategory';
+import '@/models/associations'; 
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +17,10 @@ export async function GET(request: NextRequest) {
 
     // Ищем лот по его первичному ключу (Id)
     const lot = await Lot.findByPk(lotId, {
-      include: [{ model: LotCategory, as: 'categories' }],
+      include: [
+        { model: Bidding, as: 'Bidding', attributes: ['Type', 'ViewingProcedure'] },
+        { model: LotCategory, as: 'categories', attributes: ['Id', 'Name'] },
+      ],
     });
 
     if (!lot) {
