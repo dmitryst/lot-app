@@ -265,3 +265,60 @@
 .priceSeparator {
   color: #999;
 }
+
+/* --- Стили для кнопки "Опубликовать в PROD" --- */
+.publishButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: 1px solid #e2e8f0; /* Легкая рамка по умолчанию */
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%; /* Круглая кнопка */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718096; /* Цвет иконки по умолчанию */
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Легкая тень */
+  z-index: 10; /* Убедимся, что кнопка поверх других элементов */
+}
+
+.publishButton:hover:not(:disabled) {
+  color: #0070f3; /* Синий при наведении */
+  border-color: #0070f3;
+  background-color: rgba(0, 112, 243, 0.1); /* Светло-синий фон при наведении */
+}
+
+.publishButton.loading {
+  cursor: wait;
+  /* Анимация вращения для иконки загрузки */
+  animation: spin 1s linear infinite;
+  color: #0070f3;
+  border-color: #0070f3;
+}
+
+.publishButton.success {
+  cursor: default;
+  color: #28a745; /* Зеленый при успехе */
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.publishButton.error {
+  cursor: default;
+  color: #dc3545; /* Красный при ошибке */
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Анимация вращения */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
