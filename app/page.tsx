@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import LotCard from '../components/LotCard';
 import styles from './page.module.css';
@@ -7,7 +8,7 @@ import { Lot } from '../types';
 // --- СПИСОК КАТЕГОРИЙ, ЗАДАННЫЙ В КОДЕ ---
 const PREDEFINED_CATEGORIES = [
   'Автомобили',
-  'Дебиторская задолженность',
+  'Права требования (дебиторская задолженность)',
   'Земельные участки',
   'Жилые здания (помещения)',
   'Прочее',
@@ -34,6 +35,9 @@ export default function Page() {
   const [priceFrom, setPriceFrom] = useState<string>('');
   const [priceTo, setPriceTo] = useState<string>('');
 
+  // Состояние для видимости фильтров на мобильных
+  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+
   // --- Загрузка только лотов при первом рендере ---
   useEffect(() => {
     fetch('/api/lots')
@@ -49,7 +53,7 @@ export default function Page() {
       .finally(() => setLoading(false));
   }, []);
 
-  // --- Логика фильтрации при изменении выбранной категории, вида торгов ---
+  // --- Логика фильтрации ---
   useEffect(() => {
     let tempLots = allLots;
 
@@ -95,73 +99,82 @@ export default function Page() {
     setter(rawValue);
   };
 
+  // --- JSX для рендеринга фильтров ---
+  const filtersSidebarContent = (
+    <>
+      <div className={styles.filterGroup}>
+        <h3 className={styles.filterTitle}>Категории</h3>
+        <div className={styles.buttonGroup}>
+          <button onClick={() => setSelectedCategory('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+          {PREDEFINED_CATEGORIES.map(category => (
+            <button key={category} onClick={() => setSelectedCategory(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>{category}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.filterGroup}>
+        <h3 className={styles.filterTitle}>Вид торгов</h3>
+        <div className={styles.buttonGroup}>
+          <button onClick={() => setSelectedBiddingType('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+          {BIDDING_TYPES.map(type => (
+            <button key={type} onClick={() => setSelectedBiddingType(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>{type}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.filterGroup}>
+        <h3 className={styles.filterTitle}>Начальная цена, ₽</h3>
+        <div className={styles.priceFilterInputs}>
+          <input
+            type="text"
+            className={styles.priceInput}
+            placeholder="от"
+            value={formatNumberWithSpaces(priceFrom)}
+            onChange={(e) => handlePriceInputChange(e, setPriceFrom)}
+          />
+          <span className={styles.priceSeparator}>—</span>
+          <input
+            type="text"
+            className={styles.priceInput}
+            placeholder="до"
+            value={formatNumberWithSpaces(priceTo)}
+            onChange={(e) => handlePriceInputChange(e, setPriceTo)}
+          />
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    <main className={styles.mainLayout}>
-      {/* --- САЙДБАР С ФИЛЬТРАМИ --- */}
-      <aside className={styles.sidebar}>
-        <div className={styles.filterGroup}>
-          <h3 className={styles.filterTitle}>Категории</h3>
-          <div className={styles.filterOptions}>
-            <button onClick={() => setSelectedCategory('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
-            {PREDEFINED_CATEGORIES.map(category => (
-              <button key={category} onClick={() => setSelectedCategory(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
+    <main className={styles.main}>
+      {/* --- Контейнер для фильтров (Сайдбар) --- */}
+      <div className={styles.filtersContainer}>
+        <button
+          className={styles.toggleFiltersButton}
+          onClick={() => setIsFiltersVisible(!isFiltersVisible)}
+        >
+          {isFiltersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
+        </button>
+        {/* Вот здесь мы добавляем классы для сайдбара */}
+        <aside className={`${styles.sidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
+          {filtersSidebarContent}
+        </aside>
+      </div>
 
-        <div className={styles.filterGroup}>
-          <h3 className={styles.filterTitle}>Вид торгов</h3>
-          <div className={styles.filterOptions}>
-            <button onClick={() => setSelectedBiddingType('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
-            {BIDDING_TYPES.map(type => (
-              <button key={type} onClick={() => setSelectedBiddingType(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* --- ФИЛЬТР ПО ЦЕНЕ --- */}
-        <div className={styles.filterGroup}>
-          <h3 className={styles.filterTitle}>Начальная цена, ₽</h3>
-          <div className={styles.priceFilterInputs}>
-            <input
-              type="text"
-              placeholder="от"
-              value={formatNumberWithSpaces(priceFrom)}
-              onChange={(e) => handlePriceInputChange(e, setPriceFrom)}
-              className={styles.priceInput}
-              autoComplete="off"
-            />
-            <span className={styles.priceSeparator}>–</span>
-            <input
-              type="text"
-              placeholder="до"
-              value={formatNumberWithSpaces(priceTo)}
-              onChange={(e) => handlePriceInputChange(e, setPriceTo)}
-              className={styles.priceInput}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-      </aside>
-
-      {/* --- ОСНОВНОЙ КОНТЕНТ (СПИСОК ЛОТОВ) --- */}
-      <div className={styles.contentArea}>
+      {/* --- Контейнер для основного контента (Лоты) --- */}
+      <section className={styles.contentArea}>
         {loading ? (
           <p>Загрузка лотов...</p>
         ) : filteredLots.length > 0 ? (
           <div className={styles.lotsGrid}>
-            {filteredLots.map((lot) => (
+            {filteredLots.map((lot: Lot) => (
               <LotCard key={lot.Id} lot={lot} />
             ))}
           </div>
         ) : (
           <p>По вашему запросу лотов не найдено.</p>
         )}
-      </div>
+      </section>
     </main>
   );
 }
