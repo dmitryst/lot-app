@@ -46,7 +46,7 @@ export default function BuyLotPage() {
     <div className={styles.container}>
       <Link href="/" className={styles.backLink}>← Вернуться к списку лотов</Link>
       
-      <LotCard key={lot.Id} lot={lot} />
+      <LotCard key={lot.id} lot={lot} />
 
       {/* Информация о покупке */}
       <div className={styles.purchaseInfo}>

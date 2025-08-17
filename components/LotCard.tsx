@@ -63,7 +63,7 @@ export default function LotCard({ lot }: LotCardProps) {
                 throw new Error('URL бэкенда не настроен. Проверьте переменную NEXT_PUBLIC_CSHARP_BACKEND_URL.');
             }
 
-            const response = await fetch(`${apiUrl}/api/lots/${lot.Id}/copy-to-prod`, {
+            const response = await fetch(`${apiUrl}/api/lots/${lot.id}/copy-to-prod`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,45 +111,45 @@ export default function LotCard({ lot }: LotCardProps) {
             </button>
 
             <div className={styles.cardContent}>
-                <a href={lot.Url} target="_blank" rel="noopener noreferrer">
-                    <h2>{lot.Description}</h2>
+                <a href={lot.url} target="_blank" rel="noopener noreferrer">
+                    <h2>{lot.description}</h2>
                 </a>
 
                 <p className={styles.priceDetail}>
                     Начальная цена:
-                    <span className={styles.priceValue}>{formatMoney(lot.StartPrice)}</span>
-                    {lot.Bidding.Type === 'Публичное предложение' ? (
+                    <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>
+                    {lot.bidding.type === 'Публичное предложение' ? (
                         <span className={styles.iconDown}><IconArrowDown /></span>
                     ) : (
                         <span className={styles.iconUp}><IconArrowUp /></span>
                     )}
                 </p>
 
-                {lot.Step && (
+                {lot.step && (
                     <p className={styles.priceDetail}>
                         Шаг цены:
-                        <span className={styles.priceValue}>{formatMoney(lot.Step)}</span>
+                        <span className={styles.priceValue}>{formatMoney(lot.step)}</span>
                     </p>
                 )}
 
-                {lot.Deposit && (
+                {lot.deposit && (
                     <p className={styles.priceDetail}>
                         Задаток:
-                        <span className={styles.priceValue}>{formatMoney(lot.Deposit)}</span>
+                        <span className={styles.priceValue}>{formatMoney(lot.deposit)}</span>
                     </p>
                 )}
 
-                {lot.Bidding.ViewingProcedure && (
+                {lot.bidding.viewingProcedure && (
                     <Accordion title="Порядок ознакомления">
-                        {lot.Bidding.ViewingProcedure}
+                        {lot.bidding.viewingProcedure}
                     </Accordion>
                 )}
 
                 {lot.categories && lot.categories.length > 0 && (
                     <div className={styles.categoriesContainer}>
                         {lot.categories.map((cat) => (
-                            <span key={cat.Id} className={styles.categoryTag}>
-                                {cat.Name}
+                            <span key={cat.id} className={styles.categoryTag}>
+                                {cat.name}
                             </span>
                         ))}
                     </div>
@@ -157,7 +157,7 @@ export default function LotCard({ lot }: LotCardProps) {
             </div>
 
             <div className={styles.cardFooter}>
-                <Link href={`/buy/${lot.Id}`} className={styles.buyButton}>
+                <Link href={`/buy/${lot.id}`} className={styles.buyButton}>
                     Купить через агента
                 </Link>
             </div>

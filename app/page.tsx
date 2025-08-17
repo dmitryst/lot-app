@@ -23,11 +23,17 @@ const formatNumberWithSpaces = (value: string) => {
   return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
 
+const PAGE_SIZE = 10;
+
 export default function Page() {
   // --- Состояния компонента ---
   const [allLots, setAllLots] = useState<Lot[]>([]);         // Все лоты с сервера
   const [filteredLots, setFilteredLots] = useState<Lot[]>([]); // Лоты для отображения
   const [loading, setLoading] = useState(true);
+
+  // --- Состояния для пагинации ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   // --- Состояния для фильтров ---
   const [selectedCategory, setSelectedCategory] = useState<string>('Все'); // Выбранная категория
@@ -40,33 +46,42 @@ export default function Page() {
 
   // --- Загрузка только лотов при первом рендере ---
   useEffect(() => {
-    fetch('/api/lots')
+    setLoading(true);
+    const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+    if (!apiUrl) {
+      console.error("URL бэкенда не настроен.");
+      setLoading(false);
+      return;
+    }
+
+    fetch(`${apiUrl}/api/lots?pageNumber=${currentPage}&pageSize=${PAGE_SIZE}`)
       .then((res) => {
         if (!res.ok) throw new Error('Не удалось загрузить лоты');
         return res.json();
       })
-      .then((lotsData) => {
-        setAllLots(lotsData);
-        setFilteredLots(lotsData); // Изначально показываем все лоты
+      .then((data) => {
+        setAllLots(data.items);
+        setFilteredLots(data.items); // Изначально показываем все лоты с текущей страницы
+        setTotalPages(data.totalPages);
       })
       .catch(error => console.error("Ошибка при загрузке лотов:", error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [currentPage]); // Перезагружаем данные при изменении currentPage
 
-  // --- Логика фильтрации ---
+  // --- Логика фильтрации (работает для лотов на текущей странице) ---
   useEffect(() => {
-    let tempLots = allLots;
+    let tempLots = [...allLots];
 
     // 1. Фильтруем по категории
     if (selectedCategory !== 'Все') {
       tempLots = tempLots.filter(lot =>
-        lot.categories.some(cat => cat.Name === selectedCategory)
+        lot.categories.some(cat => cat.name === selectedCategory)
       );
     }
 
     // 2. Фильтруем по виду торгов
     if (selectedBiddingType !== 'Все') {
-      tempLots = tempLots.filter(lot => lot.Bidding.Type === selectedBiddingType);
+      tempLots = tempLots.filter(lot => lot.bidding.type === selectedBiddingType);
     }
 
     // 3. Фильтр по цене
@@ -75,12 +90,12 @@ export default function Page() {
 
     if (!isNaN(from) || !isNaN(to)) {
       tempLots = tempLots.filter(lot => {
-        const lotPrice = lot.StartPrice ? parseFloat(lot.StartPrice) : null;
+        const lotPrice = lot.startPrice ? parseFloat(lot.startPrice) : null;
         if (lotPrice === null) return false; // Исключаем лоты без цены
 
         const fromCondition = isNaN(from) || lotPrice >= from;
         const toCondition = isNaN(to) || lotPrice <= to;
-        
+
         return fromCondition && toCondition;
       });
     }
@@ -98,6 +113,19 @@ export default function Page() {
     const rawValue = e.target.value.replace(/\D/g, '');
     setter(rawValue);
   };
+
+  // --- JSX для пагинации ---
+  const paginationControls = (
+    <div className={styles.pagination}>
+      <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage <= 1}>
+        Назад
+      </button>
+      <span>Стр. {currentPage} из {totalPages}</span>
+      <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages}>
+        Вперед
+      </button>
+    </div>
+  );
 
   // --- JSX для рендеринга фильтров ---
   const filtersSidebarContent = (
@@ -166,11 +194,14 @@ export default function Page() {
         {loading ? (
           <p>Загрузка лотов...</p>
         ) : filteredLots.length > 0 ? (
-          <div className={styles.lotsGrid}>
-            {filteredLots.map((lot: Lot) => (
-              <LotCard key={lot.Id} lot={lot} />
-            ))}
-          </div>
+          <>
+            <div className={styles.lotsGrid}>
+              {filteredLots.map((lot: Lot) => (
+                <LotCard key={lot.id} lot={lot} />
+              ))}
+            </div>
+            {paginationControls}
+          </>
         ) : (
           <p>По вашему запросу лотов не найдено.</p>
         )}
