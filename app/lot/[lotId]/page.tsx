@@ -1,10 +1,10 @@
-// app/buy/[lotId]/page.tsx
+// app/lot/[lotId]/page.tsx
 
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import styles from './buy.module.css'; // Стили для этой страницы
+import styles from './lot.module.css'; // Стили для этой страницы
 import LotCard from '../../../components/LotCard';
 import { Lot } from '../../../types';
 

@@ -14,6 +14,7 @@ services:
         - POSTGRES_HOST=${POSTGRES_HOST}
         - POSTGRES_PORT=${POSTGRES_PORT}
         - NEXT_PUBLIC_CSHARP_BACKEND_URL=${NEXT_PUBLIC_CSHARP_BACKEND_URL}
+        - NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED=${NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED}
     container_name: lot-app-container
     restart: unless-stopped
     ports:
@@ -55,23 +56,9 @@ services:
       - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      # ПЕРЕМЕННЫЕ ДЛЯ DEV БАЗЫ
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - BackgroundParsers__Enabled=false
-     # ПЕРЕМЕННЫЕ ДЛЯ PROD БАЗЫ
-      - PROD_DB_NAME=${PROD_DB_NAME}
-      - PROD_DB_USER=${PROD_DB_USER}
-      - PROD_DB_PASSWORD=${PROD_DB_PASSWORD}
-      - PROD_DB_HOST=${PROD_DB_HOST}
-      - PROD_DB_PORT=${PROD_DB_PORT}
     ports:
       - "8080:8080"
     depends_on:
-      # Парсер будет ждать, пока postgres не станет 'healthy'
       postgres:
         condition: service_healthy
     networks:

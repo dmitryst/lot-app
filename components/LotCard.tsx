@@ -47,6 +47,8 @@ export default function LotCard({ lot }: LotCardProps) {
     // Состояние для отслеживания статуса копирования
     const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
+    const isPublishButtonEnabled = process.env.NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED === 'true';
+
     // Обработчик нажатия на кнопку "Опубликовать"
     const handlePublishToProd = async () => {
         if (publishStatus === 'loading' || publishStatus === 'success') {
@@ -84,7 +86,7 @@ export default function LotCard({ lot }: LotCardProps) {
             setPublishStatus('error');
         } finally {
             // через несколько секунд вернуть статус idle, чтобы можно было попробовать снова
-            setTimeout(() => setPublishStatus('idle'), 3000); 
+            setTimeout(() => setPublishStatus('idle'), 3000);
         }
     };
 
@@ -92,23 +94,15 @@ export default function LotCard({ lot }: LotCardProps) {
         <div className={styles.card}>
 
             {/* --- КНОПКА "ОПУБЛИКОВАТЬ В PROD" --- */}
-            <button
-                className={`${styles.publishButton} ${styles[publishStatus]}`}
-                onClick={handlePublishToProd}
-                disabled={publishStatus === 'loading' || publishStatus === 'success'}
-                title={
-                    publishStatus === 'success'
-                        ? 'Лот успешно опубликован!'
-                        : publishStatus === 'loading'
-                            ? 'Публикация...'
-                            : publishStatus === 'error'
-                                ? 'Ошибка публикации'
-                                : 'Опубликовать в PROD'
-                }
-                aria-label="Опубликовать лот в Production"
-            >
-                <PublishIcon status={publishStatus} />
-            </button>
+            {isPublishButtonEnabled && (
+                <button
+                    className={`${styles.publishButton} ${publishStatus !== 'idle' ? styles[publishStatus] : ''}`}
+                    onClick={handlePublishToProd}
+                    disabled={publishStatus === 'loading' || publishStatus === 'success'}
+                >
+                    <PublishIcon status={publishStatus} />
+                </button>
+            )}
 
             <div className={styles.cardContent}>
                 <a href={lot.url} target="_blank" rel="noopener noreferrer">
@@ -157,8 +151,8 @@ export default function LotCard({ lot }: LotCardProps) {
             </div>
 
             <div className={styles.cardFooter}>
-                <Link href={`/buy/${lot.id}`} className={styles.buyButton}>
-                    Купить через агента
+                <Link href={`/lot/${lot.id}`} className={styles.buyButton}>
+                    Подробнее
                 </Link>
             </div>
         </div>
