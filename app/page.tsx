@@ -54,7 +54,7 @@ export default function Page() {
       return;
     }
 
-    fetch(`${apiUrl}/api/lots?pageNumber=${currentPage}&pageSize=${PAGE_SIZE}`)
+    fetch(`${apiUrl}/api/lots/list?pageNumber=${currentPage}&pageSize=${PAGE_SIZE}`)
       .then((res) => {
         if (!res.ok) throw new Error('Не удалось загрузить лоты');
         return res.json();

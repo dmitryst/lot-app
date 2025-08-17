@@ -17,25 +17,33 @@ export default function BuyLotPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (lotId) {
-      fetch(`/api/lots/${lotId}`)
-        .then(async (res) => {
-          if (!res.ok) {
-            const data = await res.json();
-            throw new Error(data.error || 'Не удалось загрузить данные лота');
-          }
-          return res.json();
-        })
-        .then((data) => {
-          setLot(data);
-        })
-        .catch((err) => {
-          setError(err.message);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    if (!lotId) return;
+
+    const fetchLot = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+        if (!apiUrl) {
+          throw new Error("URL бэкенда не настроен.");
+        }
+
+        const response = await fetch(`${apiUrl}/api/lots/${lotId}`);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Ошибка загрузки лота.");
+        }
+
+        const data: Lot = await response.json();
+        setLot(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLot();
   }, [lotId]);
 
   if (loading) return <div className={styles.container}><p>Загрузка...</p></div>;
@@ -45,7 +53,7 @@ export default function BuyLotPage() {
   return (
     <div className={styles.container}>
       <Link href="/" className={styles.backLink}>← Вернуться к списку лотов</Link>
-      
+
       <LotCard key={lot.id} lot={lot} />
 
       {/* Информация о покупке */}
