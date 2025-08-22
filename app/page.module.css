@@ -236,7 +236,7 @@
   background: #fff;
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky; /* Делаем сайдбар "липким" при прокрутке */
   top: 20px;
 }
@@ -246,17 +246,21 @@
 }
 
 /* --- ГРУППЫ ФИЛЬТРОВ ВНУТРИ САЙДБАРА --- */
+/* --- СТИЛИ ДЛЯ ГРУПП ФИЛЬТРОВ В ГОРИЗОНТАЛЬНОЙ ПАНЕЛИ --- */
 .filterGroup {
-  margin-bottom: 28px;
+  margin-bottom: 0; /* Убираем вертикальный отступ */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .filterTitle {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
   color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  border-bottom: none; /* Убираем разделитель */
+  padding-bottom: 0;
 }
 
 .filterOptions {
@@ -343,7 +347,7 @@
   justify-content: center;
   color: #718096; /* Цвет иконки по умолчанию */
   transition: all 0.2s ease-in-out;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Легкая тень */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Легкая тень */
   z-index: 10; /* Убедимся, что кнопка поверх других элементов */
 }
 
@@ -380,6 +384,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -389,48 +394,45 @@
 /* ЧАСТЬ 3: МЕДИА-ЗАПРОС ДЛЯ ДЕСКТОПА (экраны шире 768px) */
 /* =================================================================== */
 @media (min-width: 769px) {
-  /* Возвращаем двухколоночный макет для основной области */
   .main {
-    flex-direction: row;
     align-items: flex-start;
     gap: 32px;
     padding: 2.5rem 1.5rem;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 40px auto;
   }
 
-  /* Скрываем мобильную кнопку */
+  /* Кнопка "Показать фильтры" на десктопе не нужна */
   .toggleFiltersButton {
     display: none;
   }
 
-  /* Задаем контейнеру фильтров фиксированную ширину, чтобы он не растягивался */
+  /* --- КОНТЕЙНЕР ДЛЯ ФИЛЬТРОВ --- */
+  /* Контейнер теперь занимает всю ширину */
   .filtersContainer {
-    width: 260px;
-    flex-shrink: 0; /* Запрещаем контейнеру сжиматься */
+    width: 100%;
+    margin-bottom: 2rem; /* Отступ от списка лотов */
   }
 
-  /* Показываем сайдбар и стилизуем его под десктоп */
+  /* --- ПАНЕЛЬ ФИЛЬТРОВ (БЫВШИЙ САЙДБАР) --- */
   .sidebar {
-    display: flex; /* Показываем сайдбар */
-    flex: 0 0 260px; /* Не будет расти, не будет сжиматься, базовая ширина 260px */
-    position: sticky; /* Делаем сайдбар "липким" при прокрутке */
-    top: 20px;
-    /* Стили ниже уже были в ЧАСТИ 1, но здесь они применяются для десктопного сайдбара */
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    width: 260px; /* Явно задаем ширину */
-    height: fit-content; /* Чтобы sticky работал корректно */
+    display: flex; /* Фильтры всегда видны на десктопе */
+    flex-direction: row; /* горизонтальное расположение */
+    flex-wrap: wrap; /* Позволяем фильтрам переноситься на новую строку */
+    align-items: center; /* Выравниваем группы фильтров по центру */
+    gap: 1.5rem; /* Расстояние между группами фильтров */
+
+    /* Убираем стили сайдбара */
+    position: static;
+    width: 100%;
+    padding: 1rem 1.5rem; /* Уменьшаем вертикальные отступы */
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   .content {
-    flex-grow: 1;
-    /* Убедимся, что контент не может стать меньше определенной ширины,
-       чтобы избежать "схлопывания" на узких десктопных окнах.
-       Это значение можно подобрать под ваш контент. */
-    min-width: 0;
+    width: 100%;
   }
 
   /*
@@ -480,3 +482,69 @@
 .pagination span {
   font-weight: 500;
 }
+
+/* =================================================================== */
+/* ЧАСТЬ 4: СТИЛИ ДЛЯ КАРТОЧКИ ЛОТА С ИЗОБРАЖЕНИЕМ */
+/* Эти стили отвечают за двухколоночный макет внутри одной карточки */
+/* =================================================================== */
+
+.lotCardContainer {
+  /* Заменяем display: flex; на display: grid; для более предсказуемого поведения колонок */
+  display: grid;
+  /* Задаем первой колонке (для картинки) фиксированную ширину 250px, 
+     а второй (для контента) - все оставшееся пространство (1fr). */
+  grid-template-columns: 250px 1fr; 
+  gap: 1.5rem; /* Отступ между картинкой и контентом */
+
+  /* Эти стили дублируют .card, чтобы сохранить внешний вид */
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  /* Для позиционирования кнопки "опубликовать" */
+  align-items: flex-start;
+  /* Выравниваем дочерние элементы по верхнему краю, а не растягиваем */
+}
+
+.lotCardContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  width: 250px;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lotImage {
+  /* Пустой класс для Next.js <Image>, если потребуются доп. стили. */
+  /* layout="fill" заставит его заполнить родительский .imageWrapper */
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Важное правило, чтобы flex-элементы не выходили за пределы родителя */
+}
+
+/* 
+  Мы используем существующий класс .cardContent для основного блока текста,
+  просто убедитесь, что он находится внутри .contentWrapper
+*/
+.cardContent {
+  flex-grow: 1;
+  /* Позволяет этому блоку растягиваться, прижимая футер вниз */
+}
+
+/* 
+  Ваши существующие классы .cardFooter, .publishButton, .buyButton и др.
+  будут работать как и раньше, если они находятся внутри .contentWrapper.
+*/

@@ -1,5 +1,8 @@
+/* app/lot/[lotId]/lot.module.css */
+
 .container {
-  max-width: 800px;
+  /* === Увеличиваем ширину контейнера === */
+  max-width: 1200px; 
   margin: 40px auto;
   padding: 20px;
 }
@@ -16,15 +19,107 @@
   text-decoration: underline;
 }
 
-.lotCard {
-  margin-bottom: 40px;
+.centeredMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 5rem 0;
 }
 
+/* === ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ ДЕТАЛЕЙ ЛОТА === */
+.lotDetailGrid {
+  display: grid;
+  /* Задаем две колонки с равной шириной */
+  grid-template-columns: 1fr 1fr;
+  gap: 40px; /* Расстояние между колонками и строками */
+  margin-bottom: 60px;
+}
+
+.imageSection {
+  grid-column: 1 / 2; /* Занимает первую колонку */
+  grid-row: 1 / 2;    /* Занимает первую строку */
+  
+  position: relative;
+  width: 100%;
+  padding-top: 80%; /* Соотношение сторон 5:4 */
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mainImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.infoSection {
+  grid-column: 2 / 3; /* Занимает вторую колонку */
+  grid-row: 1 / 2;    /* Занимает первую строку */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Удаляем заголовок .lotTitle, так как он теперь в секции описания */
+
+.lotInfo {
+  font-size: 1rem;
+  color: #4a5568;
+  margin: 0 0 12px 0; /* Увеличиваем нижний отступ */
+}
+
+.priceInfo {
+  margin-top: 16px; /* Уменьшаем отступ */
+  padding: 20px;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.priceLabel {
+  display: block;
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 8px;
+}
+
+.priceValue {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a202c;
+}
+
+/* === НОВЫЕ СТИЛИ ДЛЯ СЕКЦИИ ОПИСАНИЯ === */
+.descriptionSection {
+  /* Занимает обе колонки, начиная с первой и заканчивая перед третьей */
+  grid-column: 1 / 3; 
+  grid-row: 2 / 3;    /* Занимает вторую строку */
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0; /* Разделитель */
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.descriptionText {
+  color: #374151;
+  line-height: 1.7;
+  /* Можно добавить стили для форматирования текста, если он приходит как HTML */
+}
+
+
+/* === СТИЛИ ДЛЯ БЛОКА "КАК КУПИТЬ" (остаются почти без изменений) === */
 .purchaseInfo {
   background: #fff;
   padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .purchaseInfo h2 {
@@ -65,4 +160,26 @@
 
 .ctaButton:hover {
   background-color: #005bb5;
+}
+
+/* === СТИЛИ ДЛЯ БЛОКА С ЗАДАТКОМ === */
+
+.depositInfo {
+  margin-top: 16px; /* Отступ от блока с начальной ценой */
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef; /* Светлая разделительная линия */
+}
+
+.depositLabel {
+  display: block;
+  font-size: 0.9rem; /* Немного меньше, чем .priceLabel */
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+.depositValue {
+  display: block;
+  font-size: 1.75rem; /* Заметно меньше, чем основная цена */
+  font-weight: 700;
+  color: #343a40; /* Немного светлее, чем основная цена */
 }

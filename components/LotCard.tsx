@@ -1,10 +1,15 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '../app/page.module.css';
 import { Lot } from '../types';
 import { formatMoney } from '../utils/format';
 import Accordion from './Accordion';
+
+// Импортируем картинку как статический ресурс.
+// Путь указывается относительно текущего файла.
+import placeholderImage from '../public/placeholder.png'; 
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -41,9 +46,10 @@ const PublishIcon = ({ status }: { status: 'idle' | 'loading' | 'success' | 'err
 // --- ПРОПСЫ КОМПОНЕНТА ---
 interface LotCardProps {
     lot: Lot;
+    imageUrl?: string | null;
 }
 
-export default function LotCard({ lot }: LotCardProps) {
+export default function LotCard({ lot, imageUrl }: LotCardProps) {
     // Состояние для отслеживания статуса копирования
     const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -91,69 +97,82 @@ export default function LotCard({ lot }: LotCardProps) {
     };
 
     return (
-        <div className={styles.card}>
+        <div className={styles.lotCardContainer}>
 
-            {/* --- КНОПКА "ОПУБЛИКОВАТЬ В PROD" --- */}
-            {isPublishButtonEnabled && (
-                <button
-                    className={`${styles.publishButton} ${publishStatus !== 'idle' ? styles[publishStatus] : ''}`}
-                    onClick={handlePublishToProd}
-                    disabled={publishStatus === 'loading' || publishStatus === 'success'}
-                >
-                    <PublishIcon status={publishStatus} />
-                </button>
-            )}
-
-            <div className={styles.cardContent}>
-                <a href={lot.url} target="_blank" rel="noopener noreferrer">
-                    <h2>{lot.description}</h2>
-                </a>
-
-                <p className={styles.priceDetail}>
-                    Начальная цена:
-                    <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>
-                    {lot.bidding.type === 'Публичное предложение' ? (
-                        <span className={styles.iconDown}><IconArrowDown /></span>
-                    ) : (
-                        <span className={styles.iconUp}><IconArrowUp /></span>
-                    )}
-                </p>
-
-                {lot.step && (
-                    <p className={styles.priceDetail}>
-                        Шаг цены:
-                        <span className={styles.priceValue}>{formatMoney(lot.step)}</span>
-                    </p>
-                )}
-
-                {lot.deposit && (
-                    <p className={styles.priceDetail}>
-                        Задаток:
-                        <span className={styles.priceValue}>{formatMoney(lot.deposit)}</span>
-                    </p>
-                )}
-
-                {lot.bidding.viewingProcedure && (
-                    <Accordion title="Порядок ознакомления">
-                        {lot.bidding.viewingProcedure}
-                    </Accordion>
-                )}
-
-                {lot.categories && lot.categories.length > 0 && (
-                    <div className={styles.categoriesContainer}>
-                        {lot.categories.map((cat) => (
-                            <span key={cat.id} className={styles.categoryTag}>
-                                {cat.name}
-                            </span>
-                        ))}
-                    </div>
-                )}
+            {/* Блок для изображения (1/3 ширины) */}
+            <div className={styles.imageWrapper}>
+                <Image
+                    src={imageUrl || placeholderImage}
+                    alt={`Изображение для лота: ${lot.description}`}
+                    layout="fill"
+                    objectFit="cover"
+                    className={styles.lotImage}
+                />
             </div>
 
-            <div className={styles.cardFooter}>
-                <Link href={`/lot/${lot.id}`} className={styles.buyButton}>
-                    Подробнее
-                </Link>
+            <div className={styles.contentWrapper}>
+                {/* --- КНОПКА "ОПУБЛИКОВАТЬ В PROD" --- */}
+                {isPublishButtonEnabled && (
+                    <button
+                        className={`${styles.publishButton} ${publishStatus !== 'idle' ? styles[publishStatus] : ''}`}
+                        onClick={handlePublishToProd}
+                        disabled={publishStatus === 'loading' || publishStatus === 'success'}
+                    >
+                        <PublishIcon status={publishStatus} />
+                    </button>
+                )}
+
+                <div className={styles.cardContent}>
+                    <a href={lot.url} target="_blank" rel="noopener noreferrer">
+                        <h2>{lot.description}</h2>
+                    </a>
+
+                    <p className={styles.priceDetail}>
+                        Начальная цена:
+                        <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>
+                        {lot.bidding.type === 'Публичное предложение' ? (
+                            <span className={styles.iconDown}><IconArrowDown /></span>
+                        ) : (
+                            <span className={styles.iconUp}><IconArrowUp /></span>
+                        )}
+                    </p>
+
+                    {lot.step && (
+                        <p className={styles.priceDetail}>
+                            Шаг цены:
+                            <span className={styles.priceValue}>{formatMoney(lot.step)}</span>
+                        </p>
+                    )}
+
+                    {lot.deposit && (
+                        <p className={styles.priceDetail}>
+                            Задаток:
+                            <span className={styles.priceValue}>{formatMoney(lot.deposit)}</span>
+                        </p>
+                    )}
+
+                    {lot.bidding.viewingProcedure && (
+                        <Accordion title="Порядок ознакомления">
+                            {lot.bidding.viewingProcedure}
+                        </Accordion>
+                    )}
+
+                    {lot.categories && lot.categories.length > 0 && (
+                        <div className={styles.categoriesContainer}>
+                            {lot.categories.map((cat) => (
+                                <span key={cat.id} className={styles.categoryTag}>
+                                    {cat.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.cardFooter}>
+                    <Link href={`/lot/${lot.id}`} className={styles.buyButton}>
+                        Подробнее
+                    </Link>
+                </div>
             </div>
         </div>
     );

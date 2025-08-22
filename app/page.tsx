@@ -23,7 +23,7 @@ const formatNumberWithSpaces = (value: string) => {
   return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function Page() {
   // --- Состояния компонента ---
@@ -175,29 +175,30 @@ export default function Page() {
 
   return (
     <main className={styles.main}>
-      {/* --- Контейнер для фильтров (Сайдбар) --- */}
-      <div className={styles.filtersContainer}>
-        <button
-          className={styles.toggleFiltersButton}
-          onClick={() => setIsFiltersVisible(!isFiltersVisible)}
-        >
-          {isFiltersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
-        </button>
-        {/* Вот здесь мы добавляем классы для сайдбара */}
-        <aside className={`${styles.sidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
-          {filtersSidebarContent}
-        </aside>
-      </div>
-
-      {/* --- Контейнер для основного контента (Лоты) --- */}
       <section className={styles.contentArea}>
+        <div className={styles.filtersContainer}>
+          <button
+            className={styles.toggleFiltersButton}
+            onClick={() => setIsFiltersVisible(!isFiltersVisible)}
+          >
+            {isFiltersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
+          </button>
+          <aside className={`${styles.sidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
+            {filtersSidebarContent}
+          </aside>
+        </div>
+
         {loading ? (
           <p>Загрузка лотов...</p>
         ) : filteredLots.length > 0 ? (
           <>
             <div className={styles.lotsGrid}>
               {filteredLots.map((lot: Lot) => (
-                <LotCard key={lot.id} lot={lot} />
+                <LotCard
+                  key={lot.id}
+                  lot={lot}
+                  imageUrl={lot.imageUrl}
+                />
               ))}
             </div>
             {paginationControls}

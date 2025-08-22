@@ -12,6 +12,7 @@ export type Lot = {
   deposit: string | null;
   isFavorite: boolean;
   bidding: BiddingInfo;
+  imageUrl: string | null;
   categories: {
     id: number;
     name: string;
