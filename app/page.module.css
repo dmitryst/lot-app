@@ -548,3 +548,22 @@
   Ваши существующие классы .cardFooter, .publishButton, .buyButton и др.
   будут работать как и раньше, если они находятся внутри .contentWrapper.
 */
+
+.searchButton {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 1.5rem; /* Отступ сверху */
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #28a745; /* Зеленый цвет для акцента */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.searchButton:hover {
+  background-color: #218838;
+}

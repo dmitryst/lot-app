@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback  } from 'react';
 import LotCard from '../components/LotCard';
 import styles from './page.module.css';
 import { Lot } from '../types';
@@ -44,6 +44,41 @@ export default function Page() {
   // Состояние для видимости фильтров на мобильных
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
+  const fetchLots = useCallback(async () => {
+        setLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+        if (!apiUrl) {
+            console.error("URL бэкенда не настроен.");
+            setLoading(false);
+            return;
+        }
+
+        // Формируем URL с параметрами
+        const params = new URLSearchParams({
+            pageNumber: currentPage.toString(),
+            pageSize: PAGE_SIZE.toString()
+        });
+
+        // Добавляем фильтр, если он выбран
+        if (selectedBiddingType !== 'Все') {
+            params.append('biddingType', selectedBiddingType);
+        }
+        // Здесь можно добавить другие фильтры (по цене, категории)
+
+        try {
+            const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
+            if (!res.ok) throw new Error('Не удалось загрузить лоты');
+            
+            const data = await res.json();
+            setFilteredLots(data.items);
+            setTotalPages(data.totalPages);
+        } catch (error) {
+            console.error("Ошибка при загрузке лотов:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [currentPage, selectedBiddingType]); // Зависимости для useCallback
+
   // --- Загрузка только лотов при первом рендере ---
   useEffect(() => {
     setLoading(true);
@@ -68,41 +103,10 @@ export default function Page() {
       .finally(() => setLoading(false));
   }, [currentPage]); // Перезагружаем данные при изменении currentPage
 
-  // --- Логика фильтрации (работает для лотов на текущей странице) ---
-  useEffect(() => {
-    let tempLots = [...allLots];
-
-    // 1. Фильтруем по категории
-    if (selectedCategory !== 'Все') {
-      tempLots = tempLots.filter(lot =>
-        lot.categories.some(cat => cat.name === selectedCategory)
-      );
-    }
-
-    // 2. Фильтруем по виду торгов
-    if (selectedBiddingType !== 'Все') {
-      tempLots = tempLots.filter(lot => lot.bidding.type === selectedBiddingType);
-    }
-
-    // 3. Фильтр по цене
-    const from = parseFloat(priceFrom);
-    const to = parseFloat(priceTo);
-
-    if (!isNaN(from) || !isNaN(to)) {
-      tempLots = tempLots.filter(lot => {
-        const lotPrice = lot.startPrice ? parseFloat(lot.startPrice) : null;
-        if (lotPrice === null) return false; // Исключаем лоты без цены
-
-        const fromCondition = isNaN(from) || lotPrice >= from;
-        const toCondition = isNaN(to) || lotPrice <= to;
-
-        return fromCondition && toCondition;
-      });
-    }
-
-    setFilteredLots(tempLots);
-
-  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo, allLots]);
+  // Этот хук теперь просто вызывает fetchLots при изменении зависимостей
+    useEffect(() => {
+        fetchLots();
+    }, [fetchLots]); // Зависимость от самой функции
 
   // --- УНИВЕРСАЛЬНЫЙ ОБРАБОТЧИК ДЛЯ ПОЛЕЙ ЦЕНЫ ---
   const handlePriceInputChange = (
