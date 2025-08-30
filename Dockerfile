@@ -5,9 +5,8 @@ WORKDIR /app
 # Копируем package.json и lock-файл
 COPY package.json package-lock.json* ./
 
-# Устанавливаем зависимости. Флаг --production не используем, так как
-# для сборки TypeScript-проекта нужен сам typescript из devDependencies
-RUN npm ci
+# Устанавливаем зависимости, игнорируя конфликты peer dependencies
+RUN npm ci --legacy-peer-deps
 
 # === Этап 2: Сборка приложения ===
 FROM node:18-alpine AS builder
@@ -21,6 +20,7 @@ ARG POSTGRES_HOST
 ARG POSTGRES_PORT
 ARG NEXT_PUBLIC_CSHARP_BACKEND_URL
 ARG NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED
+ARG NEXT_PUBLIC_YANDEX_MAPS_API_KEY
 ARG NODE_ENV=production
 
 # Устанавливаем эти аргументы как переменные окружения для этого этапа
@@ -31,6 +31,7 @@ ENV POSTGRES_HOST=$POSTGRES_HOST
 ENV POSTGRES_PORT=$POSTGRES_PORT
 ENV NEXT_PUBLIC_CSHARP_BACKEND_URL=$NEXT_PUBLIC_CSHARP_BACKEND_URL
 ENV NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED=$NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED
+ENV NEXT_PUBLIC_YANDEX_MAPS_API_KEY=$NEXT_PUBLIC_YANDEX_MAPS_API_KEY
 ENV NODE_ENV=$NODE_ENV
 
 # Выводим переменные окружения на этапе сборки
@@ -42,6 +43,7 @@ RUN echo "--- Build-time environment variables ---" && \
     echo "POSTGRES_PORT: $POSTGRES_PORT" && \
     echo "NEXT_PUBLIC_CSHARP_BACKEND_URL: $NEXT_PUBLIC_CSHARP_BACKEND_URL" && \
     echo "NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED: $NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED" && \
+    echo "NEXT_PUBLIC_YANDEX_MAPS_API_KEY: $NEXT_PUBLIC_YANDEX_MAPS_API_KEY" && \
     echo "----------------------------------------"
 
 # Копируем зависимости с предыдущего этапа

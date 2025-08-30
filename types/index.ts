@@ -13,6 +13,7 @@ export type Lot = {
   isFavorite: boolean;
   bidding: BiddingInfo;
   imageUrl: string | null;
+  coordinates: [number, number] | null,
   categories: {
     id: number;
     name: string;

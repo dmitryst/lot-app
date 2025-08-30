@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'; // <-- Используем хук для получения lotId
+import LotMap from '../../../components/LotMap';
 
 import { Lot } from '../../../types'; // <-- Убедитесь, что путь к типам правильный
 import styles from './lot.module.css'; // <-- Используем стили для этой страницы
@@ -116,8 +117,15 @@ export default function LotPage() {
             {lot.description}
           </div>
         </div>
-
       </div>
+
+      {/* Показываем карту, только если есть координаты */}
+      {lot.coordinates && lot.coordinates.length === 2 && (
+        <div className={styles.mapSection}>
+          <h2 className={styles.sectionTitle}>Расположение на карте</h2>
+          <LotMap coordinates={lot.coordinates as [number, number]} />
+        </div>
+      )}
 
       {/* Информация о покупке (остается без изменений) */}
       <div className={styles.purchaseInfo}>
