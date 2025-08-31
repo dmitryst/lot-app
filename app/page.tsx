@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import LotCard from '../components/LotCard';
+import Pagination from '../components/Pagination';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
@@ -110,19 +111,6 @@ export default function Page() {
     setter(e.target.value.replace(/\D/g, ''));
   };
 
-  // --- JSX для пагинации ---
-  const paginationControls = (
-    <div className={styles.pagination}>
-      <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage <= 1}>
-        Назад
-      </button>
-      <span>Стр. {currentPage} из {totalPages}</span>
-      <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages}>
-        Вперед
-      </button>
-    </div>
-  );
-
   // --- JSX для рендеринга фильтров ---
   const filtersSidebarContent = (
     <>
@@ -185,19 +173,26 @@ export default function Page() {
         </div>
 
         {loading ? (
-          <p>Загрузка лотов...</p>
+          <div className={styles.loadingMessage}>Загрузка лотов...</div>
         ) : filteredLots.length > 0 ? (
           <>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+
             <div className={styles.lotsGrid}>
               {filteredLots.map((lot: Lot) => (
-                <LotCard
-                  key={lot.id}
-                  lot={lot}
-                  imageUrl={lot.imageUrl}
-                />
+                <LotCard key={lot.id} lot={lot} imageUrl={lot.imageUrl} />
               ))}
             </div>
-            {paginationControls}
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </>
         ) : (
           <p>По вашему запросу лотов не найдено.</p>
