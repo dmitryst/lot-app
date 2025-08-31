@@ -1,35 +1,52 @@
+// app/api/lots/[lotId]/route.ts
+
 import { NextResponse, NextRequest } from 'next/server';
-import { sequelize } from '@/lib/db';
-import { Lot } from '@/models/Lot';
-import { Bidding } from '@/models/Bidding';
-import { LotCategory } from '@/models/LotCategory';
-import '@/models/associations'; 
 
 export async function GET(request: NextRequest) {
   try {
-    const { pathname } = request.nextUrl;
-    // Разделяем путь по '/' (например, ['', 'api', 'lots', '123'])
+    const pathname = request.nextUrl.pathname;
     const segments = pathname.split('/');
-    // Берем последний сегмент, который и является нашим ID
     const lotId = segments[segments.length - 1];
 
-    await sequelize.authenticate();
-
-    // Ищем лот по его первичному ключу (Id)
-    const lot = await Lot.findByPk(lotId, {
-      include: [
-        { model: Bidding, as: 'Bidding', attributes: ['Type', 'ViewingProcedure'] },
-        { model: LotCategory, as: 'categories', attributes: ['Id', 'Name'] },
-      ],
-    });
-
-    if (!lot) {
-      return NextResponse.json({ error: 'Лот не найден' }, { status: 404 });
+    if (!lotId || lotId === '[lotId]') { // Доп. проверка на случай ошибки
+      return NextResponse.json({ error: 'ID лота не предоставлен' }, { status: 400 });
     }
 
-    return NextResponse.json(lot);
+    const backendUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+    if (!backendUrl) {
+      console.error('URL бэкенда (NEXT_PUBLIC_CSHARP_BACKEND_URL) не настроен.');
+      return NextResponse.json(
+        { error: 'Внутренняя ошибка конфигурации сервера.' },
+        { status: 500 }
+      );
+    }
+
+    const apiUrl = `${backendUrl}/api/lots/${lotId}`;
+
+    const apiResponse = await fetch(apiUrl, {
+      // Кэшируем ответы этого API-маршрута на сервере на 1 час (3600 сек). 
+      // Если за этот час придет 100 запросов на один и тот же лот, реальный запрос к
+      // бэкенду будет сделан только один раз, что значительно снизит нагрузку.
+      next: { revalidate: 3600 },
+    });
+
+    if (!apiResponse.ok) {
+      const errorData = await apiResponse.json();
+      return NextResponse.json(
+        { error: errorData.message || 'Ошибка при запросе к бэкенду' },
+        { status: apiResponse.status }
+      );
+    }
+
+    const lotData = await apiResponse.json();
+
+    return NextResponse.json(lotData);
+
   } catch (error) {
-    console.error('Ошибка при загрузке лота:', error);
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    console.error('Критическая ошибка в API-маршруте:', error);
+    return NextResponse.json(
+      { error: 'Внутренняя ошибка сервера.' },
+      { status: 500 }
+    );
   }
 }

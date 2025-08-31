@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback  } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import debounce from 'lodash.debounce';
 import LotCard from '../components/LotCard';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
-// --- СПИСОК КАТЕГОРИЙ, ЗАДАННЫЙ В КОДЕ ---
+// --- Константы ---
 const PREDEFINED_CATEGORIES = [
   'Автомобили',
   'Права требования (дебиторская задолженность)',
@@ -13,7 +14,6 @@ const PREDEFINED_CATEGORIES = [
   'Жилые здания (помещения)',
   'Прочее',
 ];
-
 const BIDDING_TYPES = ['Открытый аукцион', 'Публичное предложение'];
 
 const formatNumberWithSpaces = (value: string) => {
@@ -25,62 +25,23 @@ const formatNumberWithSpaces = (value: string) => {
 
 const PAGE_SIZE = 20;
 
+// --- Основной компонент страницы ---
 export default function Page() {
-  // --- Состояния компонента ---
-  const [allLots, setAllLots] = useState<Lot[]>([]);         // Все лоты с сервера
-  const [filteredLots, setFilteredLots] = useState<Lot[]>([]); // Лоты для отображения
+  // --- Состояния для данных и UI ---
+  const [filteredLots, setFilteredLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // --- Состояния для пагинации ---
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-
-  // --- Состояния для фильтров ---
-  const [selectedCategory, setSelectedCategory] = useState<string>('Все'); // Выбранная категория
-  const [selectedBiddingType, setSelectedBiddingType] = useState<string>('Все');
-  const [priceFrom, setPriceFrom] = useState<string>('');
-  const [priceTo, setPriceTo] = useState<string>('');
-
-  // Состояние для видимости фильтров на мобильных
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
-  const fetchLots = useCallback(async () => {
-        setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
-        if (!apiUrl) {
-            console.error("URL бэкенда не настроен.");
-            setLoading(false);
-            return;
-        }
+  // --- Состояния для фильтров ---
+  const [selectedCategory, setSelectedCategory] = useState('Все');
+  const [selectedBiddingType, setSelectedBiddingType] = useState('Все');
+  const [priceFrom, setPriceFrom] = useState('');
+  const [priceTo, setPriceTo] = useState('');
 
-        // Формируем URL с параметрами
-        const params = new URLSearchParams({
-            pageNumber: currentPage.toString(),
-            pageSize: PAGE_SIZE.toString()
-        });
-
-        // Добавляем фильтр, если он выбран
-        if (selectedBiddingType !== 'Все') {
-            params.append('biddingType', selectedBiddingType);
-        }
-        // Здесь можно добавить другие фильтры (по цене, категории)
-
-        try {
-            const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
-            if (!res.ok) throw new Error('Не удалось загрузить лоты');
-            
-            const data = await res.json();
-            setFilteredLots(data.items);
-            setTotalPages(data.totalPages);
-        } catch (error) {
-            console.error("Ошибка при загрузке лотов:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [currentPage, selectedBiddingType]); // Зависимости для useCallback
-
-  // --- Загрузка только лотов при первом рендере ---
-  useEffect(() => {
+  // --- Функция для загрузки данных с сервера ---
+  const fetchLots = useCallback(async (page = 1) => {
     setLoading(true);
     const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
     if (!apiUrl) {
@@ -89,33 +50,64 @@ export default function Page() {
       return;
     }
 
-    fetch(`${apiUrl}/api/lots/list?pageNumber=${currentPage}&pageSize=${PAGE_SIZE}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Не удалось загрузить лоты');
-        return res.json();
-      })
-      .then((data) => {
-        setAllLots(data.items);
-        setFilteredLots(data.items); // Изначально показываем все лоты с текущей страницы
-        setTotalPages(data.totalPages);
-      })
-      .catch(error => console.error("Ошибка при загрузке лотов:", error))
-      .finally(() => setLoading(false));
-  }, [currentPage]); // Перезагружаем данные при изменении currentPage
+    const params = new URLSearchParams({
+      pageNumber: page.toString(),
+      pageSize: PAGE_SIZE.toString(),
+    });
 
-  // Этот хук теперь просто вызывает fetchLots при изменении зависимостей
-    useEffect(() => {
-        fetchLots();
-    }, [fetchLots]); // Зависимость от самой функции
+    // Собираем параметры фильтрации
+    if (selectedBiddingType !== 'Все') params.append('biddingType', selectedBiddingType);
+    if (selectedCategory !== 'Все') params.append('category', selectedCategory);
+    if (priceFrom) params.append('priceFrom', priceFrom);
+    if (priceTo) params.append('priceTo', priceTo);
 
-  // --- УНИВЕРСАЛЬНЫЙ ОБРАБОТЧИК ДЛЯ ПОЛЕЙ ЦЕНЫ ---
-  const handlePriceInputChange = (
+    try {
+      const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
+      if (!res.ok) throw new Error('Не удалось загрузить лоты');
+      const data = await res.json();
+      setFilteredLots(data.items);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error("Ошибка при загрузке лотов:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo]); // Зависит от всех фильтров
+
+  // --- Создаем "отложенную" версию функции загрузки ---
+  // Это предотвращает отправку запросов при каждом нажатии клавиши в полях цены
+  const debouncedFetchLots = useMemo(() => {
+    return debounce(() => fetchLots(1), 800); // Задержка 800 мс, всегда ищем с 1-й страницы
+  }, [fetchLots]);
+
+  // --- Основной хук для применения фильтров ---
+  useEffect(() => {
+    // Сбрасываем на первую страницу при изменении любого фильтра
+    setCurrentPage(1);
+    // Вызываем отложенную функцию
+    debouncedFetchLots();
+
+    // Отменяем запланированный вызов, если компонент размонтируется
+    return () => {
+      debouncedFetchLots.cancel();
+    };
+  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo, debouncedFetchLots]);
+
+  // --- Хук для пагинации ---
+  // Загружает данные при смене страницы (если это не было вызвано сменой фильтров)
+  useEffect(() => {
+    if (currentPage > 1) {
+      fetchLots(currentPage);
+    }
+  }, [currentPage, fetchLots]);
+
+
+  // --- Обработчики для полей цены ---
+  const handlePriceChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     setter: React.Dispatch<React.SetStateAction<string>>
   ) => {
-    // Сохраняем в состояние только цифры
-    const rawValue = e.target.value.replace(/\D/g, '');
-    setter(rawValue);
+    setter(e.target.value.replace(/\D/g, ''));
   };
 
   // --- JSX для пагинации ---
@@ -162,7 +154,7 @@ export default function Page() {
             className={styles.priceInput}
             placeholder="от"
             value={formatNumberWithSpaces(priceFrom)}
-            onChange={(e) => handlePriceInputChange(e, setPriceFrom)}
+            onChange={(e) => handlePriceChange(e, setPriceFrom)}
           />
           <span className={styles.priceSeparator}>—</span>
           <input
@@ -170,7 +162,7 @@ export default function Page() {
             className={styles.priceInput}
             placeholder="до"
             value={formatNumberWithSpaces(priceTo)}
-            onChange={(e) => handlePriceInputChange(e, setPriceTo)}
+            onChange={(e) => handlePriceChange(e, setPriceTo)}
           />
         </div>
       </div>
