@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import debounce from 'lodash.debounce';
 import LotCard from '../components/LotCard';
 import Pagination from '../components/Pagination';
@@ -159,6 +160,10 @@ export default function Page() {
 
   return (
     <main className={styles.main}>
+      <Link href="/map" className={styles.mapLinkButton}>
+        Смотреть недвижимость на карте
+      </Link>
+
       <section className={styles.contentArea}>
         <div className={styles.filtersContainer}>
           <button

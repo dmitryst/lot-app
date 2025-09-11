@@ -1,0 +1,18 @@
+.mapContainer {
+  width: 100%;
+  /* Высота на весь экран минус, например, высота хедера */
+  height: calc(100vh - 80px); 
+  position: relative;
+}
+
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  z-index: 10;
+}

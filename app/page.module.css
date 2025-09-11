@@ -567,3 +567,25 @@
 .searchButton:hover {
   background-color: #218838;
 }
+
+/* --- Стили для кнопки-ссылки на карту --- */
+.mapLinkButton {
+  display: inline-block;
+  padding: 12px 24px;
+  margin-bottom: 1.5rem; /* Отступ снизу до фильтров */
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+  background-color: #007bff; /* Яркий синий цвет для привлечения внимания */
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.mapLinkButton:hover {
+  background-color: #0056b3; /* Более темный синий при наведении */
+  transform: translateY(-2px);
+}
