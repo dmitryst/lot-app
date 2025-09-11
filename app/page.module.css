@@ -568,24 +568,58 @@
   background-color: #218838;
 }
 
-/* --- Стили для кнопки-ссылки на карту --- */
+/* --- Стили для баннера с картой --- */
+
+/* Контейнер для баннера */
+.mapBanner {
+  position: relative; /* Необходимо для позиционирования псевдо-элемента */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 140px; /* Примерная высота, равная ~2 высотам кнопки */
+  margin-bottom: 2rem;
+  background-image: url('/map-bg.jpg'); /* Путь к вашему фоновому изображению */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  overflow: hidden; /* Скрываем все, что выходит за пределы скругленных углов */
+}
+
+/* Затемняющий слой поверх картинки для лучшей читаемости текста */
+.mapBanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* Черный полупрозрачный слой */
+  z-index: 1; /* Размещаем под кнопкой */
+}
+
+/* Кнопка-ссылка, которая теперь находится поверх баннера */
 .mapLinkButton {
-  display: inline-block;
-  padding: 12px 24px;
-  margin-bottom: 1.5rem; /* Отступ снизу до фильтров */
-  font-size: 1rem;
+  position: relative; /* Чтобы кнопка была над затемняющим слоем */
+  z-index: 2;
+  display: inline-flex; /* Используем inline-flex для центрирования текста */
+  align-items: center;
+  justify-content: center;
+  height: 60px; /* Фиксированная высота кнопки */
+  padding: 0 32px;
+  font-size: 1.1rem;
   font-weight: 600;
-  text-align: center;
   color: #fff;
-  background-color: #007bff; /* Яркий синий цвет для привлечения внимания */
-  border: none;
-  border-radius: 8px;
+  background-color: #007bff;
+  border: 2px solid #fff; /* Белая рамка для контраста */
+  border-radius: 10px;
   text-decoration: none;
-  transition: background-color 0.2s, transform 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  transition: all 0.2s ease-in-out;
 }
 
 .mapLinkButton:hover {
-  background-color: #0056b3; /* Более темный синий при наведении */
-  transform: translateY(-2px);
+  background-color: #0056b3;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
 }

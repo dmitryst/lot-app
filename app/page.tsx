@@ -160,9 +160,11 @@ export default function Page() {
 
   return (
     <main className={styles.main}>
-      <Link href="/map" className={styles.mapLinkButton}>
-        Смотреть недвижимость на карте
-      </Link>
+      <div className={styles.mapBanner}>
+        <Link href="/map" className={styles.mapLinkButton}>
+          Смотреть недвижимость на карте
+        </Link>
+      </div>
 
       <section className={styles.contentArea}>
         <div className={styles.filtersContainer}>
