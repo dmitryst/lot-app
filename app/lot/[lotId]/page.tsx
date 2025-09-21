@@ -1,15 +1,12 @@
 // app/lot/[lotId]/page.tsx
-
 'use client';
-
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useParams } from 'next/navigation'; // <-- Используем хук для получения lotId
+import { useParams, useRouter } from 'next/navigation';
 import LotMap from '../../../components/LotMap';
 
-import { Lot } from '../../../types'; // <-- Убедитесь, что путь к типам правильный
-import styles from './lot.module.css'; // <-- Используем стили для этой страницы
+import { Lot } from '../../../types';
+import styles from './lot.module.css';
 
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
@@ -20,6 +17,17 @@ const PurchaseStep = ({ title, description }: { title: string; description: stri
 );
 
 export default function LotPage() {
+  const router = useRouter();
+
+  const handleBackToList = () => {
+    // Пытаемся прочитать сохраненный URL списка лотов
+    const savedQuery = sessionStorage.getItem('lotListQuery');
+
+    // Переходим на главную страницу, добавляя сохраненные параметры
+    // Если ничего не сохранено, перейдет просто на "/"
+    router.push(`/${savedQuery || ''}`);
+  };
+
   const params = useParams();
   const lotId = params.lotId;
 
@@ -63,7 +71,9 @@ export default function LotPage() {
 
   return (
     <main className={styles.container}>
-      <Link href="/" className={styles.backLink}>← Вернуться к списку лотов</Link>
+      <button onClick={handleBackToList} className={styles.backLink}>
+        &larr; Вернуться к списку лотов
+      </button>
 
       {/* === НОВЫЙ МАКЕТ СЕТКИ === */}
       <div className={styles.lotDetailGrid}>

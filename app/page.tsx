@@ -1,7 +1,9 @@
+// app/page.tsx
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import debounce from 'lodash.debounce';
 import LotCard from '../components/LotCard';
 import Pagination from '../components/Pagination';
@@ -27,90 +29,151 @@ const formatNumberWithSpaces = (value: string) => {
 
 const PAGE_SIZE = 20;
 
+// Обертка для основного компонента, чтобы использовать Suspense
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <Page />
+    </Suspense>
+  );
+}
+
 // --- Основной компонент страницы ---
-export default function Page() {
-  // --- Состояния для данных и UI ---
-  const [filteredLots, setFilteredLots] = useState<Lot[]>([]);
+function Page() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // ЕДИНСТВЕННЫЙ источник данных для API — URL
+  const page = Number(searchParams.get('page')) || 1;
+  const category = searchParams.get('category') || 'Все';
+  const biddingType = searchParams.get('biddingType') || 'Все';
+  const priceFromParam = searchParams.get('priceFrom') || '';
+  const priceToParam = searchParams.get('priceTo') || '';
+
+  // Локальный UI-стейт, инициализируем из URL на каждом рендере
+  // (контролируемые элементы должны сразу отражать URL)
+  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [selectedBiddingType, setSelectedBiddingType] = useState(biddingType);
+  const [priceFrom, setPriceFrom] = useState(priceFromParam);
+  const [priceTo, setPriceTo] = useState(priceToParam);
+
+  // Синхронизация UI <- URL (чтобы при Back/Forward видны были актуальные значения)
+  useEffect(() => setSelectedCategory(category), [category]);
+  useEffect(() => setSelectedBiddingType(biddingType), [biddingType]);
+  useEffect(() => setPriceFrom(priceFromParam), [priceFromParam]);
+  useEffect(() => setPriceTo(priceToParam), [priceToParam]);
+
+  // Утилита: атомарно обновить URL-параметры
+  const updateQuery = useCallback((patch: Record<string, string | number | null | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === null || value === undefined || value === '' || value === 'Все') {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [router, pathname, searchParams]);
+
+  // Handlers — пишут и в локальный UI, и сразу в URL
+  const onCategoryClick = (value: string) => {
+    setSelectedCategory(value);
+    updateQuery({ category: value, page: 1 });
+  };
+
+  const onBiddingTypeClick = (value: string) => {
+    setSelectedBiddingType(value);
+    updateQuery({ biddingType: value, page: 1 });
+  };
+
+  const debouncedPriceUpdate = useMemo(
+    () => debounce((from: string, to: string) => {
+      updateQuery({
+        priceFrom: from.replace(/\D/g, ''),
+        priceTo: to.replace(/\D/g, ''),
+        page: 1,
+      });
+    }, 500),
+    [updateQuery]
+  );
+
+  const onPriceFromChange = (val: string) => {
+    const clean = val.replace(/\D/g, '');
+    setPriceFrom(clean);
+    debouncedPriceUpdate(clean, priceTo);
+  };
+
+  const onPriceToChange = (val: string) => {
+    const clean = val.replace(/\D/g, '');
+    setPriceTo(clean);
+    debouncedPriceUpdate(priceFrom, clean);
+  };
+
+  const onPageChange = (nextPage: number) => {
+    updateQuery({ page: nextPage });
+  };
+
+  // Данные
+  const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
-  // --- Состояния для фильтров ---
-  const [selectedCategory, setSelectedCategory] = useState('Все');
-  const [selectedBiddingType, setSelectedBiddingType] = useState('Все');
-  const [priceFrom, setPriceFrom] = useState('');
-  const [priceTo, setPriceTo] = useState('');
-
-  // --- Функция для загрузки данных с сервера ---
-  const fetchLots = useCallback(async (page = 1) => {
+  // Загрузка данных ТОЛЬКО из searchParams
+  const fetchLots = useCallback(async () => {
     setLoading(true);
     const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
     if (!apiUrl) {
-      console.error("URL бэкенда не настроен.");
       setLoading(false);
       return;
     }
-
-    const params = new URLSearchParams({
-      pageNumber: page.toString(),
-      pageSize: PAGE_SIZE.toString(),
-    });
-
-    // Собираем параметры фильтрации
-    if (selectedBiddingType !== 'Все') params.append('biddingType', selectedBiddingType);
-    if (selectedCategory !== 'Все') params.append('category', selectedCategory);
-    if (priceFrom) params.append('priceFrom', priceFrom);
-    if (priceTo) params.append('priceTo', priceTo);
+    const params = new URLSearchParams(searchParams.toString());
+    // ВАЖНО: Бэкенд ждёт page и pageSize
+    params.set('pageSize', String(PAGE_SIZE));
 
     try {
       const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
       if (!res.ok) throw new Error('Не удалось загрузить лоты');
       const data = await res.json();
-      setFilteredLots(data.items);
+      setLots(data.items);
       setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error("Ошибка при загрузке лотов:", error);
+    } catch (e) {
+      console.error('Ошибка при загрузке лотов:', e);
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo]); // Зависит от всех фильтров
+  }, [searchParams]);
 
-  // --- Создаем "отложенную" версию функции загрузки ---
-  // Это предотвращает отправку запросов при каждом нажатии клавиши в полях цены
-  const debouncedFetchLots = useMemo(() => {
-    return debounce(() => fetchLots(1), 800); // Задержка 800 мс, всегда ищем с 1-й страницы
-  }, [fetchLots]);
-
-  // --- Основной хук для применения фильтров ---
   useEffect(() => {
-    // Сбрасываем на первую страницу при изменении любого фильтра
-    setCurrentPage(1);
-    // Вызываем отложенную функцию
-    debouncedFetchLots();
+    let isCancelled = false;
 
-    // Отменяем запланированный вызов, если компонент размонтируется
-    return () => {
-      debouncedFetchLots.cancel();
+    const fetchDataAndScroll = async () => {
+      await fetchLots();
+      
+      // Если компонент размонтировался, пока грузились данные, ничего не делаем
+      if (isCancelled) return;
+
+      // Проверяем наличие сохраненной позиции скролла
+      const scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition) {
+        // Ждем следующего "кадра" отрисовки, чтобы DOM гарантированно обновился
+        requestAnimationFrame(() => {
+          window.scrollTo(0, parseInt(scrollPosition, 10));
+          sessionStorage.removeItem('scrollPosition');
+        });
+      }
     };
-  }, [selectedCategory, selectedBiddingType, priceFrom, priceTo, debouncedFetchLots]);
 
-  // --- Хук для пагинации ---
-  // Загружает данные при смене страницы (если это не было вызвано сменой фильтров)
-  useEffect(() => {
-    if (currentPage > 1) {
-      fetchLots(currentPage);
-    }
-  }, [currentPage, fetchLots]);
+    fetchDataAndScroll();
 
-
-  // --- Обработчики для полей цены ---
-  const handlePriceChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    setter(e.target.value.replace(/\D/g, ''));
-  };
+    // Функция очистки, которая сработает, если компонент размонтируется
+    return () => {
+      isCancelled = true;
+    };
+  }, [fetchLots]);
 
   // --- JSX для рендеринга фильтров ---
   const filtersSidebarContent = (
@@ -118,9 +181,9 @@ export default function Page() {
       <div className={styles.filterGroup}>
         <h3 className={styles.filterTitle}>Категории</h3>
         <div className={styles.buttonGroup}>
-          <button onClick={() => setSelectedCategory('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+          <button onClick={() => onCategoryClick('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
           {PREDEFINED_CATEGORIES.map(category => (
-            <button key={category} onClick={() => setSelectedCategory(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>{category}</button>
+            <button key={category} onClick={() => onCategoryClick(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>{category}</button>
           ))}
         </div>
       </div>
@@ -128,9 +191,9 @@ export default function Page() {
       <div className={styles.filterGroup}>
         <h3 className={styles.filterTitle}>Вид торгов</h3>
         <div className={styles.buttonGroup}>
-          <button onClick={() => setSelectedBiddingType('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
+          <button onClick={() => onBiddingTypeClick('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
           {BIDDING_TYPES.map(type => (
-            <button key={type} onClick={() => setSelectedBiddingType(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>{type}</button>
+            <button key={type} onClick={() => onBiddingTypeClick(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>{type}</button>
           ))}
         </div>
       </div>
@@ -143,7 +206,7 @@ export default function Page() {
             className={styles.priceInput}
             placeholder="от"
             value={formatNumberWithSpaces(priceFrom)}
-            onChange={(e) => handlePriceChange(e, setPriceFrom)}
+            onChange={(e) => onPriceFromChange(e.target.value)}
           />
           <span className={styles.priceSeparator}>—</span>
           <input
@@ -151,7 +214,7 @@ export default function Page() {
             className={styles.priceInput}
             placeholder="до"
             value={formatNumberWithSpaces(priceTo)}
-            onChange={(e) => handlePriceChange(e, setPriceTo)}
+            onChange={(e) => onPriceToChange(e.target.value)}
           />
         </div>
       </div>
@@ -181,24 +244,36 @@ export default function Page() {
 
         {loading ? (
           <div className={styles.loadingMessage}>Загрузка лотов...</div>
-        ) : filteredLots.length > 0 ? (
+        ) : lots.length > 0 ? (
           <>
             <Pagination
-              currentPage={currentPage}
+              currentPage={page}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={onPageChange}
             />
 
             <div className={styles.lotsGrid}>
-              {filteredLots.map((lot: Lot) => (
-                <LotCard key={lot.id} lot={lot} imageUrl={lot.imageUrl} />
+              {lots.map((lot: Lot) => (
+                // Оборачиваем Link в div с onClick для сохранения скролла
+                <div
+                  key={lot.id}
+                  onMouseDown={() => {
+                    sessionStorage.setItem('scrollPosition', String(window.scrollY));
+                    // Сохраняем весь query string (например, "?page=5&category=Автомобили")
+                    sessionStorage.setItem('lotListQuery', window.location.search);
+                  }}
+                >
+                  <Link href={`/lot/${lot.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <LotCard key={lot.id} lot={lot} imageUrl={lot.imageUrl} />
+                  </Link>
+                </div>
               ))}
             </div>
 
             <Pagination
-              currentPage={currentPage}
+              currentPage={page}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={onPageChange}
             />
           </>
         ) : (

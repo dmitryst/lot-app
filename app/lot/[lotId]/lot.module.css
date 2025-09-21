@@ -192,5 +192,25 @@
   border: 1px solid #e2e8f0;
 }
 
-/* Заголовок для секции (можно переиспользовать .sectionTitle) */
-/* .sectionTitle используется и для описания, и для карты */
+/* === Стили для Вернуться назад === */
+.backLink {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 18px; /* Увеличиваем размер шрифта */
+  font-weight: 600; /* Делаем шрифт более жирным */
+  color: #007bff; /* Яркий цвет для привлечения внимания */
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background-color: #f0f7ff; /* Легкий фон для выделения */
+  border: 1px solid #cce0ff;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  background-color: #e0efff;
+  color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}

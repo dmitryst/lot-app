@@ -9,7 +9,7 @@ import Accordion from './Accordion';
 
 // Импортируем картинку как статический ресурс.
 // Путь указывается относительно текущего файла.
-import placeholderImage from '../public/placeholder.png'; 
+import placeholderImage from '../public/placeholder.png';
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -56,7 +56,8 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     const isPublishButtonEnabled = process.env.NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED === 'true';
 
     // Обработчик нажатия на кнопку "Опубликовать"
-    const handlePublishToProd = async () => {
+    const handlePublishToProd = async (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (publishStatus === 'loading' || publishStatus === 'success') {
             // Если уже идет загрузка или успешно, игнорируем повторные нажатия
             return;
@@ -123,9 +124,9 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                 )}
 
                 <div className={styles.cardContent}>
-                    <a href={lot.url} target="_blank" rel="noopener noreferrer">
-                        <h2>{lot.description}</h2>
-                    </a>
+                    <h2>
+                        {lot.description}
+                    </h2>
 
                     <p className={styles.priceDetail}>
                         Начальная цена:
@@ -169,9 +170,13 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                 </div>
 
                 <div className={styles.cardFooter}>
-                    <Link href={`/lot/${lot.id}`} className={styles.buyButton}>
+                    {/* 
+                      КНОПКА "ПОДРОБНЕЕ" ПРОСТО ВИЗУАЛЬНЫЙ ЭЛЕМЕНТ.
+                      Клик по ней вызовет onNavigate родительского div.
+                    */}
+                    <div className={styles.buyButton}>
                         Подробнее
-                    </Link>
+                    </div>
                 </div>
             </div>
         </div>
