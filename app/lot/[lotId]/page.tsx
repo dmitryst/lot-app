@@ -3,6 +3,10 @@ import type { Metadata } from 'next';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
 
+type Props = {
+    params: { lotId: string };
+};
+
 // Функция для получения данных лота по ID
 async function getLotData(lotId: string): Promise<Lot | null> {
   const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
@@ -23,7 +27,7 @@ async function getLotData(lotId: string): Promise<Lot | null> {
 }
 
 // ГЕНЕРАЦИЯ МЕТАДАННЫХ
-export async function generateMetadata({ params }: { params: { lotId: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lot = await getLotData(params.lotId);
 
   if (!lot) {
@@ -44,7 +48,7 @@ export async function generateMetadata({ params }: { params: { lotId: string } }
   };
 }
 
-export default async function Page({ params }: { params: { lotId: string } }) {
+export default async function Page({ params }: Props) {
   // Получаем данные на сервере
   const lot = await getLotData(params.lotId);
 
