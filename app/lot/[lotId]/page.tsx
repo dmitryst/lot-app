@@ -4,8 +4,8 @@ import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
 
 type Props = {
-    params: { lotId: string };
-    searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ lotId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 // Функция для получения данных лота по ID
@@ -28,8 +28,9 @@ async function getLotData(lotId: string): Promise<Lot | null> {
 }
 
 // ГЕНЕРАЦИЯ МЕТАДАННЫХ
-export async function generateMetadata({ params, searchParams  }: Props): Promise<Metadata> {
-  const lot = await getLotData(params.lotId);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lotId } = await params;
+  const lot = await getLotData(lotId);
 
   if (!lot) {
     return {
@@ -49,10 +50,8 @@ export async function generateMetadata({ params, searchParams  }: Props): Promis
   };
 }
 
-export default async function Page({ params, searchParams  }: Props) {
-  // Получаем данные на сервере
-  const lot = await getLotData(params.lotId);
-
-  // Передаем данные в клиентский компонент через пропсы
+export default async function Page({ params }: Props) {
+  const { lotId } = await params;
+  const lot = await getLotData(lotId);
   return <LotDetailsClient lot={lot} />;
 }
