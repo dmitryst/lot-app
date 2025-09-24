@@ -5,6 +5,7 @@ import LotDetailsClient from './LotDetailsClient';
 
 type Props = {
     params: { lotId: string };
+    searchParams: { [key: string]: string | string[] | undefined };
 };
 
 // Функция для получения данных лота по ID
@@ -27,7 +28,7 @@ async function getLotData(lotId: string): Promise<Lot | null> {
 }
 
 // ГЕНЕРАЦИЯ МЕТАДАННЫХ
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams  }: Props): Promise<Metadata> {
   const lot = await getLotData(params.lotId);
 
   if (!lot) {
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams  }: Props) {
   // Получаем данные на сервере
   const lot = await getLotData(params.lotId);
 
