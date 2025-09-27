@@ -58,6 +58,8 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     // Обработчик нажатия на кнопку "Опубликовать"
     const handlePublishToProd = async (e: React.MouseEvent) => {
         e.stopPropagation();
+        e.preventDefault();
+        
         if (publishStatus === 'loading' || publishStatus === 'success') {
             // Если уже идет загрузка или успешно, игнорируем повторные нажатия
             return;
