@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import LotMap from '../../../components/LotMap';
 import { Lot } from '../../../types';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
 
 // Компонент для отображения одного этапа покупки
@@ -16,31 +17,41 @@ const PurchaseStep = ({ title, description }: { title: string; description: stri
 
 // Компонент получает данные через пропсы
 export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
-    const router = useRouter();
+  const router = useRouter();
 
-    const handleBackToList = () => {
-        const savedQuery = sessionStorage.getItem('lotListQuery');
-        router.push(`/${savedQuery || ''}`);
-    };
+  const handleBackToList = () => {
+    const savedQuery = sessionStorage.getItem('lotListQuery');
+    router.push(`/${savedQuery || ''}`);
+  };
 
-    // Если данные не пришли с сервера
-    if (!lot) {
-        return (
-            <div className={styles.container}>
-                <button onClick={handleBackToList} className={styles.backLink}>
-                    &larr; Вернуться к списку лотов
-                </button>
-                <h1>Лот не найден</h1>
-                <p>К сожалению, запрашиваемый лот не существует или был удален.</p>
-            </div>
-        );
-    }
-    
+  // Если данные не пришли с сервера
+  if (!lot) {
     return (
+      <div className={styles.container}>
+        <button onClick={handleBackToList} className={styles.backLink}>
+          &larr; Вернуться к списку лотов
+        </button>
+        <h1>Лот не найден</h1>
+        <p>К сожалению, запрашиваемый лот не существует или был удален.</p>
+      </div>
+    );
+  }
+
+  // Формируем "хлебные крошки" для навигации и SEO
+  const crumbs = [
+    { label: 'Главная', href: '/' },
+    { label: lot.description.substring(0, 50) + '...', href: `/lot/${lot.id}` }
+  ];
+
+  return (
     <main className={styles.container}>
+      <Breadcrumbs crumbs={crumbs} />
+
       <button onClick={handleBackToList} className={styles.backLink}>
         &larr; Вернуться к списку лотов
       </button>
+
+      <h1 className={styles.mainLotTitle}>{lot.description}</h1>
 
       {/* === НОВЫЙ МАКЕТ СЕТКИ === */}
       <div className={styles.lotDetailGrid}>
@@ -51,10 +62,11 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         <div className={styles.imageSection}>
           <Image
             src={lot.imageUrl || '/placeholder.png'}
-            alt={`Изображение для лота: ${lot.description}`}
+            alt={`Фото лота: ${lot.description}`}
             width={500}
             height={400}
             className={styles.mainImage}
+            priority
           />
         </div>
 
