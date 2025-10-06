@@ -1,0 +1,69 @@
+/* app/components/CategoryTree.module.css */
+
+/* Общий контейнер для всего дерева категорий */
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Вертикальный отступ между родительскими категориями */
+    padding: 0.5rem;
+    border: 1px solid #e0e0e0; /* Рамка, как у других фильтров */
+    border-radius: 8px; /* Скругление углов, как у других элементов */
+    background-color: #fdfdfd;
+}
+
+/* Блок для одной родительской категории */
+.parent {
+    font-size: 1rem;
+}
+
+/* "Шапка" родительской категории (чекбокс + название) */
+.parentHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem; /* Отступ между чекбоксом и текстом */
+}
+
+/* Название родительской категории */
+.parentName {
+    font-weight: 600; /* Делаем название родителя жирным */
+    cursor: pointer; /* Показываем, что на него можно нажать для раскрытия */
+    user-select: none; /* Запрещаем выделение текста при клике */
+    transition: color 0.2s ease;
+}
+
+/* Эффект при наведении на название родительской категории */
+.parentName:hover {
+    color: #0056b3; /* Цвет для hover-эффекта, можно взять ваш основной */
+}
+
+/* Контейнер для дочерних категорий (для создания отступа) */
+.children {
+    padding-left: 1.8rem; /* Отступ слева, создающий эффект "дерева" */
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Вертикальный отступ между дочерними категориями */
+}
+
+/* Блок для одной дочерней категории */
+.child {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Стили для чекбоксов, чтобы они были одинаковыми */
+.parentHeader input[type="checkbox"],
+.child input[type="checkbox"] {
+    margin: 0;
+    width: 16px; /* Задаем фиксированный размер */
+    height: 16px;
+    cursor: pointer;
+    accent-color: #007bff; /* Цвет "галочки", можно поменять на ваш основной */
+}
+
+/* Стили для текста дочерней категории */
+.child label {
+    font-size: 0.9rem; /* Делаем шрифт дочерних категорий чуть меньше */
+    color: #333;
+}

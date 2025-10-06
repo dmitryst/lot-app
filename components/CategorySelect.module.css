@@ -1,0 +1,83 @@
+/* app/components/CategorySelect.module.css */
+
+.inputRow {
+  display: flex;
+  align-items: center; /* Выравниваем label и инпут по вертикали */
+  gap: 12px;           /* Добавляем отступ между ними */
+}
+
+.container {
+  position: relative; /* Важно для позиционирования popover */
+  width: 100%;
+}
+
+.label {
+  font-weight: 500;
+  font-size: 1rem;
+  flex-shrink: 0; /* Запрещаем label сжиматься, если не хватает места */
+}
+
+.selectTrigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s;
+  flex-grow: 1; /* Разрешаем инпуту занимать все оставшееся место */
+  min-width: 150px; /* Можно немного уменьшить, т.к. label теперь рядом */
+}
+
+.selectTrigger:hover {
+  border-color: #888;
+}
+
+.arrow {
+  transition: transform 0.2s ease-in-out;
+  color: #888;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  max-height: 400px; /* Ограничиваем высоту, чтобы не вылезать за экран */
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Важно, чтобы панель была поверх всего */
+  padding: 10px;
+}
+
+.popoverActions {
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.applyButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.applyButton:hover {
+  background-color: #0056b3;
+}

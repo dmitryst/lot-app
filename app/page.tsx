@@ -5,20 +5,14 @@ import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import debounce from 'lodash.debounce';
+
+import { CATEGORIES_TREE, BIDDING_TYPES, PAGE_SIZE } from './data/constants';
+
 import LotCard from '../components/LotCard';
 import Pagination from '../components/Pagination';
+import CategorySelect from '../components/CategorySelect';
 import styles from './page.module.css';
 import { Lot } from '../types';
-
-// --- Константы ---
-const PREDEFINED_CATEGORIES = [
-  'Автомобили',
-  'Права требования (дебиторская задолженность)',
-  'Земельные участки',
-  'Жилые здания (помещения)',
-  'Прочее',
-];
-const BIDDING_TYPES = ['Открытый аукцион', 'Публичное предложение'];
 
 const formatNumberWithSpaces = (value: string) => {
   if (!value) return '';
@@ -26,8 +20,6 @@ const formatNumberWithSpaces = (value: string) => {
   const cleanValue = value.replace(/\D/g, '');
   return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
-
-const PAGE_SIZE = 20;
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -46,44 +38,52 @@ function Page() {
 
   // ЕДИНСТВЕННЫЙ источник данных для API — URL
   const page = Number(searchParams.get('page')) || 1;
-  const category = searchParams.get('category') || 'Все';
   const biddingType = searchParams.get('biddingType') || 'Все';
   const priceFromParam = searchParams.get('priceFrom') || '';
   const priceToParam = searchParams.get('priceTo') || '';
 
   // Локальный UI-стейт, инициализируем из URL на каждом рендере
   // (контролируемые элементы должны сразу отражать URL)
-  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBiddingType, setSelectedBiddingType] = useState(biddingType);
   const [priceFrom, setPriceFrom] = useState(priceFromParam);
   const [priceTo, setPriceTo] = useState(priceToParam);
 
   // Синхронизация UI <- URL (чтобы при Back/Forward видны были актуальные значения)
-  useEffect(() => setSelectedCategory(category), [category]);
-  useEffect(() => setSelectedBiddingType(biddingType), [biddingType]);
-  useEffect(() => setPriceFrom(priceFromParam), [priceFromParam]);
-  useEffect(() => setPriceTo(priceToParam), [priceToParam]);
+  // --- СИНХРОНИЗАЦИЯ UI С URL ---
+  // Этот блок важен, чтобы при перезагрузке или навигации по истории
+  // UI отражал состояние из URL
+  useEffect(() => {
+    setSelectedCategories(searchParams.getAll('categories'));
+    setSelectedBiddingType(searchParams.get('biddingType') || 'Все');
+    setPriceFrom(searchParams.get('priceFrom') || '');
+    setPriceTo(searchParams.get('priceTo') || '');
+  }, [searchParams]);
 
   // Утилита: атомарно обновить URL-параметры
-  const updateQuery = useCallback((patch: Record<string, string | number | null | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
+    const currentParams = new URLSearchParams(window.location.search);
 
-    for (const [key, value] of Object.entries(patch)) {
-      if (value === null || value === undefined || value === '' || value === 'Все') {
-        params.delete(key);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        currentParams.delete(key);
+        value.forEach(item => currentParams.append(key, item));
+      } else if (value === null || value === undefined || value === '' || value === 'Все') {
+        currentParams.delete(key);
       } else {
-        params.set(key, String(value));
+        currentParams.set(key, String(value));
       }
-    }
-    router.replace(`${pathname}?${params.toString()}`);
-  }, [router, pathname, searchParams]);
+    });
+
+    router.push(`${pathname}?${currentParams.toString()}`);
+  }, [pathname, router]);
+
+  // Они только формируют новый URL, а загрузкой занимается useEffect выше.
+  const handleCategoryChange = useCallback((newSelected: string[]) => {
+    updateQuery({ categories: newSelected, page: 1 });
+  }, [updateQuery]);
 
   // Handlers — пишут и в локальный UI, и сразу в URL
-  const onCategoryClick = (value: string) => {
-    setSelectedCategory(value);
-    updateQuery({ category: value, page: 1 });
-  };
-
   const onBiddingTypeClick = (value: string) => {
     setSelectedBiddingType(value);
     updateQuery({ biddingType: value, page: 1 });
@@ -127,21 +127,32 @@ function Page() {
     setLoading(true);
     const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
     if (!apiUrl) {
+      console.error("API URL не определен!");
       setLoading(false);
       return;
     }
+
+    // searchParams - единственный источник правды.
+    // Просто берем все параметры из текущего URL.
     const params = new URLSearchParams(searchParams.toString());
-    // ВАЖНО: Бэкенд ждёт page и pageSize
     params.set('pageSize', String(PAGE_SIZE));
 
     try {
       const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
-      if (!res.ok) throw new Error('Не удалось загрузить лоты');
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Не удалось загрузить лоты: ${errorText}`);
+      }
+
       const data = await res.json();
+
       setLots(data.items);
       setTotalPages(data.totalPages);
     } catch (e) {
       console.error('Ошибка при загрузке лотов:', e);
+      setLots([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -152,7 +163,7 @@ function Page() {
 
     const fetchDataAndScroll = async () => {
       await fetchLots();
-      
+
       // Если компонент размонтировался, пока грузились данные, ничего не делаем
       if (isCancelled) return;
 
@@ -179,13 +190,12 @@ function Page() {
   const filtersSidebarContent = (
     <>
       <div className={styles.filterGroup}>
-        <h3 className={styles.filterTitle}>Категории</h3>
-        <div className={styles.buttonGroup}>
-          <button onClick={() => onCategoryClick('Все')} className={selectedCategory === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
-          {PREDEFINED_CATEGORIES.map(category => (
-            <button key={category} onClick={() => onCategoryClick(category)} className={selectedCategory === category ? styles.activeFilter : styles.filterButton}>{category}</button>
-          ))}
-        </div>
+        {/* Категории */}
+        <CategorySelect
+          categories={CATEGORIES_TREE}
+          selectedCategories={selectedCategories}
+          onChange={handleCategoryChange}
+        />
       </div>
 
       <div className={styles.filterGroup}>
