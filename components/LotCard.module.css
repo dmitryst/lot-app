@@ -1,0 +1,203 @@
+.lotCardContainer {
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.04);
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column; /* Для мобильных - все вертикально */
+}
+
+.cardContent {
+  flex-grow: 1;
+  /* Позволяет этому блоку растягиваться, прижимая футер вниз */
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 160px;
+  position: relative;
+}
+
+.lotImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-bottom: 1px solid #f3f3f3;
+}
+
+.contentWrapper {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* КЛАСС для параграфов с ценой */
+.priceDetail {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Позволяет переноситься, если не влезает */
+  gap: 0 8px; /* Отступ 8px по горизонтали, 0 по вертикали */
+  margin: 8px 0;
+}
+
+/* КЛАСС для самой цены */
+.priceValue {
+  font-weight: 600; /* Делаем жирнее */
+  font-size: 1.05rem; /* Немного увеличиваем размер */
+  color: #1a202c; /* Делаем темнее, чем основной текст */
+}
+
+/* Изменяем позиционирование иконок */
+.iconUp, .iconDown {
+  display: flex;
+  align-items: center;
+  /* margin-left: 8px; был раньше, теперь используем gap в .priceDetail */
+}
+
+.iconUp {
+  color: #28a745;
+}
+
+.iconDown {
+  color: #dc3545;
+}
+
+/* Контейнер для тегов категорий */
+.categoriesContainer {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Расстояние между тегами */
+}
+
+/* Стиль для одного тега категории */
+.categoryTag {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Делаем карточку flex-контейнером, чтобы футер прижался к низу */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Основной контент карточки будет занимать всё доступное пространство */
+.cardContent {
+  flex-grow: 1;
+}
+
+/* Футер карточки */
+.cardFooter {
+  margin-top: 24px;
+}
+
+.actionsWrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* Кнопка "Купить" */
+.buyButton {
+  display: inline-block;
+  background-color: #0070f3;
+  color: white;
+  padding: 10px 20px;
+  margin-right: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.buyButton:hover {
+  background-color: #005bb5;
+}
+
+/* --- Стили для кнопки "Опубликовать в PROD" --- */
+.publishButton {
+  position: static;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: 1px solid #e2e8f0; /* Легкая рамка по умолчанию */
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%; /* Круглая кнопка */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718096; /* Цвет иконки по умолчанию */
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Легкая тень */
+  z-index: 10; /* Убедимся, что кнопка поверх других элементов */
+}
+
+.publishButton:hover:not(:disabled) {
+  color: #0070f3; /* Синий при наведении */
+  border-color: #0070f3;
+  background-color: rgba(0, 112, 243, 0.1); /* Светло-синий фон при наведении */
+}
+
+.publishButton.loading {
+  cursor: wait;
+  /* Анимация вращения для иконки загрузки */
+  animation: spin 1s linear infinite;
+  color: #0070f3;
+  border-color: #0070f3;
+}
+
+.publishButton.success {
+  cursor: default;
+  color: #28a745; /* Зеленый при успехе */
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.publishButton.error {
+  cursor: default;
+  color: #dc3545; /* Красный при ошибке */
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Анимация вращения */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Для десктопа - размещение в строку */
+@media (min-width: 900px) {
+  .lotCardContainer {
+    flex-direction: row;
+  }
+  .imageWrapper {
+    width: 180px;
+    height: 140px;
+    flex-shrink: 0;
+  }
+  .contentWrapper {
+    padding: 18px 16px;
+    align-items: flex-start;
+  }
+}
+
+/* Скрыть на мобильных */
+@media (max-width: 900px) {
+  .buyButton {
+    display: none;
+  }
+}

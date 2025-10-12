@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column; /* Вертикальный макет для мобильных */
   gap: 1.5rem;
-  padding: 1rem;
+  padding-top: 0;
 }
 
 .filtersContainer {
@@ -55,102 +55,7 @@
 /* ЧАСТЬ 2: ОРИГИНАЛЬНЫЕ СТИЛИ С КОММЕНТАРИЯМИ */
 /* =================================================================== */
 
-/* Стили для контейнера, в котором лежат все карточки */
-.lotsGrid {
-  display: grid;
-  grid-template-columns: 1fr; /* ПО УМОЛЧАНИЮ: 1 колонка */
-  gap: 24px; /* Расстояние между карточками */
-}
 
-/* Стили для одной карточки лота */
-.card {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  padding: 24px;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  border: 1px solid #e2e8f0;
-  /* Делаем карточку flex-контейнером, чтобы футер прижался к низу */
-  display: flex;
-  flex-direction: column;
-  position: relative; /* Для позиционирования дочерних absolute элементов */
-}
-
-/* Эффект при наведении на карточку */
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Заголовок-описание лота */
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 1.25rem;
-  color: #2d3748;
-}
-
-/* Детали лота (цена, шаг, депозит) */
-.card p {
-  margin: 8px 0;
-  color: #4a5568;
-  font-size: 0.95rem;
-}
-
-.card p b {
-  color: #2d3748;
-}
-
-/* Контейнер для тегов категорий */
-.categoriesContainer {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px; /* Расстояние между тегами */
-}
-
-/* Стиль для одного тега категории */
-.categoryTag {
-  background-color: #e2e8f0;
-  color: #4a5568;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-/* Делаем карточку flex-контейнером, чтобы футер прижался к низу */
-.card {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Основной контент карточки будет занимать всё доступное пространство */
-.cardContent {
-  flex-grow: 1;
-}
-
-/* Футер карточки */
-.cardFooter {
-  margin-top: 24px; /* Отступ от контента */
-  text-align: right;
-}
-
-/* Кнопка "Купить" */
-.buyButton {
-  display: inline-block;
-  background-color: #0070f3;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.buyButton:hover {
-  background-color: #005bb5;
-}
 
 /* Контейнер для кнопок-фильтров */
 .filterContainer {
@@ -189,44 +94,13 @@
   cursor: pointer;
 }
 
-/* КЛАСС для параграфов с ценой */
-.priceDetail {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap; /* Позволяет переноситься, если не влезает */
-  gap: 0 8px; /* Отступ 8px по горизонтали, 0 по вертикали */
-  margin: 8px 0;
-}
-
-/* КЛАСС для самой цены */
-.priceValue {
-  font-weight: 600; /* Делаем жирнее */
-  font-size: 1.05rem; /* Немного увеличиваем размер */
-  color: #1a202c; /* Делаем темнее, чем основной текст */
-}
-
-/* Изменяем позиционирование иконок */
-.iconUp, .iconDown {
-  display: flex;
-  align-items: center;
-  /* margin-left: 8px; был раньше, теперь используем gap в .priceDetail */
-}
-
-.iconUp {
-  color: #28a745;
-}
-
-.iconDown {
-  color: #dc3545;
-}
-
 /* --- НОВЫЙ ДВУХКОЛОНОЧНЫЙ МАКЕТ --- */
 .mainLayout {
   display: flex;
   gap: 32px; /* Расстояние между сайдбаром и контентом */
   align-items: flex-start;
   max-width: 1200px;
-  margin: 40px auto;
+  margin-top: 0;
   padding: 0 20px;
 }
 
@@ -332,62 +206,11 @@
   color: #999;
 }
 
-/* --- Стили для кнопки "Опубликовать в PROD" --- */
-.publishButton {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: 1px solid #e2e8f0; /* Легкая рамка по умолчанию */
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%; /* Круглая кнопка */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #718096; /* Цвет иконки по умолчанию */
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Легкая тень */
-  z-index: 10; /* Убедимся, что кнопка поверх других элементов */
-}
-
-.publishButton:hover:not(:disabled) {
-  color: #0070f3; /* Синий при наведении */
-  border-color: #0070f3;
-  background-color: rgba(0, 112, 243, 0.1); /* Светло-синий фон при наведении */
-}
-
-.publishButton.loading {
-  cursor: wait;
-  /* Анимация вращения для иконки загрузки */
-  animation: spin 1s linear infinite;
-  color: #0070f3;
-  border-color: #0070f3;
-}
-
-.publishButton.success {
-  cursor: default;
-  color: #28a745; /* Зеленый при успехе */
-  border-color: #28a745;
-  background-color: rgba(40, 167, 69, 0.1);
-}
-
-.publishButton.error {
-  cursor: default;
-  color: #dc3545; /* Красный при ошибке */
-  border-color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
-}
-
-/* Анимация вращения */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+/* Стили для контейнера, в котором лежат все карточки */
+.lotsGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* ПО УМОЛЧАНИЮ: 1 колонка */
+  gap: 24px; /* Расстояние между карточками */
 }
 
 /* =================================================================== */
@@ -397,7 +220,7 @@
   .main {
     align-items: flex-start;
     gap: 32px;
-    padding: 2.5rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     max-width: 1440px;
     margin: 40px auto;
   }
@@ -484,65 +307,12 @@
 }
 
 /* =================================================================== */
-/* ЧАСТЬ 4: СТИЛИ ДЛЯ КАРТОЧКИ ЛОТА С ИЗОБРАЖЕНИЕМ */
-/* Эти стили отвечают за двухколоночный макет внутри одной карточки */
-/* =================================================================== */
-
-.lotCardContainer {
-  /* Заменяем display: flex; на display: grid; для более предсказуемого поведения колонок */
-  display: grid;
-  /* Задаем первой колонке (для картинки) фиксированную ширину 250px, 
-     а второй (для контента) - все оставшееся пространство (1fr). */
-  grid-template-columns: 250px 1fr; 
-  gap: 1.5rem; /* Отступ между картинкой и контентом */
-
-  /* Эти стили дублируют .card, чтобы сохранить внешний вид */
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  padding: 24px;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  border: 1px solid #e2e8f0;
-  position: relative;
-  /* Для позиционирования кнопки "опубликовать" */
-  align-items: flex-start;
-  /* Выравниваем дочерние элементы по верхнему краю, а не растягиваем */
-}
-
-.lotCardContainer:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.imageWrapper {
-  position: relative;
-  width: 100%;
-  width: 250px;
-  height: 200px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.lotImage {
-  /* Пустой класс для Next.js <Image>, если потребуются доп. стили. */
-  /* layout="fill" заставит его заполнить родительский .imageWrapper */
-}
-
-.contentWrapper {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  /* Важное правило, чтобы flex-элементы не выходили за пределы родителя */
-}
 
 /* 
   Мы используем существующий класс .cardContent для основного блока текста,
   просто убедитесь, что он находится внутри .contentWrapper
 */
-.cardContent {
-  flex-grow: 1;
-  /* Позволяет этому блоку растягиваться, прижимая футер вниз */
-}
+
 
 /* 
   Ваши существующие классы .cardFooter, .publishButton, .buyButton и др.
@@ -578,7 +348,8 @@
   align-items: center;
   width: 100%;
   height: 140px; /* Примерная высота, равная ~2 высотам кнопки */
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 0;
   background-image: url('/map-bg.jpg'); /* Путь к вашему фоновому изображению */
   background-size: cover;
   background-position: center;

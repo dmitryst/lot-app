@@ -1,8 +1,7 @@
 'use client';
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import styles from '../app/page.module.css';
+import styles from './LotCard.module.css';
 import { Lot } from '../types';
 import { formatMoney } from '../utils/format';
 import Accordion from './Accordion';
@@ -10,6 +9,17 @@ import Accordion from './Accordion';
 // Импортируем картинку как статический ресурс.
 // Путь указывается относительно текущего файла.
 import placeholderImage from '../public/placeholder.png';
+
+function useIsDesktop() {
+    const [isDesktop, setIsDesktop] = useState(true);
+    useEffect(() => {
+        const handler = () => setIsDesktop(window.innerWidth >= 900);
+        handler();
+        window.addEventListener("resize", handler);
+        return () => window.removeEventListener("resize", handler);
+    }, []);
+    return isDesktop;
+}
 
 // --- ИКОНКИ ---
 const IconArrowUp = () => (
@@ -55,11 +65,13 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
 
     const isPublishButtonEnabled = process.env.NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED === 'true';
 
+    const isDesktop = useIsDesktop();
+
     // Обработчик нажатия на кнопку "Опубликовать"
     const handlePublishToProd = async (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        
+
         if (publishStatus === 'loading' || publishStatus === 'success') {
             // Если уже идет загрузка или успешно, игнорируем повторные нажатия
             return;
@@ -114,16 +126,6 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
             </div>
 
             <div className={styles.contentWrapper}>
-                {/* --- КНОПКА "ОПУБЛИКОВАТЬ В PROD" --- */}
-                {isPublishButtonEnabled && (
-                    <button
-                        className={`${styles.publishButton} ${publishStatus !== 'idle' ? styles[publishStatus] : ''}`}
-                        onClick={handlePublishToProd}
-                        disabled={publishStatus === 'loading' || publishStatus === 'success'}
-                    >
-                        <PublishIcon status={publishStatus} />
-                    </button>
-                )}
 
                 <div className={styles.cardContent}>
                     <h2>
@@ -154,13 +156,13 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                         </p>
                     )}
 
-                    {lot.bidding.viewingProcedure && (
+                    {isDesktop && lot.bidding.viewingProcedure && (
                         <Accordion title="Порядок ознакомления">
                             {lot.bidding.viewingProcedure}
                         </Accordion>
                     )}
 
-                    {lot.categories && lot.categories.length > 0 && (
+                    {isDesktop && lot.categories && lot.categories.length > 0 && (
                         <div className={styles.categoriesContainer}>
                             {lot.categories.map((cat) => (
                                 <span key={cat.id} className={styles.categoryTag}>
@@ -172,12 +174,22 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                 </div>
 
                 <div className={styles.cardFooter}>
-                    {/* 
-                      КНОПКА "ПОДРОБНЕЕ" ПРОСТО ВИЗУАЛЬНЫЙ ЭЛЕМЕНТ.
-                      Клик по ней вызовет onNavigate родительского div.
-                    */}
-                    <div className={styles.buyButton}>
-                        Подробнее
+                    <div className={styles.actionsWrapper}>
+                        {/* 
+                        КНОПКА "ПОДРОБНЕЕ" ПРОСТО ВИЗУАЛЬНЫЙ ЭЛЕМЕНТ.
+                        Клик по ней вызовет onNavigate родительского div.*/}
+                        <div className={styles.buyButton}>Подробнее</div>
+
+                        {/* --- КНОПКА "ОПУБЛИКОВАТЬ В PROD" --- */}
+                        {isPublishButtonEnabled && (
+                            <button
+                                className={`${styles.publishButton} ${publishStatus !== 'idle' ? styles[publishStatus] : ''}`}
+                                onClick={handlePublishToProd}
+                                disabled={publishStatus === 'loading' || publishStatus === 'success'}
+                            >
+                                <PublishIcon status={publishStatus} />
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
