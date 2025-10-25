@@ -1,0 +1,114 @@
+/* Файл: app/login/login.module.css */
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* Высота минус хедер */
+    padding: 2rem;
+    background-color: #f0f2f5; /* Значение из вашего globals.css */
+}
+
+.formWrapper {
+    width: 100%;
+    max-width: 420px;
+    background-color: #ffffff; /* Белый фон для формы */
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #1a202c; /* Темный цвет из вашего globals.css */
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568; /* Более светлый текст для лейблов */
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #1a202c;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #3182ce; /* Синий цвет для фокуса */
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.3);
+}
+
+.button {
+    width: 100%;
+    padding: 0.85rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #3182ce; /* Синий цвет для кнопки */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #2b6cb0; /* Более темный синий при наведении */
+}
+
+.button:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    color: #c53030; /* Красный для ошибок */
+    background-color: #fed7d7;
+    border: 1px solid #fbb6b6;
+    padding: 0.75rem;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+}
+
+.linkText {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #4a5568;
+}
+
+.linkText a {
+    color: #3182ce;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.linkText a:hover {
+    text-decoration: underline;
+}

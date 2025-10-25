@@ -72,9 +72,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   // Формируем заголовок и описание, богатые ключевыми словами
-  const title = `Купить: ${lot.description.substring(0, 70)}... | Торги по банкротству s-lot.ru`;
+  const title = `Купить: ${lot.title ? lot.title : lot.description}... | Торги по банкротству s-lot.ru`;
   const price = lot.startPrice ?? 0;
-  const description = `Лот на торгах: ${lot.description}. Начальная цена: ${price.toLocaleString('ru-RU')} ₽.}. Участие в торгах с s-lot.ru.`;
+  const description = `Лот на торгах: ${lot.title ? lot.title : lot.description}. Начальная цена: ${price.toLocaleString('ru-RU')} ₽.}. Участие в торгах с s-lot.ru.`;
 
   return {
     title,

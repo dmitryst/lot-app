@@ -53,3 +53,32 @@
     color: white;
     border-color: #007bff;
 }
+
+/* --- СТИЛИ ДЛЯ ПЛАШКИ-УВЕДОМЛЕНИЯ --- */
+
+.promoBanner {
+    position: absolute;
+    top: 80px; /* Ниже панели фильтров */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    background-color: rgba(255, 235, 59, 0.9); /* Желтый фон */
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.promoBanner a {
+    color: #007bff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.promoBanner a:hover {
+    text-decoration: underline;
+}

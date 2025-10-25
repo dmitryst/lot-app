@@ -1,9 +1,14 @@
+// Файл: app/map/page.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Map, Placemark, Clusterer } from '@pbe/react-yandex-maps';
 import styles from './map.module.css';
 import { CATEGORIES_TREE } from '../data/constants';
+import { useAuth } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Находим узел "Недвижимость" и получаем его дочерние категории
 const realEstateNode = CATEGORIES_TREE.find(node => node.name === 'Недвижимость');
@@ -15,10 +20,14 @@ interface GeoLot {
     startPrice: number;
     latitude: number;
     longitude: number;
-    categoryName?: string;
 }
 
 export default function MapPage() {
+    const { user } = useAuth();
+    const router = useRouter();
+    const [showPaywall, setShowPaywall] = useState(false);
+    const [accessInfo, setAccessInfo] = useState({ hasFullAccess: false, totalCount: 0 });
+
     const [lots, setLots] = useState<GeoLot[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -43,10 +52,19 @@ export default function MapPage() {
             const apiUrl = `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/with-coordinates?${queryString}`;
 
             try {
-                const res = await fetch(apiUrl);
-                if (!res.ok) throw new Error('Не удалось загрузить лоты для карты');
-                const data: GeoLot[] = await res.json();
-                setLots(data);
+                const res = await fetch(apiUrl, {credentials: 'include'}); // Важно для отправки cookie
+                if (res.status === 401) {
+                    router.push('/login');
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(`Ошибка сервера: ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                setLots(data.lots);
+                setAccessInfo({ hasFullAccess: data.hasFullAccess, totalCount: data.totalCount });
             } catch (error) {
                 console.error("Ошибка при загрузке лотов:", error);
                 setLots([]);
@@ -56,7 +74,7 @@ export default function MapPage() {
         };
 
         fetchGeoLots();
-    }, [selectedCategories]);  // Перезагружаем данные при изменении фильтров
+    }, [selectedCategories, router]);
 
     return (
         <div className={styles.mapContainer}>
@@ -72,6 +90,14 @@ export default function MapPage() {
                     </button>
                 ))}
             </div>
+
+            {/* баннер-уведомление */}
+            {!loading && !accessInfo.hasFullAccess && (
+                <div className={styles.promoBanner}>
+                    Отображается {lots.length} из {accessInfo.totalCount} объектов. 
+                    Для полного доступа <Link href="/subscribe">оформите подписку</Link>.
+                </div>
+            )}
 
             {/* карта */}
             {loading && <div className={styles.loader}>Загрузка карты и объектов...</div>}

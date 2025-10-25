@@ -51,7 +51,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         &larr; Вернуться к списку лотов
       </button>
 
-      <h1 className={styles.mainLotTitle}>{lot.description}</h1>
+      <h1 className={styles.mainLotTitle}>{lot.title ? lot.title : lot.description}</h1>
 
       {/* === НОВЫЙ МАКЕТ СЕТКИ === */}
       <div className={styles.lotDetailGrid}>
@@ -62,7 +62,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         <div className={styles.imageSection}>
           <Image
             src={lot.imageUrl || '/placeholder.png'}
-            alt={`Фото лота: ${lot.description}`}
+            alt={`Фото лота: ${lot.title ? lot.title : lot.description}`}
             width={500}
             height={400}
             className={styles.mainImage}

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import YandexMapsProvider from "@/components/YandexMapsProvider";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,8 +21,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
-        {/* Используем наш компонент-обертку */}
-        <YandexMapsProvider>{children}</YandexMapsProvider>
+        <AuthProvider>
+          {/* Используем наш компонент-обертку */}
+          <YandexMapsProvider>{children}</YandexMapsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

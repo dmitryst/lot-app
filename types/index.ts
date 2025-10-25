@@ -7,6 +7,7 @@ export type Lot = {
   id: string;
   url?: string;
   startPrice: string | null;
+  title: string | null;
   description: string;
   step: string | null;
   deposit: string | null;
