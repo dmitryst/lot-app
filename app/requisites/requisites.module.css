@@ -1,0 +1,93 @@
+/* /app/requisites/requisites.module.css */
+
+.container {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: #13343b;
+}
+
+.card {
+    width: 100%;
+    max-width: 700px;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.cardHeader {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.cardBody {
+    padding: 0.5rem 0;
+}
+
+.detailsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detailsListItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+}
+
+.detailsListItem:last-child {
+    border-bottom: none;
+}
+
+.itemContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.itemLabel {
+    color: #626c71;
+    font-size: 12px;
+}
+
+.itemValue {
+    font-weight: 500;
+}
+
+.copyButton {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: 1rem;
+}
+
+.copyButton:hover {
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+.copyButton.copied {
+    background-color: #28a745;
+    color: #fff;
+    border-color: transparent;
+}
