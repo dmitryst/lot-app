@@ -52,12 +52,12 @@ export default function SubscribePage() {
             <section className={styles.pricingWrapper}>
                 <div className={styles.pricingCard}>
                     <h2 className={styles.planName}>PRO</h2>
-                    <p className={styles.price}>499₽<span>/месяц</span></p>
+                    <p className={styles.price}>500₽<span>/месяц</span></p>
                     <ul className={styles.featureList}>
                         <li className={styles.featureItem}>Полный доступ ко всем объектам</li>
                         <li className={styles.featureItem}>Неограниченное использование фильтров</li>
                         <li className={styles.featureItem}>Просмотр детальной информации</li>
-                        <li className={styles.featureItem}>Приоритетная поддержка</li>
+                        {/* <li className={styles.featureItem}>Приоритетная поддержка</li> */}
                     </ul>
                     <button onClick={handleSubscribeClick} disabled={isLoading} className={styles.ctaButton}>
                         {isLoading ? 'Переходим к оплате...' : 'Оформить подписку'}
