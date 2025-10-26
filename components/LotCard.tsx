@@ -128,9 +128,9 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
             <div className={styles.contentWrapper}>
 
                 <div className={styles.cardContent}>
-                    <h2>
-                        {lot.description}
-                    </h2>
+                    <h3>
+                        {lot.title ? lot.title : lot.description}
+                    </h3>
 
                     <p className={styles.priceDetail}>
                         Начальная цена:
