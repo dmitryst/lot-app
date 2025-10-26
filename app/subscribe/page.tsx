@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import styles from './subscribe.module.css';
+import Link from 'next/link';
 
 export default function SubscribePage() {
     const { user } = useAuth();
@@ -13,6 +14,7 @@ export default function SubscribePage() {
 
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [hasAgreed, setHasAgreed] = useState(false);
 
     const handlePayment = async (planId: string) => {
         setIsLoading(planId);
@@ -82,7 +84,7 @@ export default function SubscribePage() {
                         <p className={styles.planDescription}>Полный доступ ко всем лотам и аналитике на 30 дней.</p>
                         <button 
                             onClick={() => handlePayment('pro-month')} 
-                            disabled={!!isLoading} 
+                            disabled={!!isLoading || !hasAgreed} 
                             className={styles.button}
                         >
                             {isLoading === 'pro-month' ? 'Загрузка...' : 'Выбрать'}
@@ -96,13 +98,27 @@ export default function SubscribePage() {
                         <p className={styles.planDescription}>Экономия 1000 ₽! Полный доступ на 365 дней.</p>
                         <button 
                             onClick={() => handlePayment('pro-year')} 
-                            disabled={!!isLoading}
+                            disabled={!!isLoading || !hasAgreed} 
                             className={styles.button}
                         >
                             {isLoading === 'pro-year' ? 'Загрузка...' : 'Выбрать'}
                         </button>
                     </div>
                 </div>
+
+                {/* --- БЛОК СОГЛАСИЯ --- */}
+                <div className={styles.agreement}>
+                  <input 
+                    type="checkbox" 
+                    id="terms-agreement"
+                    checked={hasAgreed}
+                    onChange={(e) => setHasAgreed(e.target.checked)}
+                  />
+                  <label htmlFor="terms-agreement">
+                    Я принимаю условия <Link href="/terms" target="_blank">Публичной оферты</Link> и даю согласие на обработку персональных данных.
+                  </label>
+                </div>
+                {/* ----------------------------- */}
 
                 {error && <p className={styles.errorMessage}>{error}</p>}
 

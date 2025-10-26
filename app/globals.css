@@ -29,3 +29,40 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* Стили для футера */
+.footer {
+  background-color: #1a202c;
+  color: #a0aec0;
+  padding: 1.5rem 1rem;
+  margin-top: auto; /* Прижимает футер к низу */
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-link {
+  color: #a0aec0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+}
