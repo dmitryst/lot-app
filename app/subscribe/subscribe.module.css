@@ -1,96 +1,121 @@
 /* Файл: app/subscribe/subscribe.module.css */
-
 .container {
-    max-width: 960px;
-    margin: 4rem auto;
-    padding: 2rem;
-    background-color: #f0f2f5; /* Базовый фон */
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.header h1 {
-    font-size: 2.25rem; /* ~36px */
-    font-weight: 700;
-    color: #1a202c;
-    margin-bottom: 1rem;
-}
-
-.header p {
-    font-size: 1.125rem; /* ~18px */
-    color: #4a5568;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.pricingWrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 4rem;
+    padding: 4rem 1rem 6rem; /* Увеличили отступ снизу */
+    background-color: #f7fafc;
+    min-height: 100vh;
 }
 
-.pricingCard {
-    background-color: #ffffff;
-    border: 2px solid #3182ce; /* Синий акцент */
-    border-radius: 12px;
-    padding: 2.5rem;
+.content {
+    max-width: 800px;
     width: 100%;
-    max-width: 400px;
     text-align: center;
-    box-shadow: 0 10px 15px -3px rgba(49, 130, 206, 0.1), 0 4px 6px -2px rgba(49, 130, 206, 0.05);
 }
 
-.planName {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #3182ce;
-    margin-bottom: 0.5rem;
-}
-
-.price {
+.title {
     font-size: 2.5rem;
     font-weight: 700;
     color: #1a202c;
     margin-bottom: 0.5rem;
 }
 
-.price span {
-    font-size: 1rem;
-    font-weight: 400;
+.subtitle {
+    font-size: 1.125rem;
     color: #4a5568;
+    margin-bottom: 2.5rem; /* Увеличили отступ */
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.featureList {
+/* Стили для блока с преимуществами */
+.featuresWrapper {
+    margin-bottom: 3rem;
+}
+
+.featuresList {
     list-style: none;
     padding: 0;
-    margin: 2rem 0;
-    text-align: left;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.featuresList li {
+    background-color: #ebf8ff;
+    color: #3182ce;
+    padding: 0.6rem 1.2rem;
+    border-radius: 9999px; /* Делает теги овальными */
+    font-size: 0.9rem;
+}
+
+/* Стили для карточек тарифов */
+.plansContainer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem; /* Добавили отступ снизу */
+}
+
+.planCard {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    width: 320px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
 }
 
-.featureItem {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1rem;
+.planCardFeatured {
+    border-color: #3182ce;
+    border-width: 2px;
+}
+
+.featuredBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #3182ce;
+    color: white;
+    padding: 0.25rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transform: rotate(45deg) translate(25%, -60%);
+    transform-origin: center;
+    width: 120px;
+}
+
+.planTitle, .sectionTitle {
+    font-size: 1.75rem; /* Увеличили заголовок секции */
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1.5rem; /* Увеличили отступ */
+}
+
+.planPrice {
+    font-size: 2.25rem;
+    font-weight: 700;
     color: #1a202c;
+    margin-bottom: 1rem;
 }
 
-/* SVG иконка галочки */
-.featureItem::before {
-    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'%3E%3C/path%3E%3C/svg%3E");
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0; /* Чтобы иконка не сжималась */
+.planDescription {
+    color: #718096;
+    margin-bottom: 2rem;
+    flex-grow: 1;
 }
 
-.ctaButton {
+.button {
     width: 100%;
     padding: 0.85rem;
     font-size: 1rem;
@@ -103,70 +128,52 @@
     transition: background-color 0.2s;
 }
 
-.ctaButton:hover {
+.button:hover {
     background-color: #2b6cb0;
 }
 
-.ctaButton:disabled {
+.button:disabled {
     background-color: #a0aec0;
     cursor: not-allowed;
 }
 
-.faqSection {
-    max-width: 720px;
-    margin: 0 auto;
+.errorMessage {
+    color: #c53030;
+    background-color: #fed7d7;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.faqSection h2 {
-    text-align: center;
-    font-size: 1.875rem;
-    margin-bottom: 2rem;
-    color: #1a202c;
+/* Стили для секции FAQ */
+.faqSection {
+    text-align: left;
+    max-width: 700px; /* Сделали секцию шире */
+    margin: 4rem auto 0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 3rem;
 }
 
 .faqItem {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 1.5rem 0;
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 1rem;
 }
 
-.faqItem:last-child {
-    border-bottom: none;
-}
-
-.faqQuestion {
-    font-size: 1.125rem;
+.faqItem h4 {
     font-weight: 600;
-    margin: 0 0 1rem 0;
-    color: #1a202c;
+    font-size: 1.1rem;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
 }
 
-.faqAnswer {
-    font-size: 1rem;
-    color: #4a5568;
+.faqItem p {
     margin: 0;
+    color: #4a5568;
     line-height: 1.6;
-}
-
-/* Адаптивность для мобильных */
-@media (max-width: 768px) {
-    .container {
-        margin: 2rem auto;
-        padding: 1rem;
-    }
-
-    .header h1 {
-        font-size: 1.75rem;
-    }
-
-    .header p {
-        font-size: 1rem;
-    }
-
-    .pricingCard {
-        padding: 2rem;
-    }
-
-    .price {
-        font-size: 2.25rem;
-    }
 }

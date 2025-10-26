@@ -10,76 +10,119 @@ import styles from './subscribe.module.css';
 export default function SubscribePage() {
     const { user } = useAuth();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubscribeClick = async () => {
-        setIsLoading(true);
+    const [isLoading, setIsLoading] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const handlePayment = async (planId: string) => {
+        setIsLoading(planId);
+        setError(null);
+
         if (!user) {
             router.push('/login?redirect=/subscribe');
             return;
         }
 
+        const backendUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+        const apiUrl = `${backendUrl}/api/payments/create-session`;
+
         // Запрос к бэкенду для создания сессии оплаты
         try {
-            const res = await fetch('/api/payments/create-session', {
+            const res = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Можно передать ID тарифа, если их будет несколько
-                body: JSON.stringify({ planId: 'pro-monthly' }) 
+                credentials: 'include',
+                // передаем ID тарифа, так как их существует несколько
+                body: JSON.stringify({ planId })
             });
 
-            if (res.ok) {
-                const { checkoutUrl } = await res.json();
-                // Перенаправление на страницу платежного шлюза
-                window.location.href = checkoutUrl;
-            } else {
-                alert('Не удалось создать сессию оплаты. Попробуйте позже.');
-                setIsLoading(false);
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Не удалось создать сессию оплаты.');
             }
-        } catch (error) {
+
+            const { confirmationUrl } = await res.json();
+
+            // Перенаправление на страницу платежного шлюзаы
+            if (confirmationUrl) {
+                window.location.href = confirmationUrl;
+            } else {
+                throw new Error('Не удалось получить ссылку на оплату.');
+            }
+
+        } catch (err: any) {
             alert('Произошла ошибка. Попробуйте позже.');
-            setIsLoading(false);
+            setError(err.message || 'Произошла неизвестная ошибка.');
+            setIsLoading(null);
         }
     };
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <h1>Разблокируйте полный доступ</h1>
-                <p>Получите неограниченный доступ ко всем объектам на карте и расширенным фильтрам для максимально эффективного поиска.</p>
-            </header>
+            <div className={styles.content}>
+                <h1 className={styles.title}>Доступ к PRO</h1>
+                <p className={styles.subtitle}>
+                    Получите неограниченный доступ ко всем объектам на карте и расширенным фильтрам для максимально эффективного поиска.
+                </p>
 
-            <section className={styles.pricingWrapper}>
-                <div className={styles.pricingCard}>
-                    <h2 className={styles.planName}>PRO</h2>
-                    <p className={styles.price}>500₽<span>/месяц</span></p>
-                    <ul className={styles.featureList}>
-                        <li className={styles.featureItem}>Полный доступ ко всем объектам</li>
-                        <li className={styles.featureItem}>Неограниченное использование фильтров</li>
-                        <li className={styles.featureItem}>Просмотр детальной информации</li>
-                        {/* <li className={styles.featureItem}>Приоритетная поддержка</li> */}
+                {/* Блок с преимуществами */}
+                <div className={styles.featuresWrapper}>
+                    <ul className={styles.featuresList}>
+                        <li>✓ Полный доступ ко всем объектам</li>
+                        <li>✓ Неограниченное использование фильтров</li>
+                        <li>✓ Просмотр детальной информации</li>
                     </ul>
-                    <button onClick={handleSubscribeClick} disabled={isLoading} className={styles.ctaButton}>
-                        {isLoading ? 'Переходим к оплате...' : 'Оформить подписку'}
-                    </button>
                 </div>
-            </section>
 
-            <section className={styles.faqSection}>
-                <h2>Часто задаваемые вопросы</h2>
-                <div className={styles.faqItem}>
-                    <h3 className={styles.faqQuestion}>Могу ли я отменить подписку в любое время?</h3>
-                    <p className={styles.faqAnswer}>Да, вы можете отменить подписку в любой момент в вашем личном кабинете. Доступ к PRO-функциям сохранится до конца оплаченного периода.</p>
+                {/* Тарифные планы */}
+                <div className={styles.plansContainer}>
+                    <div className={styles.planCard}>
+                        <h2 className={styles.planTitle}>Месяц</h2>
+                        <p className={styles.planPrice}>500 ₽</p>
+                        <p className={styles.planDescription}>Полный доступ ко всем лотам и аналитике на 30 дней.</p>
+                        <button 
+                            onClick={() => handlePayment('pro-month')} 
+                            disabled={!!isLoading} 
+                            className={styles.button}
+                        >
+                            {isLoading === 'pro-month' ? 'Загрузка...' : 'Выбрать'}
+                        </button>
+                    </div>
+
+                    <div className={`${styles.planCard} ${styles.planCardFeatured}`}>
+                        <div className={styles.featuredBadge}>Выгодно</div>
+                        <h2 className={styles.planTitle}>Год</h2>
+                        <p className={styles.planPrice}>5000 ₽</p>
+                        <p className={styles.planDescription}>Экономия 1000 ₽! Полный доступ на 365 дней.</p>
+                        <button 
+                            onClick={() => handlePayment('pro-year')} 
+                            disabled={!!isLoading}
+                            className={styles.button}
+                        >
+                            {isLoading === 'pro-year' ? 'Загрузка...' : 'Выбрать'}
+                        </button>
+                    </div>
                 </div>
-                <div className={styles.faqItem}>
-                    <h3 className={styles.faqQuestion}>Какие способы оплаты вы принимаете?</h3>
-                    <p className={styles.faqAnswer}>Мы принимаем все основные банковские карты (Visa, MasterCard, Мир) через безопасный платежный шлюз.</p>
-                </div>
-                <div className={styles.faqItem}>
-                    <h3 className={styles.faqQuestion}>Что произойдет после оплаты?</h3>
-                    <p className={styles.faqAnswer}>Сразу после успешной оплаты PRO-статус будет активирован для вашего аккаунта, и вы получите полный доступ ко всем функциям сайта.</p>
-                </div>
-            </section>
+
+                {error && <p className={styles.errorMessage}>{error}</p>}
+
+                {/* Секция FAQ */}
+                <section className={styles.faqSection}>
+                    <h2 className={styles.sectionTitle}>Часто задаваемые вопросы</h2>
+                    <div className={styles.faqItem}>
+                        <h4>Могу ли я отменить подписку в любое время?</h4>
+                        <p>Да, вы можете отменить подписку в любой момент в вашем личном кабинете. Доступ к PRO-функциям сохранится до конца оплаченного периода.</p>
+                    </div>
+                    <div className={styles.faqItem}>
+                        <h4>Какие способы оплаты вы принимаете?</h4>
+                        <p>Мы принимаем банковские карты Мир через безопасный платежный шлюз.</p>
+                    </div>
+                    <div className={styles.faqItem}>
+                        <h4>Что произойдет после оплаты?</h4>
+                        <p>Сразу после успешной оплаты PRO-статус будет активирован для вашего аккаунта, и вы получите полный доступ ко всем функциям сайта.</p>
+                    </div>
+                </section>
+            </div>
         </div>
     );
 }
