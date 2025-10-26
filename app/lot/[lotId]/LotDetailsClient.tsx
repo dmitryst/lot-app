@@ -93,7 +93,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           </div>
 
           {/* Можно добавить кнопку "купить" прямо сюда */}
-          <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button>
+          {/* <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button> */}
         </div>
 
         {/* --- ЭЛЕМЕНТЫ ВТОРОЙ СТРОКИ --- */}
