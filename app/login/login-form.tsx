@@ -100,7 +100,7 @@ export default function LoginForm() {
                     </button>
                 </form>
                 <p className={styles.linkText}>
-                    Нет аккаунта? <Link href="/register">Зарегистрироваться</Link>
+                    Нет аккаунта? <Link href="/login/register">Зарегистрироваться</Link>
                 </p>
             </div>
         </div>
