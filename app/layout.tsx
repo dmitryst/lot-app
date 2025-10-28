@@ -6,6 +6,7 @@ import "./globals.css";
 import YandexMapsProvider from "@/components/YandexMapsProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import Link from "next/link";
+import VersionDisplay from "@/components/VersionDisplay";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
             <footer className="footer">
               <div className="footer-container">
                 <p>© 2025 s-lot.ru. Все права защищены.</p>
+                <VersionDisplay /> 
                 <nav>
                   <Link href="/subscribe" className="footer-link">Тарифы</Link>
                   <Link href="/terms" className="footer-link">Публичная оферта</Link>

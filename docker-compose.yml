@@ -8,14 +8,10 @@ services:
       context: ./lot-app
       # Передаем переменные из .env в качестве аргументов на этап сборки
       args:
-        - POSTGRES_DB=${POSTGRES_DB}
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        - POSTGRES_HOST=${POSTGRES_HOST}
-        - POSTGRES_PORT=${POSTGRES_PORT}
         - NEXT_PUBLIC_CSHARP_BACKEND_URL=${NEXT_PUBLIC_CSHARP_BACKEND_URL}
         - NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED=${NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED}
         - NEXT_PUBLIC_YANDEX_MAPS_API_KEY=${NEXT_PUBLIC_YANDEX_MAPS_API_KEY}
+        - NEXT_PUBLIC_APP_VERSION=${NEXT_PUBLIC_APP_VERSION}
     container_name: lot-app-container
     restart: unless-stopped
     ports:
@@ -57,6 +53,7 @@ services:
       - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - BackgroundParsers__Enabled=true
     ports:
       - "8080:8080"
     depends_on:
