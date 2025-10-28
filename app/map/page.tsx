@@ -14,6 +14,12 @@ import Link from 'next/link';
 const realEstateNode = CATEGORIES_TREE.find(node => node.name === 'Недвижимость');
 const PROPERTY_CATEGORIES = realEstateNode?.children?.map(child => child.name) || [];
 
+enum AccessLevel {
+    Anonymous = 0,
+    Limited = 1,
+    Full = 2,
+}
+
 interface GeoLot {
     id: string;
     title: string;
@@ -22,13 +28,19 @@ interface GeoLot {
     longitude: number;
 }
 
+interface MapLotsResponse {
+    lots: GeoLot[];
+    totalCount: number;
+    accessLevel: AccessLevel;
+}
+
 export default function MapPage() {
     const { user } = useAuth();
     const router = useRouter();
     const [showPaywall, setShowPaywall] = useState(false);
     const [accessInfo, setAccessInfo] = useState({ hasFullAccess: false, totalCount: 0 });
 
-    const [lots, setLots] = useState<GeoLot[]>([]);
+    const [mapData, setMapData] = useState<MapLotsResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -52,7 +64,7 @@ export default function MapPage() {
             const apiUrl = `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/with-coordinates?${queryString}`;
 
             try {
-                const res = await fetch(apiUrl, {credentials: 'include'}); // Важно для отправки cookie
+                const res = await fetch(apiUrl, { credentials: 'include' }); // Важно для отправки cookie
                 if (res.status === 401) {
                     router.push('/login');
                     return;
@@ -61,20 +73,52 @@ export default function MapPage() {
                     throw new Error(`Ошибка сервера: ${res.status}`);
                 }
 
-                const data = await res.json();
-
-                setLots(data.lots);
-                setAccessInfo({ hasFullAccess: data.hasFullAccess, totalCount: data.totalCount });
+                const data: MapLotsResponse = await res.json();
+                setMapData(data);
             } catch (error) {
                 console.error("Ошибка при загрузке лотов:", error);
-                setLots([]);
+                setMapData(null);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchGeoLots();
-    }, [selectedCategories, router]);
+    }, [selectedCategories]);
+
+    // Функция для рендеринга информационных плашек
+    const renderInfoPanel = () => {
+        if (loading || !mapData) return null;
+
+        switch (mapData.accessLevel) {
+            case AccessLevel.Anonymous:
+                return (
+                    <div className={`${styles.infoPanel} ${styles.warning}`}>
+                        Вы видите только {mapData.lots.length} из {mapData.totalCount} объектов.
+                        <Link href="/login?redirect=/map">Войдите</Link> или <Link href="/login/register">зарегистрируйтесь</Link>, чтобы увидеть все.
+                    </div>
+                );
+
+            case AccessLevel.Limited:
+                return (
+                    <div className={`${styles.infoPanel} ${styles.danger}`}>
+                        Ваша подписка неактивна. Отображено {mapData.lots.length} из {mapData.totalCount} объектов.
+                        <Link href="/subscribe">Оформите подписку</Link>, чтобы получить полный доступ.
+                    </div>
+                );
+
+            case AccessLevel.Full:
+                // Для пользователей с полным доступом можно ничего не показывать или показать нейтральное сообщение
+                return (
+                    <div className={`${styles.infoPanel} ${styles.success}`}>
+                        PRO-доступ активен. Отображено {mapData.lots.length} объектов.
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className={styles.mapContainer}>
@@ -92,12 +136,7 @@ export default function MapPage() {
             </div>
 
             {/* баннер-уведомление */}
-            {!loading && !accessInfo.hasFullAccess && (
-                <div className={styles.promoBanner}>
-                    Отображается {lots.length} из {accessInfo.totalCount} объектов. 
-                    Для полного доступа <Link href="/subscribe">оформите подписку</Link>.
-                </div>
-            )}
+            {renderInfoPanel()}
 
             {/* карта */}
             {loading && <div className={styles.loader}>Загрузка карты и объектов...</div>}
@@ -115,7 +154,7 @@ export default function MapPage() {
                         groupByCoordinates: false, // Группируем по координатам, а не по индексам
                     }}
                 >
-                    {lots.map(lot => (
+                    {mapData?.lots.map(lot => (
                         <Placemark
                             key={lot.id}
                             geometry={[lot.latitude, lot.longitude]}
