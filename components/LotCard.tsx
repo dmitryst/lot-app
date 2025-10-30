@@ -116,6 +116,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     // Приоритет: статическая карта -> основное изображение -> плейсхолдер.
 
     let finalImageUrl: string | any = imageUrl || placeholderImage;
+    let useNextImage = true;
     let objectFitMode: 'cover' | 'contain' = 'cover'; // Режим по умолчанию
 
     // Проверяем, есть ли у лота валидные координаты
@@ -131,6 +132,9 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         // Формируем URL для Яндекс.Карты Static API, если координаты есть.
         // ВАЖНО: API ожидает сначала долготу (longitude), затем широту (latitude).
         finalImageUrl = `https://static-maps.yandex.ru/1.x/?pt=${longitude},${latitude},pm2bll&z=14&l=map&size=450,400`;
+
+        // Для URL Яндекс.Карт отключаем использование next/image
+        useNextImage = false;
     }
 
     // Если в итоге используется плейсхолдер, меняем режим масштабирования
@@ -143,13 +147,22 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
 
             {/* Блок для изображения (1/3 ширины) */}
             <div className={styles.imageWrapper}>
-                <Image
-                    src={finalImageUrl}
-                    alt={`Изображение для лота: ${lot.description}`}
-                    layout="fill"
-                    objectFit={objectFitMode}
-                    className={styles.lotImage}
-                />
+                {useNextImage ? (
+                    <Image
+                        src={finalImageUrl}
+                        alt={`Изображение для лота: ${lot.description}`}
+                        layout="fill"
+                        objectFit={objectFitMode}
+                        className={styles.lotImage}
+                    />
+                ) : (
+                    <img
+                        src={finalImageUrl}
+                        alt={`Изображение для лота: ${lot.description}`}
+                        className={styles.lotImage}
+                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                    />
+                )}
             </div>
 
             <div className={styles.contentWrapper}>
@@ -182,12 +195,6 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                             <span className={styles.priceValue}>{formatMoney(lot.deposit)}</span>
                         </p>
                     )}
-
-                    {/* {isDesktop && lot.bidding.viewingProcedure && (
-                        <Accordion title="Порядок ознакомления">
-                            {lot.bidding.viewingProcedure}
-                        </Accordion>
-                    )} */}
 
                     {isDesktop && lot.categories && lot.categories.length > 0 && (
                         <div className={styles.categoriesContainer}>
