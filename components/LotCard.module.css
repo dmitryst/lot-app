@@ -7,6 +7,7 @@
   margin-bottom: 12px;
   display: flex;
   flex-direction: column; /* Для мобильных - все вертикально */
+  padding: 10px; 
 }
 
 .cardContent {
@@ -16,8 +17,10 @@
 
 .imageWrapper {
   width: 100%;
-  height: 160px;
+  aspect-ratio: 16 / 9;
   position: relative;
+  border-radius: 8px; /* Скругляем углы самого изображения */
+  overflow: hidden;   /* Обрезаем все, что выходит за рамки скругления */
 }
 
 .lotImage {
@@ -28,7 +31,7 @@
 }
 
 .contentWrapper {
-  padding: 16px 12px;
+  padding: 24px 4px 0; /* Уменьшаем боковые отступы, т.к. теперь есть общий */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -185,8 +188,8 @@
     flex-direction: row;
   }
   .imageWrapper {
-    width: 180px;
-    height: 140px;
+    width: 400px;
+    height: 286px;
     flex-shrink: 0;
   }
   .contentWrapper {

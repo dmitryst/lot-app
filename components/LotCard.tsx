@@ -111,16 +111,43 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         }
     };
 
+    // --- Формирование статической ссылки на карту с лотом ---
+    // Определяем финальный URL для изображения.
+    // Приоритет: статическая карта -> основное изображение -> плейсхолдер.
+
+    let finalImageUrl: string | any = imageUrl || placeholderImage;
+    let objectFitMode: 'cover' | 'contain' = 'cover'; // Режим по умолчанию
+
+    // Проверяем, есть ли у лота валидные координаты
+    if (
+        lot.coordinates &&
+        Array.isArray(lot.coordinates) &&
+        lot.coordinates.length === 2 &&
+        typeof lot.coordinates[0] === 'number' &&
+        typeof lot.coordinates[1] === 'number'
+    ) {
+        const [latitude, longitude] = lot.coordinates;
+
+        // Формируем URL для Яндекс.Карты Static API, если координаты есть.
+        // ВАЖНО: API ожидает сначала долготу (longitude), затем широту (latitude).
+        finalImageUrl = `https://static-maps.yandex.ru/1.x/?pt=${longitude},${latitude},pm2bll&z=14&l=map&size=450,400`;
+    }
+
+    // Если в итоге используется плейсхолдер, меняем режим масштабирования
+    if (finalImageUrl === placeholderImage) {
+        objectFitMode = 'contain';
+    }
+
     return (
         <div className={styles.lotCardContainer}>
 
             {/* Блок для изображения (1/3 ширины) */}
             <div className={styles.imageWrapper}>
                 <Image
-                    src={imageUrl || placeholderImage}
+                    src={finalImageUrl}
                     alt={`Изображение для лота: ${lot.description}`}
                     layout="fill"
-                    objectFit="cover"
+                    objectFit={objectFitMode}
                     className={styles.lotImage}
                 />
             </div>
@@ -156,11 +183,11 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                         </p>
                     )}
 
-                    {isDesktop && lot.bidding.viewingProcedure && (
+                    {/* {isDesktop && lot.bidding.viewingProcedure && (
                         <Accordion title="Порядок ознакомления">
                             {lot.bidding.viewingProcedure}
                         </Accordion>
-                    )}
+                    )} */}
 
                     {isDesktop && lot.categories && lot.categories.length > 0 && (
                         <div className={styles.categoriesContainer}>

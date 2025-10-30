@@ -53,7 +53,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
       <h1 className={styles.mainLotTitle}>{lot.title ? lot.title : lot.description}</h1>
 
-      {/* === НОВЫЙ МАКЕТ СЕТКИ === */}
       <div className={styles.lotDetailGrid}>
 
         {/* --- ЭЛЕМЕНТЫ ПЕРВОЙ СТРОКИ --- */}
@@ -63,8 +62,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <Image
             src={lot.imageUrl || '/placeholder.png'}
             alt={`Фото лота: ${lot.title ? lot.title : lot.description}`}
-            width={500}
-            height={400}
+            width={400}
+            height={286}
             className={styles.mainImage}
             priority
           />
@@ -75,13 +74,13 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <p className={styles.lotInfo}><b>Номер лота:</b> {lot.id}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <div className={styles.priceInfo}>
-            {/* Блок для начальной цены остался без изменений */}
+            {/* Блок для начальной цены */}
             <div>
               <span className={styles.priceLabel}>Начальная цена:</span>
               <span className={styles.priceValue}>{lot.startPrice ? `${lot.startPrice.toLocaleString()} ₽` : 'Не указана'}</span>
             </div>
 
-            {/* === НОВЫЙ БЛОК: УСЛОВНЫЙ РЕНДЕРИНГ ЗАДАТКА === */}
+            {/* === УСЛОВНЫЙ РЕНДЕРИНГ ЗАДАТКА === */}
             {lot.deposit && (
               <div className={styles.depositInfo}>
                 <span className={styles.depositLabel}>Величина задатка:</span>
@@ -102,7 +101,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         <div className={styles.descriptionSection}>
           <h2 className={styles.sectionTitle}>Описание лота</h2>
           <div className={styles.descriptionText}>
-            {/* Здесь должен быть полный текст описания лота */}
             {lot.description}
           </div>
         </div>
@@ -116,7 +114,17 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         </div>
       )}
 
-      {/* Информация о покупке (остается без изменений) */}
+      {/* Порядок ознакомления с имуществом */}
+      {lot.bidding?.viewingProcedure && (
+        <div className={styles.descriptionSection}>
+          <h2 className={styles.sectionTitle}>Порядок ознакомления с имуществом</h2>
+          <div className={styles.descriptionText}>
+            {lot.bidding.viewingProcedure}
+          </div>
+        </div>
+      )}
+
+      {/* Информация о покупке */}
       <div className={styles.purchaseInfo}>
         <h2>Как купить лот через агента</h2>
         <PurchaseStep

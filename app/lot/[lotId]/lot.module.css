@@ -32,16 +32,17 @@
   /* Задаем две колонки с равной шириной */
   grid-template-columns: 1fr 1fr;
   gap: 40px; /* Расстояние между колонками и строками */
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 .imageSection {
   grid-column: 1 / 2; /* Занимает первую колонку */
   grid-row: 1 / 2;    /* Занимает первую строку */
-  
   position: relative;
   width: 100%;
-  padding-top: 80%; /* Соотношение сторон 5:4 */
+  max-width: 450px;
+  aspect-ratio: 4 / 3;  /* Задаем соотношение сторон 4:3 */
+  object-fit: cover;    /* Применяем масштабирование к контейнеру */
   border-radius: 12px;
   overflow: hidden;
 }
@@ -52,7 +53,6 @@
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
 }
 
 .infoSection {
@@ -114,8 +114,9 @@
 }
 
 
-/* === СТИЛИ ДЛЯ БЛОКА "КАК КУПИТЬ" (остаются почти без изменений) === */
+/* === СТИЛИ ДЛЯ БЛОКА "Информация о покупке" === */
 .purchaseInfo {
+  margin-top: 20px;
   background: #fff;
   padding: 32px;
   border-radius: 8px;
@@ -186,7 +187,7 @@
 
 /* === СТИЛИ ДЛЯ СЕКЦИИ С КАРТОЙ === */
 .mapSection {
-  margin-bottom: 60px; /* Отступ до блока "Как купить" */
+  margin-bottom: 40px;
   border-radius: 12px;
   overflow: hidden; /* Скрывает углы карты, чтобы они были скругленными */
   border: 1px solid #e2e8f0;
