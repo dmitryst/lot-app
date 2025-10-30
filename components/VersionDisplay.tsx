@@ -12,7 +12,7 @@ export default function VersionDisplay() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/health/version`);
         if (res.ok) {
           const data = await res.json();
-          setBackendVersion(data.Version);
+          setBackendVersion(data.version);
         } else {
           setBackendVersion('error');
         }
