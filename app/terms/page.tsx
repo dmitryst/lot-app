@@ -58,7 +58,7 @@ export default function TermsOfServicePage() {
           Банк: ПАО Сбербанк<br/>
           БИК: 044525225<br/>
           Корреспондентский счет: 30101810400000000225<br/>
-          E-mail для связи: dmitry_stepanov@inbox.ru
+          E-mail для связи: info@s-lot.ru
         </address>
       </div>
     </div>

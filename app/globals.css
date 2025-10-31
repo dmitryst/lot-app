@@ -66,3 +66,16 @@ a {
 .footer-link:hover {
   color: #ffffff;
 }
+
+.footer a {
+  color: #0070f3; /* Яркий синий цвет для ссылок */
+  text-decoration: underline; /* Подчеркивание по умолчанию */
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: #0056b3; /* Затемнение при наведении */
+  text-decoration: none; /* Убираем подчеркивание при наведении для интерактивности */
+}
