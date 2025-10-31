@@ -247,7 +247,7 @@ function Page() {
           >
             {isFiltersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
           </button>
-          <aside className={`${styles.sidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
+          <aside className={`${styles.filtersSidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
             {filtersSidebarContent}
           </aside>
         </div>
