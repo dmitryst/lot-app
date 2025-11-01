@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
+import { CATEGORIES_TREE } from '../../data/constants'; 
 
 // --- SEO ОПТИМИЗАЦИЯ: Компонент для структурированных данных JSON-LD ---
 // Этот скрипт помогает Яндексу и Google точно понять, что продается на странице.
@@ -12,8 +13,8 @@ function JsonLd({ lot }: { lot: Lot }) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": lot.description,
-    "description": `Лот на торгах по банкротству: ${lot.description}. Начальная цена: ${price.toLocaleString('ru-RU')} ₽.`,
+    "name": lot.title || lot.description.substring(0, 100),
+    "description": lot.description,
     "image": lot.imageUrl || 'https://s-lot.ru/placeholder.png',
     "offers": {
       "@type": "Offer",
@@ -39,6 +40,52 @@ function JsonLd({ lot }: { lot: Lot }) {
 type Props = {
   params: Promise<{ lotId: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+// Динамическая генерация ключевых слов ---
+const generateKeywords = (lot: Lot): string => {
+  // Базовые ключевые слова для любой страницы
+  const baseKeywords = [
+    'торги по банкротству', 'аукционы по банкротству', 'имущество банкротов', 'аукцион',
+    'электронные торги', 'купить на торгах', 'купить со скидкой', 'имущество должников', 's-lot.ru'
+  ];
+
+  // Ключевые слова на основе категорий
+  const categoryKeywords: string[] = [];
+  const lotCategory = lot.categories?.[0]; // Берем самую специфичную категорию
+
+  if (lotCategory) {
+    const categoryName = lotCategory.name.toLowerCase();
+    // Добавляем запросы для конкретной категории
+    categoryKeywords.push(
+      `купить ${categoryName} с торгов`,
+      `${categoryName} с торгов по банкротству`,
+      `${categoryName} аукцион по банкротству`
+    );
+
+    // Ищем родительскую категорию и добавляем запросы для нее
+    const parentCategory = CATEGORIES_TREE.find(cat => cat.children?.some(child => child.name === categoryName));
+    if (parentCategory) {
+      const parentCategoryName = parentCategory.name.toLowerCase();
+      categoryKeywords.push(
+        `купить ${parentCategoryName} с торгов`,
+        `${parentCategoryName} с торгов по банкротству`,
+        `${parentCategoryName} аукцион по банкротству`
+      );
+    }
+  }
+
+  // Ключевые слова из данных самого лота
+  const lotSpecificKeywords = lot.title ? lot.title.split(' ').filter(word => word.length > 2) : [];
+  // TODO: добавить КН
+  // if (lot.cadastralNumber) {
+  //   lotSpecificKeywords.push(lot.cadastralNumber);
+  // }
+
+  // Объединяем все, удаляем дубликаты и возвращаем строку
+  const allKeywords = [...baseKeywords, ...categoryKeywords, ...lotSpecificKeywords];
+  
+  return [...new Set(allKeywords)].join(', ');
 };
 
 // Функция для получения данных лота по ID
@@ -72,13 +119,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   // Формируем заголовок и описание, богатые ключевыми словами
-  const title = `Купить: ${lot.title ? lot.title : lot.description}... | Торги по банкротству s-lot.ru`;
   const price = lot.startPrice ?? 0;
-  const description = `Лот на торгах: ${lot.title ? lot.title : lot.description}. Начальная цена: ${price.toLocaleString('ru-RU')} ₽.}. Участие в торгах с s-lot.ru.`;
+  const formattedPrice = price.toLocaleString('ru-RU').replace(/\s/g, ' ');
+
+  const lotTitle = lot.title || lot.description.substring(0, 70);
+
+  const title = `Купить ${lotTitle} на торгах по банкротству за ${formattedPrice} ₽ — s-lot.ru`;
+  const description = `${lot.description}. Начальная цена: ${formattedPrice} ₽. Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!`;
+  
+  const keywords = generateKeywords(lot);
 
   return {
     title,
     description,
+    keywords,
     alternates: {
       canonical: `https://s-lot.ru/lot/${lot.id}`,
     },
