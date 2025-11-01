@@ -7,6 +7,7 @@ import YandexMapsProvider from "@/components/YandexMapsProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import Link from "next/link";
 import VersionDisplay from "@/components/VersionDisplay";
+import YandexMetrika from "@/components/YandexMetrika";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,6 +50,8 @@ export default function RootLayout({
               </div>
             </footer>
         </AuthProvider>
+        
+        <YandexMetrika />
       </body>
     </html>
   );
