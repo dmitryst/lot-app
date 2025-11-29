@@ -233,6 +233,18 @@ function Page() {
 
   return (
     <main className={styles.main}>
+      {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
+      <div className={styles.promoBanner}>
+        <div className={styles.promoContent}>
+          <h2>🔥 Инвест-лот месяца: Магнит (Саратов)</h2>
+          <p>Доходность 20%. Вход от 22 млн руб. Федеральный арендатор.</p>
+        </div>
+        <Link href="/gab/magnit-saratov" className={styles.promoButton}>
+          Смотреть расчет
+        </Link>
+      </div>
+      {/* --- КОНЕЦ БАННЕРА --- */}
+
       <div className={styles.mapBanner}>
         <Link href="/map" className={styles.mapLinkButton}>
           Смотреть недвижимость на карте

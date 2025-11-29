@@ -387,3 +387,72 @@
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
 }
+
+/* =================================================================== */
+/* ЧАСТЬ 4: ПРОМО-БАННЕРЫ (ВРЕМЕННЫЕ АКЦИИ) */
+/* =================================================================== */
+
+.promoBanner {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+  border-radius: 12px;
+  padding: 24px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.promoBanner:hover {
+  transform: translateY(-2px);
+}
+
+.promoContent h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.promoContent p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.promoButton {
+  background-color: white;
+  color: #0070f3;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.promoButton:hover {
+  background-color: #f0f9ff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 600px) {
+  .promoBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  
+  .promoButton {
+    width: 100%;
+    text-align: center;
+  }
+}
