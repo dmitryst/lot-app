@@ -44,7 +44,7 @@ export default function GabPage() {
           <img src="/images/magnit-saratov.png" alt="Здание Магнит Саратов" />
           <div className={styles.imageOverlay}>
             <span className={styles.badge}>Доходность 16–20%</span>
-            <span className={styles.badge}>Окупаемость ~4 года</span>
+            <span className={styles.badge}>Окупаемость ~4,6 года</span>
           </div>
         </div>
       </section>
@@ -63,8 +63,8 @@ export default function GabPage() {
 
           <h2>Почему это выгодно?</h2>
           <p>
-            Лот реализуется с существенным дисконтом (30-40% от рынка). Федеральный арендатор обеспечивает стабильный поток, 
-            а наличие свободной мансарды дает потенциал для увеличения прибыли (Upside).
+            Лот реализуется с существенным дисконтом (30-40% от рынка). Федеральный арендатор обеспечивает стабильный поток,
+            а наличие свободной площади дает потенциал для увеличения прибыли (Upside).
           </p>
         </div>
 
@@ -85,17 +85,22 @@ export default function GabPage() {
                   <tr>
                     <td>19.12.2025</td>
                     <td>32 433 750</td>
-                    <td>❌</td>
-                  </tr>
-                  <tr>
-                    <td>29.12.2025</td>
-                    <td>25 947 000</td>
                     <td>📉</td>
                   </tr>
+                  <tr>
+                    <td>24.12.2025</td>
+                    <td>29 190 375</td>
+                    <td>❌</td>
+                  </tr>
                   <tr className={styles.recommended}>
+                    <td>29.12.2025</td>
+                    <td>25 947 000</td>
+                    <td>✅ Вход</td>
+                  </tr>
+                  <tr>
                     <td>16.01.2026</td>
                     <td>22 703 625</td>
-                    <td>✅ Вход</td>
+                    <td>⚠️ Риск</td>
                   </tr>
                   <tr>
                     <td>21.01.2026</td>
@@ -109,12 +114,38 @@ export default function GabPage() {
                   </tr>
                 </tbody>
               </table>
+
+              {/* --- ЛЕГЕНДА --- */}
+              <div className={styles.legendBlock}>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendIcon}>❌</span> Пропущенный этап
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendIcon}>📉</span> Текущий прием заявок
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendIcon}>✅</span> <strong>Рекомендуем покупать</strong>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendIcon}>⚠️</span> Риск выкупа конкурентами
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendIcon}>🔥</span> Минимальная цена (шанс &lt; 5%)
+                </div>
+              </div>
+              {/* --- КОНЕЦ ЛЕГЕНДЫ --- */}
             </div>
-            
+
             <div className={styles.ctaBlock}>
-              <p className={styles.ctaText}>Хотите забрать этот лот?</p>
+              {/* <p className={styles.ctaText}>Хотите забрать этот лот?</p> */}
               {/* <a href="tel:+79000000000" className={styles.callButton}>Позвонить агенту</a> */}
-              <a href="mailto:info@s-lot.ru" className={styles.emailLink}>Запросить фин. модель</a>
+              <a href="mailto:info@s-lot.ru?subject=Запрос финмодели Магнит Саратов" className={styles.emailLink}>
+                📊 Получить фин. модель
+              </a>
+
+              <p className={styles.hint}>
+                Поможем подать заявку и выкупить лот без КЭП
+              </p>
             </div>
           </div>
         </div>
