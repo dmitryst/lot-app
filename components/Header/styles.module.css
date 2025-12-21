@@ -9,10 +9,9 @@
     /* box-shadow: 0 2px 4px rgba(0,0,0,0.03); */
 }
 
-/* Внутренний контейнер, который повторяет параметры .main из page.module.css */
 .headerContent {
     display: flex;
-    justify-content: flex-end; /* Контент справа */
+    justify-content: space-between; /* чтобы лого было слева, а меню справа */
     align-items: center;
     gap: 20px;
     
@@ -26,6 +25,35 @@
         padding: 0.75rem 1rem;
     }
 }
+
+/* стили для левой части с лого */
+.leftSection {
+    display: flex;
+    align-items: center;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 10px; /* Отступ между картинкой и текстом, если текст есть в картинке, можно убрать */
+}
+
+.logoImage {
+    /* Подберите высоту под ваш дизайн, обычно 32-40px для хедера */
+    height: 36px; 
+    width: auto; /* Ширина подстроится автоматически */
+    object-fit: contain;
+}
+
+/* Правая часть (профиль, выход) */
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ... остальные стили (userInfo, favLink, etc.) */
 
 .userInfo {
     font-weight: 500;
