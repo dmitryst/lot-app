@@ -29,8 +29,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <FavoritesProvider>
-            <Header />
-            
+            <Suspense fallback={<div style={{ height: '60px' }} />}>
+              <Header />
+            </Suspense>
+
             <YandexMapsProvider>{children}</YandexMapsProvider>
 
             {/* --- ФУТЕР --- */}
