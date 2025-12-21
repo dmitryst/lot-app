@@ -43,10 +43,21 @@ export default function LoginForm() {
             if (res.ok) {
                 const data = await res.json();
                 setUser({ email: data.email });
-                router.push('/map');
+
+                // Пытаемся получить returnUrl из параметров URL
+                // (например, login?returnUrl=/lots?page=2)
+                const returnUrl = searchParams.get('returnUrl');
+
+                // Если returnUrl есть — идем туда. Если нет — идем на /map
+                if (returnUrl) {
+                    router.push(decodeURIComponent(returnUrl));
+                } else {
+                    router.push('/map');
+                }
+
                 return;
             }
-            
+
             if (res.status === 401) {
                 setError('Ошибка входа. Проверьте email и пароль.');
             } else {

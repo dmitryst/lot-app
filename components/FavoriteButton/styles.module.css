@@ -1,0 +1,38 @@
+/* components/FavoriteButton/styles.module.css */
+
+/* Кнопка "Сердечко" */
+.favoriteButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10; /* Поверх карточки */
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.favoriteButton:hover {
+  transform: scale(1.1);
+  background: #fff;
+}
+
+.favoriteIcon {
+  width: 20px;
+  height: 20px;
+  stroke: #ff4081; /* Цвет контура */
+  fill: none;
+  stroke-width: 2;
+  transition: fill 0.2s ease;
+}
+
+.favoriteIcon.active {
+  fill: #ff4081; /* Цвет заливки при активе */
+}

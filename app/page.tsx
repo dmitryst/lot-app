@@ -8,7 +8,7 @@ import debounce from 'lodash.debounce';
 
 import { CATEGORIES_TREE, BIDDING_TYPES, PAGE_SIZE } from './data/constants';
 
-import LotCard from '../components/LotCard';
+import { LotItem } from '@/components/LotItem';
 import Pagination from '../components/Pagination';
 import CategorySelect from '../components/CategorySelect';
 import styles from './page.module.css';
@@ -276,19 +276,12 @@ function Page() {
 
             <div className={styles.lotsGrid}>
               {lots.map((lot: Lot) => (
-                // Оборачиваем Link в div с onClick для сохранения скролла
-                <div
+                <LotItem
                   key={lot.id}
-                  onMouseDown={() => {
-                    sessionStorage.setItem('scrollPosition', String(window.scrollY));
-                    // Сохраняем весь query string (например, "?page=5&category=Автомобили")
-                    sessionStorage.setItem('lotListQuery', window.location.search);
-                  }}
-                >
-                  <Link href={`/lot/${lot.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <LotCard key={lot.id} lot={lot} imageUrl={lot.imageUrl} />
-                  </Link>
-                </div>
+                  lot={lot}
+                  // если нужен доп. класс обёртки от page.module.css
+                  // className={styles.lotWrapper}
+                />
               ))}
             </div>
 

@@ -1,0 +1,94 @@
+/* components/Header/styles.module.css */
+
+/* Внешняя обертка на всю ширину (для фона и бордера) */
+.headerWrapper {
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaeaea;
+    /* Можно добавить тень, как у фильтров, если хочется объема */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.03); */
+}
+
+/* Внутренний контейнер, который повторяет параметры .main из page.module.css */
+.headerContent {
+    display: flex;
+    justify-content: flex-end; /* Контент справа */
+    align-items: center;
+    gap: 20px;
+    
+    /* Эти параметры должны совпадать с .main (или .mainLayout) из page.module.css */
+    max-width: 1440px; 
+    margin: 0 auto;
+    padding: 1rem 1.5rem; /* Вертикальный паддинг чуть меньше, чем у контента */
+    
+    /* Адаптив: на мобильных паддинг меньше */
+    @media (max-width: 768px) {
+        padding: 0.75rem 1rem;
+    }
+}
+
+.userInfo {
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.favLink {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.favLink:hover {
+    background-color: #fff0f5; /* Легкий розовый фон при наведении */
+    color: #ff4081;
+}
+
+.favIcon {
+    width: 22px;
+    height: 22px;
+    fill: #ff4081; /* Всегда розовое сердце */
+    /* Если хотите контурное:
+       fill: none; 
+       stroke: #333; 
+       stroke-width: 2;
+    */
+}
+
+.logoutBtn {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    background-color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background-color: #f8f9fa;
+    border-color: #cbd5e0;
+    color: #d00;
+}
+
+.loginLink {
+    color: #fff;
+    background-color: #0070f3; /* Цвет как у кнопок фильтров в активном состоянии */
+    padding: 8px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.loginLink:hover {
+    background-color: #0051a2;
+}
