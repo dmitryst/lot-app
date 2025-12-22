@@ -70,6 +70,46 @@ export default function GabPage() {
 
         {/* Правая колонка: График цены и CTA */}
         <div className={styles.sidebar}>
+          {/* --- БЛОК РЕЗУЛЬТАТОВ ТОРГОВ --- */}
+          <div className={styles.resultsCard} style={{
+            border: '2px solid #48bb78',
+            backgroundColor: '#f0fff4',
+            padding: '20px',
+            borderRadius: '12px',
+            marginBottom: '20px'
+          }}>
+            <h3 style={{ color: '#2f855a', margin: '0 0 15px 0' }}>🚀 Лот продан! Итоги торгов</h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#718096' }}>Дата продажи:</span>
+                <strong>20.12.2025</strong>
+              </li>
+              <li style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#718096' }}>Начальная цена:</span>
+                <span style={{ textDecoration: 'line-through' }}>32 433 750 ₽</span>
+              </li>
+              <li style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem' }}>
+                <span style={{ color: '#2d3748' }}>Финальная цена:</span>
+                <strong style={{ color: '#e53e3e' }}>35 678 900 ₽</strong>
+              </li>
+              <li style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #cbd5e0' }}>
+                <span style={{ color: '#718096', fontSize: '0.9rem' }}>Победитель:</span><br />
+                <strong>ООО «Вектор» из г. Владимир (ИНН 3328025795, ОГРН 1203300010210)</strong>
+                <p style={{ fontSize: '0.85rem', color: '#4a5568', marginTop: '5px' }}>
+                  Профессиональный инвестор в арендную недвижимость.
+                </p>
+              </li>
+            </ul>
+
+            <div style={{ marginTop: '20px', backgroundColor: '#fff', padding: '15px', borderRadius: '8px', border: '1px dashed #48bb78' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#2f855a' }}>
+                <strong>💡 Мнение эксперта:</strong><br />
+                Лот продан на 10% выше стартовой цены. Это подтверждает, что юридические риски (земля) были переоценены рынком, а реальная доходность актива (~14-16%) оказалась привлекательной для иногороднего профильного инвестора.
+              </p>
+            </div>
+          </div>
+          {/* --- КОНЕЦ БЛОКА --- */}
+
           <div className={styles.priceCard}>
             <h3>График снижения цены</h3>
             <div className={styles.tableWrapper}>

@@ -234,16 +234,81 @@ function Page() {
   return (
     <main className={styles.main}>
       {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
-      <div className={styles.promoBanner}>
-        <div className={styles.promoContent}>
-          <h2>🔥 Инвест-лот месяца: Магнит (Саратов)</h2>
-          <p>Доходность 20%. Вход от 24 млн руб. Федеральный арендатор.</p>
+      <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
+
+        <div className={styles.promoContent} style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '15px',
+          width: '100%',
+          position: 'relative',
+          zIndex: 10
+        }}>
+          <div style={{ flex: '1 1 300px', paddingRight: '10px' }}>
+            <div className={styles.promoBadge}>🔥 Инвест-лот месяца: Магнит (Саратов)</div>
+            <div className={styles.promoText}>
+              Доходность 20%. Вход от 24 млн руб. Федеральный арендатор.
+            </div>
+          </div>
+
+          <Link href="/gab/magnit-saratov" className={styles.promoButton} style={{
+            whiteSpace: 'nowrap',
+            flex: '1 1 auto',
+            textAlign: 'center',
+            minWidth: '200px',
+            maxWidth: '100%'
+          }}>
+            Смотреть расчет
+          </Link>
         </div>
-        <Link href="/gab/magnit-saratov" className={styles.promoButton}>
-          Смотреть расчет
-        </Link>
+
+        {/* ПЕЧАТЬ */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) rotate(-15deg)',
+          border: '1px solid #c53030',
+          padding: '5px 15px',
+          color: '#c53030',
+          backgroundColor: 'transparent',
+          zIndex: 20,
+          pointerEvents: 'none',
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{
+            fontSize: '2rem',
+            fontWeight: '400',
+            fontFamily: 'Arial, sans-serif',
+            lineHeight: '1.1'
+          }}>
+            Продано
+          </div>
+          <div style={{
+            fontSize: '1.1rem',
+            fontWeight: '700', // ЖИРНЫЙ ШРИФТ ДЛЯ ЦЕНЫ
+            fontFamily: 'Arial, sans-serif',
+            marginTop: '4px'
+          }}>
+            35 678 900 руб.
+          </div>
+        </div>
       </div>
-      {/* --- КОНЕЦ БАННЕРА --- */}
+
+
+
+
+
+
+
+
+
+
+
 
       <div className={styles.mapBanner}>
         <Link href="/map" className={styles.mapLinkButton}>
@@ -279,8 +344,8 @@ function Page() {
                 <LotItem
                   key={lot.id}
                   lot={lot}
-                  // если нужен доп. класс обёртки от page.module.css
-                  // className={styles.lotWrapper}
+                // если нужен доп. класс обёртки от page.module.css
+                // className={styles.lotWrapper}
                 />
               ))}
             </div>
