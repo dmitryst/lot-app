@@ -1,0 +1,85 @@
+.promoBanner {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+  border-radius: 12px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.promoBanner:hover {
+  transform: translateY(-2px);
+}
+
+.promoContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.promoText {
+  flex: 1 1 300px;
+  min-width: 260px;
+}
+
+.promoBadge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.title {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.subtitle {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.note {
+  margin: 10px 0 0 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.promoButton {
+  background-color: white;
+  color: #0070f3;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.promoButton:hover {
+  background-color: #f0f9ff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+}
+
+@media (max-width: 600px) {
+  .promoBanner {
+    padding: 20px;
+  }
+
+  .promoButton {
+    width: 100%;
+    text-align: center;
+  }
+}

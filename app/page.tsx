@@ -14,6 +14,11 @@ import CategorySelect from '../components/CategorySelect';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
+import PromoBanner from '@/components/PromoBanner/PromoBanner';
+import { PROMO_LOTS } from './promo/data/promo-lots';
+
+const promoLot = PROMO_LOTS['dom-v-glazinino'];
+
 const formatNumberWithSpaces = (value: string) => {
   if (!value) return '';
   // Удаляем все нечисловые символы и добавляем пробелы как разделители
@@ -234,7 +239,7 @@ function Page() {
   return (
     <main className={styles.main}>
       {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
-      <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
+      {/* <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
 
         <div className={styles.promoContent} style={{
           display: 'flex',
@@ -262,10 +267,10 @@ function Page() {
           }}>
             Смотреть расчет
           </Link>
-        </div>
+        </div> */}
 
-        {/* ПЕЧАТЬ */}
-        <div style={{
+      {/* ПЕЧАТЬ */}
+      {/* <div style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
@@ -297,12 +302,18 @@ function Page() {
             35 678 900 руб.
           </div>
         </div>
-      </div>
+      </div> */}
 
 
 
 
-
+      <PromoBanner
+        badge="🔥 Инвест-лот месяца"
+        title={promoLot.title}
+        subtitle={promoLot.subtitle ?? promoLot.description}
+        href={`/promo/${promoLot.id}`}
+        buttonText="Смотреть лот →"
+      />
 
 
 
