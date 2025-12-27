@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PROMO_LOTS } from '../data/promo-lots';
 import styles from './promo.module.css';
+import ImageGallery from './ImageGallery';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props) {
-  const lot = PROMO_LOTS[params.slug];
+  const { slug } = await params;
+  const lot = PROMO_LOTS[slug];
   if (!lot) return { title: 'Лот не найден' };
   
   return {
@@ -20,12 +22,18 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default function PromoLotPage({ params }: Props) {
-  const lot = PROMO_LOTS[params.slug];
+export default async function PromoLotPage({ params }: Props) {
+  const { slug } = await params;
+  const lot = PROMO_LOTS[slug];
 
   if (!lot) {
     notFound();
   }
+
+  // Если вдруг images не заполнен, используем одиночную img как массив
+  const galleryImages = lot.images && lot.images.length > 0 
+    ? lot.images 
+    : [lot.img];
 
   return (
     <div className={styles.container}>
@@ -38,13 +46,10 @@ export default function PromoLotPage({ params }: Props) {
         <h1 className={styles.title}>{lot.title}</h1>
         {/* Адрес можно добавить, если нужно */}
         
-        <div className={styles.mainImage}>
-          <img src={lot.img} alt={lot.title} />
-          <div className={styles.imageOverlay}>
-            <span className={styles.badge}>Доходность x2</span>
-            <span className={styles.badge}>Банкротство</span>
-          </div>
-        </div>
+        <ImageGallery 
+          images={galleryImages} 
+          title={lot.title} 
+        />
 
         <div className={styles.grid}>
           <div className={styles.content}>

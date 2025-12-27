@@ -8,7 +8,8 @@ export type PromoLot = {
   description: string;
   priceStart: string;
   priceTarget: string; // Целевая цена для инвестора
-  img: string;
+  img: string;  // Обложка (для превью и мета-тегов)
+  images: string[]; // Массив всех фото
   features: string[];
   schedule: {
     date: string;
@@ -30,7 +31,37 @@ export const PROMO_LOTS: Record<string, PromoLot> = {
     description: 'Инвест-лот в престижной локации. Цена падает до стоимости голой земли. Дом достается бонусом.',
     priceStart: '40 160 700',
     priceTarget: '28 112 490', // Целимся в этот этап (февраль)
-    img: '/images/promo/dom-v-glazinino/01.jpeg', 
+    img: '/images/promo/dom-v-glazinino/01.jpeg',
+    images: [
+      '/images/promo/dom-v-glazinino/01.jpeg',
+      '/images/promo/dom-v-glazinino/02.jpeg',
+      '/images/promo/dom-v-glazinino/03.jpeg',
+      '/images/promo/dom-v-glazinino/04.jpeg',
+      '/images/promo/dom-v-glazinino/05.jpeg',
+      '/images/promo/dom-v-glazinino/06.jpeg',
+      '/images/promo/dom-v-glazinino/07.jpeg',
+      '/images/promo/dom-v-glazinino/08.jpeg',
+      '/images/promo/dom-v-glazinino/09.jpeg',
+      '/images/promo/dom-v-glazinino/10.jpeg',
+      '/images/promo/dom-v-glazinino/11.jpeg',
+      '/images/promo/dom-v-glazinino/12.jpeg',
+      '/images/promo/dom-v-glazinino/13.jpeg',
+      '/images/promo/dom-v-glazinino/14.jpeg',
+      '/images/promo/dom-v-glazinino/15.jpeg',
+      '/images/promo/dom-v-glazinino/16.jpeg',
+      '/images/promo/dom-v-glazinino/17.jpeg',
+      '/images/promo/dom-v-glazinino/18.jpeg',
+      '/images/promo/dom-v-glazinino/19.jpeg',
+      '/images/promo/dom-v-glazinino/20.jpeg',
+      '/images/promo/dom-v-glazinino/21.jpeg',
+      '/images/promo/dom-v-glazinino/22.jpeg',
+      '/images/promo/dom-v-glazinino/23.jpeg',
+      '/images/promo/dom-v-glazinino/24.jpeg',
+      '/images/promo/dom-v-glazinino/25.jpeg',
+      '/images/promo/dom-v-glazinino/26.jpeg',
+      '/images/promo/dom-v-glazinino/27.jpeg',
+      '/images/promo/dom-v-glazinino/28.jpeg',
+    ],
     features: [
       '<strong>Локация:</strong> 17 минут пешком до МЦД "Одинцово"',
       '<strong>Участок:</strong> 17,21 сотки ИЖС (рыночная цена земли здесь ~30-35 млн)',
@@ -45,7 +76,7 @@ export const PROMO_LOTS: Record<string, PromoLot> = {
       { date: '13.01.2026', price: '34 136 595', deposit: '1 706 829', status: 'wait', statusText: '' },
       { date: '20.01.2026', price: '32 128 560', deposit: '1 606 428', status: 'wait', statusText: '' },
       { date: '27.01.2026', price: '30 120 525', deposit: '1 506 026', status: 'wait', statusText: '' },
-      { date: '03.02.2026', price: '28 112 490', deposit: '1 405 624', status: 'recommended', statusText: '✅ Вход' },
+      { date: '03.02.2026', price: '28 112 490', deposit: '1 405 624', status: 'recommended', statusText: '✅' },
       { date: '10.02.2026', price: '26 104 455', deposit: '1 305 222', status: 'hot', statusText: '' },
       { date: '17.02.2026', price: '24 096 420', deposit: '1 204 821', status: 'hot', statusText: '' },
       // Можно добавить остальные этапы, если нужно, но обычно инвестору интересны эти
