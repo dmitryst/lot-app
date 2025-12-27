@@ -21,13 +21,14 @@ export type PromoLot = {
   expertOpinion: string;
   managerTg: string; // Имя пользователя без @
   keywords?: string[];
+  badges: string[];
 };
 
 export const PROMO_LOTS: Record<string, PromoLot> = {
   'dom-v-glazinino': {
     id: 'dom-v-glazinino',
     title: 'Дом 550 м² + 17 соток ИЖС (д. Глазынино, Одинцово)',
-    subtitle: 'Вход 28 млн ₽ (Ниже рынка земли!). Потенциал х2.',
+    subtitle: 'Вход 28 млн ₽ (Ниже рынка земли!). Потенциал 50%.',
     address: 'Московская обл., г. Одинцово, д. Глазынино, д. 126',
     description: `
       Продается коттедж 557,1 кв.м на земельном участке 17,21 сотки (ИЖС) в черте города Одинцово, д. Глазынино, д. 126. Престижная локация, всего 5 км от МКАД по Минскому шоссе.
@@ -109,6 +110,7 @@ export const PROMO_LOTS: Record<string, PromoLot> = {
       '50:20:0000000:286674',
       'Одинцово, д. Глазынино, участок 126',
     ],
+    badges: ['Доходность ~50%', 'Глазынино', '⚠️ Риск выселения'],
   },
 
   // Сюда можно добавить 'magnit-saratov'

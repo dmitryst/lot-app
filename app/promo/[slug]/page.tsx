@@ -82,6 +82,7 @@ export default async function PromoLotPage({ params }: Props) {
         <ImageGallery
           images={galleryImages}
           title={lot.title}
+          badges={lot.badges}
         />
 
         <div className={styles.grid}>
