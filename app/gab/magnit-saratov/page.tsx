@@ -1,4 +1,4 @@
-// app/gab/saratov/page.tsx
+// app/gab/magnit-saratov/page.tsx
 import React from 'react';
 import Link from 'next/link';
 import styles from './gab.module.css';
