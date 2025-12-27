@@ -15,10 +15,16 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const lot = PROMO_LOTS[slug];
   if (!lot) return { title: 'Лот не найден' };
-  
+
   return {
     title: `${lot.title} | Инвест-предложение`,
     description: lot.description,
+    keywords: lot.keywords ? lot.keywords.join(', ') : undefined,
+    openGraph: {
+      title: lot.title,
+      description: lot.description,
+      images: lot.img ? [lot.img] : [],
+    },
   };
 }
 
@@ -31,12 +37,39 @@ export default async function PromoLotPage({ params }: Props) {
   }
 
   // Если вдруг images не заполнен, используем одиночную img как массив
-  const galleryImages = lot.images && lot.images.length > 0 
-    ? lot.images 
+  const galleryImages = lot.images && lot.images.length > 0
+    ? lot.images
     : [lot.img];
+
+  // Формируем JSON-LD (Schema.org)
+  // Это даст "расширенный сниппет" в поиске (цена, адрес, наличие)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing', // Или 'SingleFamilyResidence'
+    'name': lot.title,
+    'description': lot.description,
+    'image': galleryImages.map(img => `https://s-lot.ru${img}`), // Лучше полные URL
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': lot.address // Просто строка, если нет разбивки
+      // Лучше разбить: 'addressLocality': 'Одинцово', 'addressRegion': 'Московская область'
+    },
+    'offers': {
+      '@type': 'Offer',
+      'price': lot.priceStart.replace(/\s/g, ''), // Убираем пробелы "40 000" -> "40000"
+      'priceCurrency': 'RUB',
+      'availability': 'https://schema.org/InStock',
+      'url': `https://s-lot.ru/promo/${slug}` // Ссылка на страницу
+    }
+  };
 
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <header className={styles.header}>
         <Link href="/" className={styles.backLink}>← Все лоты</Link>
         <span className={styles.label}>Инвест-идея</span>
@@ -45,18 +78,25 @@ export default async function PromoLotPage({ params }: Props) {
       <section>
         <h1 className={styles.title}>{lot.title}</h1>
         {/* Адрес можно добавить, если нужно */}
-        
-        <ImageGallery 
-          images={galleryImages} 
-          title={lot.title} 
+
+        <ImageGallery
+          images={galleryImages}
+          title={lot.title}
         />
 
         <div className={styles.grid}>
           <div className={styles.content}>
             <h2>Описание актива</h2>
+
+            {/* {lot.description && (
+              <p className={styles.descriptionText}>
+                {lot.description}
+              </p>
+            )} */}
+
             <ul className={styles.featuresList}>
               {lot.features.map((feature, idx) => (
-                <li key={idx} dangerouslySetInnerHTML={{ __html: feature }} /> 
+                <li key={idx} dangerouslySetInnerHTML={{ __html: feature }} />
                 /* dangerouslySetInnerHTML нужен, если в тексте есть <b> или <br> */
               ))}
             </ul>
@@ -70,15 +110,15 @@ export default async function PromoLotPage({ params }: Props) {
           <aside className={styles.sidebar}>
             <div className={styles.priceCard}>
               <h3>График снижения цены</h3>
-              
+
               <div className={styles.tableWrapper}>
                 <table className={styles.priceTable}>
                   <thead>
                     <tr>
                       <th>Дата (до)</th>
-                      <th style={{textAlign: 'right'}}>Цена, ₽</th>
-                      <th style={{textAlign: 'right'}}>Задаток</th>
-                      <th style={{textAlign: 'center'}}></th>
+                      <th style={{ textAlign: 'right' }}>Цена, ₽</th>
+                      <th style={{ textAlign: 'right' }}>Задаток</th>
+                      <th style={{ textAlign: 'center' }}></th>
                     </tr>
                   </thead>
                   <tbody>

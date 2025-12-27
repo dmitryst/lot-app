@@ -40,6 +40,14 @@
   font-weight: 700;
 }
 
+.descriptionText {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 24px; /* Отступ до списка features */
+  white-space: pre-wrap; /* Сохраняет переносы строк, если они есть в тексте */
+}
+
 /* Сетка контента */
 .grid {
   display: grid;
