@@ -1,6 +1,6 @@
 # === Этап 1: Сборка приложения ===
-# Используем стабильный образ Debian, чтобы избежать проблем с компиляцией
-FROM node:18-buster-slim AS builder
+# Используем современный bookworm-slim. Это автоматически решит проблему с зависимостями libvips и glibc
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 
 # Копируем файлы для установки ВСЕХ зависимостей
@@ -30,7 +30,7 @@ RUN echo "URL в Dockerfile: $NEXT_PUBLIC_CSHARP_BACKEND_URL"
 RUN npm run build
 
 # === Этап 2: Финальный образ для Production ===
-FROM node:18-buster-slim AS runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 
 # Создаем пользователя с ограниченными правами
