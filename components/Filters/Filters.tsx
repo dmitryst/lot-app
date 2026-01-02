@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import debounce from 'lodash.debounce';
-import { BIDDING_TYPES, CATEGORIES_TREE } from '@/app/data/constants';
+import { BIDDING_TYPES, CATEGORIES_TREE, DEBOUNCE_DELAY } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
 import styles from './Filters.module.css';
 
@@ -38,25 +38,25 @@ export default function Filters({
 
     // --- Debounced Updaters ---
 
-    // Дебаунс для поиска (задержка 500мс)
+    // Дебаунс для поиска
     const debouncedSearchUpdate = useMemo(
         () =>
             debounce((val: string) => {
                 onUpdate({ searchQuery: val, page: 1 });
-            }, 500),
+            }, DEBOUNCE_DELAY),
         [onUpdate]
     );
 
-    // Дебаунс для цены (задержка 500мс)
+    // Дебаунс для цены
     const debouncedPriceUpdate = useMemo(
         () =>
             debounce((from: string, to: string) => {
                 onUpdate({
-                    priceFrom: from,    // Сюда приходят уже чистые числа
+                    priceFrom: from,    // Сюда приходят уже чистые числа - 1000, а не 1 000
                     priceTo: to,
                     page: 1,
                 });
-            }, 500),
+            }, DEBOUNCE_DELAY),
         [onUpdate]
     );
 

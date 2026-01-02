@@ -79,3 +79,5 @@ export const CATEGORIES_TREE: CategoryNode[] = [
 
 export const BIDDING_TYPES = ['Открытый аукцион', 'Публичное предложение'];
 export const PAGE_SIZE = 20;
+
+export const DEBOUNCE_DELAY = 500;
