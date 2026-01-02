@@ -1,0 +1,143 @@
+.section {
+  margin: 0px 0 0px 0;
+}
+
+.headerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.allLink {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.featured {
+  margin-bottom: 18px;
+}
+
+.subTitle {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  /* Горизонтальный скролл */
+  padding-bottom: 16px;
+  /* Место для скроллбара */
+  scroll-snap-type: x mandatory;
+  /* Доводка скролла */
+
+  /* Скрываем скроллбар для красоты (опционально) */
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Карточки теперь не растягиваются, а имеют фиксированную ширину */
+.card {
+  flex: 0 0 280px;
+  /* Фиксированная ширина карточки */
+  scroll-snap-align: start;
+  /* Прилипание к началу */
+
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  transition: transform 0.2s;
+  height: 100%;
+  /* Растягиваем по высоте контейнера */
+}
+
+/* Опционально: стиль скроллбара */
+.grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.grid::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .08);
+}
+
+.cardImageWrap {
+  position: relative;
+  height: 140px;
+  background: #f3f4f6;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badges {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: rgba(0, 0, 0, .72);
+  color: #fff;
+  font-size: .75rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.archiveBadge {
+  background: #dc2626;
+  color: #fff;
+  font-size: .75rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.cardBody {
+  padding: 12px;
+}
+
+.cardTitle {
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.cardText {
+  color: #4b5563;
+  font-size: .92rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -14,10 +14,7 @@ import CategorySelect from '../components/CategorySelect';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
-import PromoBanner from '@/components/PromoBanner/PromoBanner';
-import { PROMO_LOTS } from './promo/data/promo-lots';
-
-const promoLot = PROMO_LOTS['dom-v-glazinino'];
+import PromoGrid from '@/components/PromoGrid/PromoGrid';
 
 const formatNumberWithSpaces = (value: string) => {
   if (!value) return '';
@@ -307,13 +304,7 @@ function Page() {
 
 
 
-      <PromoBanner
-        badge="🔥 Инвест-лот месяца"
-        title={promoLot.title}
-        subtitle={promoLot.subtitle ?? promoLot.description}
-        href={`/promo/${promoLot.id}`}
-        buttonText="Смотреть лот →"
-      />
+      <PromoGrid hotSlug="dom-v-glazinino" maxArchived={0} />
 
 
 

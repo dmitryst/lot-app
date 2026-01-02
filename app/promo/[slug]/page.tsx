@@ -16,6 +16,8 @@ export async function generateMetadata({ params }: Props) {
   const lot = PROMO_LOTS[slug];
   if (!lot) return { title: 'Лот не найден' };
 
+  const seoDescription = lot.metaDescription || lot.description.slice(0, 160) + '...';
+
   return {
     title: `${lot.title} | Инвест-предложение`,
     description: lot.description,
