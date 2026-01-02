@@ -28,13 +28,15 @@ export default function Filters({
     const [localSearch, setLocalSearch] = useState(searchQuery);
     const [localPriceFrom, setLocalPriceFrom] = useState(priceFrom);
     const [localPriceTo, setLocalPriceTo] = useState(priceTo);
+    const [localCategories, setLocalCategories] = useState<string[]>(categories);
 
     // Синхронизация локального стейта с пропсами (если URL изменился извне, например Back/Forward)
     useEffect(() => {
         setLocalSearch(searchQuery);
         setLocalPriceFrom(formatNumber(priceFrom));
         setLocalPriceTo(formatNumber(priceTo));
-    }, [searchQuery, priceFrom, priceTo]);
+        setLocalCategories(categories);
+    }, [searchQuery, priceFrom, priceTo, categories]);
 
     // --- Debounced Updaters ---
 
@@ -56,6 +58,14 @@ export default function Filters({
                     priceTo: to,
                     page: 1,
                 });
+            }, DEBOUNCE_DELAY),
+        [onUpdate]
+    );
+
+    const debouncedCategoryUpdate = useMemo(
+        () =>
+            debounce((newCats: string[]) => {
+                onUpdate({ categories: newCats, page: 1 });
             }, DEBOUNCE_DELAY),
         [onUpdate]
     );
@@ -97,9 +107,10 @@ export default function Filters({
         onUpdate({ biddingType: type, page: 1 });
     };
 
-    const handleCategoryChange = useCallback((newSelected: string[]) => {
-        onUpdate({ categories: newSelected, page: 1 });
-    }, [onUpdate]);
+    const handleCategoryChange = (newSelected: string[]) => {
+        setLocalCategories(newSelected); // Мгновенно обновляем галочки в UI
+        debouncedCategoryUpdate(newSelected); // Отправляем запрос с задержкой
+    };
 
     const formatNumber = (value: string) => {
         if (value === null || value === undefined || value === '')
@@ -131,7 +142,7 @@ export default function Filters({
                 <label className={styles.filterLabel}>Категории</label>
                 <CategorySelect
                     categories={CATEGORIES_TREE}
-                    selectedCategories={categories}
+                    selectedCategories={localCategories}
                     onChange={handleCategoryChange}
                 />
             </div>
