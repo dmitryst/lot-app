@@ -15,8 +15,8 @@ import { Suspense } from 'react';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "s-lot.ru",
-  description: "Агрегатор торгов по банкротству",
+  title: "s-lot.ru - агрегатор торгов по банкротству",
+  description: "сайт-агрегатор торгов по банкротству, аукционы России, публичные предложения, выгодные лоты",
 };
 
 export default function RootLayout({
