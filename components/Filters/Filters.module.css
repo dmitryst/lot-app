@@ -1,0 +1,157 @@
+/* components/Filters/Filters.module.css */
+
+.filtersWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Общие стили для группы */
+.filterGroup {
+  display: flex;
+  flex-direction: column; /* По умолчанию лейбл над полем */
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Используем один класс для всех заголовков полей */
+.filterLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d; /* Более мягкий серый цвет */
+  margin-left: 2px;
+  margin-bottom: 2px;
+  text-align: left; /* Всегда по левому краю */
+}
+
+/* Лейбл сбоку (для вида торгов и цены) */
+.filterLabelInline {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  align-self: center; /* Центрируем по вертикали относительно кнопок */
+}
+
+/* Контейнеры опций */
+.filterOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.priceFilterInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Инпуты */
+.priceInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background-color: #fff;
+  height: 42px; /* Фиксируем высоту для единообразия */
+}
+
+.priceInput:focus {
+  outline: none;
+  border-color: #0070f3;
+  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+}
+
+.priceSeparator {
+  color: #999;
+}
+
+/* Кнопки фильтров */
+.filterButton {
+  padding: 0 16px;
+  height: 42px; /* Такая же высота, как у инпутов */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #495057;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filterButton:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.activeFilter {
+  padding: 0 16px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #0070f3;
+  border-radius: 20px;
+  background-color: #0070f3;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 112, 243, 0.2);
+  white-space: nowrap;
+}
+
+/* ========================================= */
+/* DESKTOP LAYOUT (GRID) */
+/* ========================================= */
+@media (min-width: 960px) {
+  .filtersWrapper {
+    display: grid;
+    /* Две колонки: первая широкая (2 части), вторая поменьше (1 часть) */
+    grid-template-columns: 2fr 1.2fr; 
+    gap: 1.5rem;
+    grid-template-areas:
+      "search categories"
+      "types price";
+    align-items: start; /* Выравнивание по верху, чтобы лейблы были на одной линии */
+  }
+
+  /* Назначаем области сетки */
+  .searchArea {
+    grid-area: search;
+  }
+
+  .categoriesArea {
+    grid-area: categories;
+  }
+
+  /* Для нижнего ряда возвращаем горизонтальное расположение лейблов */
+  .typeArea {
+    grid-area: types;
+  }
+
+  .priceArea {
+    grid-area: price;
+    /* На десктопе цену не обязательно растягивать на всю ширину ячейки */
+    justify-self: start; 
+    width: 100%;
+    max-width: 400px; /* Ограничим ширину */
+  }
+
+  /* На десктопе инпуты цены не должны быть слишком широкими */
+  .priceFilterInputs {
+    width: auto;
+    max-width: 300px;
+  }
+}

@@ -59,34 +59,6 @@
   margin-bottom: 40px;
 }
 
-/* Общий стиль для кнопки фильтра */
-.filterButton {
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  background-color: #fff;
-  color: #333;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.filterButton:hover {
-  background-color: #f0f0f0;
-  border-color: #aaa;
-}
-
-/* Стиль для активной кнопки фильтра */
-.activeFilter {
-  padding: 8px 16px;
-  border: 1px solid #0070f3;
-  border-radius: 20px;
-  background-color: #0070f3;
-  color: white;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
 /* --- НОВЫЙ ДВУХКОЛОНОЧНЫЙ МАКЕТ --- */
 .mainLayout {
   display: flex;
@@ -112,98 +84,10 @@
   flex: 1; /* Занимает всё оставшееся пространство */
 }
 
-/* --- ГРУППЫ ФИЛЬТРОВ ВНУТРИ САЙДБАРА --- */
-/* --- СТИЛИ ДЛЯ ГРУПП ФИЛЬТРОВ В ГОРИЗОНТАЛЬНОЙ ПАНЕЛИ --- */
-.filterGroup {
-  margin-bottom: 0; /* Убираем вертикальный отступ */
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.filterTitle {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  border-bottom: none; /* Убираем разделитель */
-  padding-bottom: 0;
-}
-
-.filterOptions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* --- СТИЛИ КНОПОК ФИЛЬТРА (немного изменены для сайдбара) --- */
-.filterButton {
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background-color: #f7fafc;
-  color: #4a5568;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-align: left;
-  transition: all 0.2s ease;
-}
-
-.filterButton:hover {
-  background-color: #e2e8f0;
-  border-color: #cbd5e0;
-}
-
-.activeFilter {
-  padding: 8px 12px;
-  border: 1px solid #0070f3;
-  border-radius: 6px;
-  background-color: #0070f3;
-  color: white;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-align: left;
-}
-
 /* --- СТИЛИ СПИСКА ЛОТОВ (остаются без изменений) --- */
 .lotsGrid {
   display: grid;
   gap: 24px;
-}
-
-/* Контейнер для полей ввода цены */
-.priceFilterInputs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Стилизация полей ввода */
-.priceInput {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  -moz-appearance: textfield; /* Убираем стрелки в Firefox */
-}
-
-/* Убираем стрелки в Chrome, Safari, Edge */
-.priceInput::-webkit-outer-spin-button,
-.priceInput::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.priceSeparator {
-  color: #999;
-}
-
-/* Стили для контейнера, в котором лежат все карточки */
-.lotsGrid {
-  display: grid;
-  grid-template-columns: 1fr; /* ПО УМОЛЧАНИЮ: 1 колонка */
-  gap: 24px; /* Расстояние между карточками */
 }
 
 /* =================================================================== */
@@ -230,7 +114,7 @@
     margin-bottom: 2rem; /* Отступ от списка лотов */
   }
 
-  /* --- ПАНЕЛЬ ФИЛЬТРОВ (БЫВШИЙ САЙДБАР) --- */
+  /* --- ПАНЕЛЬ ФИЛЬТРОВ --- */
   .filtersSidebar {
     display: flex; /* Фильтры всегда видны на десктопе */
     flex-direction: row; /* горизонтальное расположение */

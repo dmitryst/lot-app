@@ -4,24 +4,16 @@
 import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import debounce from 'lodash.debounce';
 
-import { CATEGORIES_TREE, BIDDING_TYPES, PAGE_SIZE } from './data/constants';
+import { PAGE_SIZE } from './data/constants';
 
 import { LotItem } from '@/components/LotItem';
 import Pagination from '../components/Pagination';
-import CategorySelect from '../components/CategorySelect';
+import Filters from '../components/Filters/Filters';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
 import PromoGrid from '@/components/PromoGrid/PromoGrid';
-
-const formatNumberWithSpaces = (value: string) => {
-  if (!value) return '';
-  // Удаляем все нечисловые символы и добавляем пробелы как разделители
-  const cleanValue = value.replace(/\D/g, '');
-  return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-};
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -43,24 +35,8 @@ function Page() {
   const biddingType = searchParams.get('biddingType') || 'Все';
   const priceFromParam = searchParams.get('priceFrom') || '';
   const priceToParam = searchParams.get('priceTo') || '';
-
-  // Локальный UI-стейт, инициализируем из URL на каждом рендере
-  // (контролируемые элементы должны сразу отражать URL)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedBiddingType, setSelectedBiddingType] = useState(biddingType);
-  const [priceFrom, setPriceFrom] = useState(priceFromParam);
-  const [priceTo, setPriceTo] = useState(priceToParam);
-
-  // Синхронизация UI <- URL (чтобы при Back/Forward видны были актуальные значения)
-  // --- СИНХРОНИЗАЦИЯ UI С URL ---
-  // Этот блок важен, чтобы при перезагрузке или навигации по истории
-  // UI отражал состояние из URL
-  useEffect(() => {
-    setSelectedCategories(searchParams.getAll('categories'));
-    setSelectedBiddingType(searchParams.get('biddingType') || 'Все');
-    setPriceFrom(searchParams.get('priceFrom') || '');
-    setPriceTo(searchParams.get('priceTo') || '');
-  }, [searchParams]);
+  const searchQueryParam = searchParams.get('searchQuery') || '';
+  const categoriesParam = searchParams.getAll('categories');
 
   // Утилита: атомарно обновить URL-параметры
   const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
@@ -79,40 +55,6 @@ function Page() {
 
     router.push(`${pathname}?${currentParams.toString()}`);
   }, [pathname, router]);
-
-  // Они только формируют новый URL, а загрузкой занимается useEffect выше.
-  const handleCategoryChange = useCallback((newSelected: string[]) => {
-    updateQuery({ categories: newSelected, page: 1 });
-  }, [updateQuery]);
-
-  // Handlers — пишут и в локальный UI, и сразу в URL
-  const onBiddingTypeClick = (value: string) => {
-    setSelectedBiddingType(value);
-    updateQuery({ biddingType: value, page: 1 });
-  };
-
-  const debouncedPriceUpdate = useMemo(
-    () => debounce((from: string, to: string) => {
-      updateQuery({
-        priceFrom: from.replace(/\D/g, ''),
-        priceTo: to.replace(/\D/g, ''),
-        page: 1,
-      });
-    }, 500),
-    [updateQuery]
-  );
-
-  const onPriceFromChange = (val: string) => {
-    const clean = val.replace(/\D/g, '');
-    setPriceFrom(clean);
-    debouncedPriceUpdate(clean, priceTo);
-  };
-
-  const onPriceToChange = (val: string) => {
-    const clean = val.replace(/\D/g, '');
-    setPriceTo(clean);
-    debouncedPriceUpdate(priceFrom, clean);
-  };
 
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage });
@@ -187,51 +129,6 @@ function Page() {
       isCancelled = true;
     };
   }, [fetchLots]);
-
-  // --- JSX для рендеринга фильтров ---
-  const filtersSidebarContent = (
-    <>
-      <div className={styles.filterGroup}>
-        {/* Категории */}
-        <CategorySelect
-          categories={CATEGORIES_TREE}
-          selectedCategories={selectedCategories}
-          onChange={handleCategoryChange}
-        />
-      </div>
-
-      <div className={styles.filterGroup}>
-        <h3 className={styles.filterTitle}>Вид торгов</h3>
-        <div className={styles.buttonGroup}>
-          <button onClick={() => onBiddingTypeClick('Все')} className={selectedBiddingType === 'Все' ? styles.activeFilter : styles.filterButton}>Все</button>
-          {BIDDING_TYPES.map(type => (
-            <button key={type} onClick={() => onBiddingTypeClick(type)} className={selectedBiddingType === type ? styles.activeFilter : styles.filterButton}>{type}</button>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.filterGroup}>
-        <h3 className={styles.filterTitle}>Начальная цена, ₽</h3>
-        <div className={styles.priceFilterInputs}>
-          <input
-            type="text"
-            className={styles.priceInput}
-            placeholder="от"
-            value={formatNumberWithSpaces(priceFrom)}
-            onChange={(e) => onPriceFromChange(e.target.value)}
-          />
-          <span className={styles.priceSeparator}>—</span>
-          <input
-            type="text"
-            className={styles.priceInput}
-            placeholder="до"
-            value={formatNumberWithSpaces(priceTo)}
-            onChange={(e) => onPriceToChange(e.target.value)}
-          />
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <main className={styles.main}>
@@ -326,8 +223,17 @@ function Page() {
           >
             {isFiltersVisible ? 'Скрыть фильтры' : 'Показать фильтры'}
           </button>
+
+          {/* Фильтры */}
           <aside className={`${styles.filtersSidebar} ${isFiltersVisible ? styles.sidebarVisible : ''}`}>
-            {filtersSidebarContent}
+            <Filters
+              categories={categoriesParam}
+              biddingType={biddingType}
+              priceFrom={priceFromParam}
+              priceTo={priceToParam}
+              searchQuery={searchQueryParam}
+              onUpdate={updateQuery}
+            />
           </aside>
         </div>
 

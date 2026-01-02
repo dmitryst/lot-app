@@ -61,7 +61,7 @@ export default function CategorySelect({ categories, selectedCategories, onChang
     return (
         <div className={styles.container} ref={wrapperRef}>
             <div className={styles.inputRow}>
-                <label className={styles.label}>Категории</label>
+                {/* <label className={styles.label}>Категории</label> */}
                 {/* Это наш "фальшивый" инпут */}
                 <div
                     className={styles.selectTrigger}
