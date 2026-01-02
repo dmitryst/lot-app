@@ -85,7 +85,7 @@ export const PROMO_LOTS: Record<string, PromoLot> = {
     ],
     schedule: [
       { date: '23.12.2025', price: '40 160 700', deposit: '2 008 035', status: 'previous', statusText: '' },
-      { date: '30.12.2025', price: '38 152 665', deposit: '1 907 633', status: 'wait', statusText: '' },
+      { date: '30.12.2025', price: '38 152 665', deposit: '1 907 633', status: 'previous', statusText: '' },
       { date: '06.01.2026', price: '36 144 630', deposit: '1 807 231', status: 'wait', statusText: '' },
       { date: '13.01.2026', price: '34 136 595', deposit: '1 706 829', status: 'wait', statusText: '' },
       { date: '20.01.2026', price: '32 128 560', deposit: '1 606 428', status: 'wait', statusText: '' },
