@@ -6,6 +6,7 @@ import debounce from 'lodash.debounce';
 import { BIDDING_TYPES, CATEGORIES_TREE, DEBOUNCE_DELAY } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
 import styles from './Filters.module.css';
+import ClearableInput from '@/components/ui/ClearableInput';
 
 interface FiltersProps {
     categories: string[];
@@ -112,6 +113,24 @@ export default function Filters({
         debouncedCategoryUpdate(newSelected); // Отправляем запрос с задержкой
     };
 
+    // --- HANDLERS ДЛЯ ОЧИСТКИ ---
+
+    const handleClearSearch = () => {
+        setLocalSearch(''); // Очищаем локально
+        debouncedSearchUpdate(''); // Запускаем обновление (можно мгновенно onUpdate, но через debounce надежнее для единообразия)
+    };
+
+    const handleClearPriceFrom = () => {
+        setLocalPriceFrom('');
+        // Передаем пустую строку для 'from' и текущее значение 'to'
+        debouncedPriceUpdate('', localPriceTo.replace(/\D/g, ''));
+    };
+
+    const handleClearPriceTo = () => {
+        setLocalPriceTo('');
+        debouncedPriceUpdate(localPriceFrom.replace(/\D/g, ''), '');
+    };
+
     const formatNumber = (value: string) => {
         if (value === null || value === undefined || value === '')
             return '';
@@ -128,12 +147,12 @@ export default function Filters({
             {/* Поиск */}
             <div className={`${styles.filterGroup} ${styles.searchArea}`}>
                 <label className={styles.filterLabel}>Поиск по словам</label>
-                <input
+                <ClearableInput
                     type="text"
-                    className={styles.priceInput}
                     placeholder="Например: квартира в Москве"
                     value={localSearch}
                     onChange={handleSearchChange}
+                    onClear={handleClearSearch}
                 />
             </div>
 
@@ -173,20 +192,20 @@ export default function Filters({
             <div className={`${styles.filterGroup} ${styles.priceArea}`}>
                 <label className={styles.filterLabel}>Начальная цена, ₽</label>
                 <div className={styles.priceFilterInputs}>
-                    <input
+                    <ClearableInput
                         type="text"
-                        className={styles.priceInput}
                         placeholder="От"
                         value={localPriceFrom}
                         onChange={handlePriceFromChange}
+                        onClear={handleClearPriceFrom}
                     />
                     <span className={styles.priceSeparator}>—</span>
-                    <input
+                    <ClearableInput
                         type="text"
-                        className={styles.priceInput}
                         placeholder="До"
                         value={localPriceTo}
                         onChange={handlePriceToChange}
+                        onClear={handleClearPriceTo}
                     />
                 </div>
             </div>

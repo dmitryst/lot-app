@@ -50,24 +50,6 @@
   width: 100%;
 }
 
-/* Инпуты */
-.priceInput {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-  background-color: #fff;
-  height: 42px; /* Фиксируем высоту для единообразия */
-}
-
-.priceInput:focus {
-  outline: none;
-  border-color: #0070f3;
-  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
-}
-
 .priceSeparator {
   color: #999;
 }
