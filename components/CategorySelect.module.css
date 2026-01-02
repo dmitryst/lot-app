@@ -36,6 +36,32 @@
   border-color: #888;
 }
 
+/* Обертка для иконок (крестик + стрелка) */
+.iconsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Кнопка крестик в инпуте */
+.clearButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.clearButton:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
 .arrow {
   transition: transform 0.2s ease-in-out;
   color: #888;
@@ -66,18 +92,70 @@
   border-top: 1px solid #eee;
 }
 
+/* Футер панели */
+.footer {
+  padding: 16px; /* Чуть больше воздуха */
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  gap: 16px; /* Отступ между кнопками, если они сблизятся */
+}
+
+/* Кнопка "Применить" (Основная) */
 .applyButton {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+  /* Задаем минимальную ширину, чтобы кнопка выглядела солидно */
+  min-width: 120px;
+  height: 40px; /* Фиксированная высота */
+  padding: 0 24px;
+  background-color: #0070f3;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.95rem;
   transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* Запрещаем перенос текста */
 }
 
 .applyButton:hover {
-  background-color: #0056b3;
+  background-color: #0060df;
+}
+
+/* Кнопка "Сбросить все" (Второстепенная) */
+.resetButton {
+  height: 40px; /* ТАКАЯ ЖЕ высота, как у applyButton */
+  padding: 0 16px;
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #e2e8f0; /* Добавляем легкую рамку для баланса */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* Запрещаем перенос текста */
+}
+
+.resetButton:hover {
+  color: #333;
+  background-color: #f8f9fa;
+  border-color: #cbd5e0;
+}
+
+.resetButton:disabled {
+  color: #ccc;
+  border-color: #eee;
+  cursor: not-allowed;
+  background-color: transparent;
 }
