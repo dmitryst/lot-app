@@ -15,7 +15,7 @@ import { Suspense } from 'react';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "s-lot.ru - агрегатор торгов по банкротству",
+  title: "s-lot.ru - поиск и анализ лотов с торгов по банкротству",
   description: "сайт-агрегатор торгов по банкротству, аукционы России, публичные предложения, выгодные лоты",
 };
 
@@ -43,7 +43,7 @@ export default function RootLayout({
                 </p>
                 <p>
                   Используя сервис, вы соглашаетесь с <Link href="/agreement">Пользовательским соглашением</Link> и <Link href="/privacy">Политикой конфиденциальности</Link>.
-                  Оплачивая услуги, вы принимаете <Link href="/terms">Оферту</Link>.
+                  Оплачивая услуги, вы принимаете <Link href="/terms">Публичную оферту</Link>.
                 </p>
                 <p>
                   ИП Степанов Дмитрий Александрович | Email: <a href="mailto:info@s-lot.ru">info@s-lot.ru</a>
@@ -51,7 +51,7 @@ export default function RootLayout({
                 <VersionDisplay />
                 <nav>
                   <Link href="/subscribe" className="footer-link">Тарифы</Link>
-                  <Link href="/terms" className="footer-link">Публичная оферта</Link>
+                  {/* <Link href="/terms" className="footer-link">Публичная оферта</Link> */}
                   <Link href="/requisites" className="footer-link">Реквизиты</Link>
                 </nav>
               </div>
