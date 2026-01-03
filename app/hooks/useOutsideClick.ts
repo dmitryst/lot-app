@@ -4,8 +4,8 @@ type Event = MouseEvent | TouchEvent;
 
 // Хук для отслеживания кликов вне указанного элемента
 export function useOutsideClick(
-  ref: RefObject<HTMLElement | null>, // <--- ИСПРАВЛЕНИЕ 1: Допускаем null
-  callback: () => void // <--- ИСПРАВЛЕНИЕ 2: Упрощаем callback
+  ref: RefObject<HTMLElement | null>,
+  callback: () => void
 ) {
   useEffect(() => {
     const listener = (event: Event) => {

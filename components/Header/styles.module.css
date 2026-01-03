@@ -120,3 +120,32 @@
 .loginLink:hover {
     background-color: #0051a2;
 }
+
+/* Стили для кнопки Лот месяца */
+.restorePromoButton {
+  margin-right: auto; /* Сдвигает кнопку влево, если используете flex */
+  margin-left: 20px;
+  background: #FFF0F0; /* Легкий фон */
+  border: 1px solid #FFD0D0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #D32F2F;
+  transition: all 0.2s;
+}
+
+.restorePromoButton:hover {
+  background: #FFE0E0;
+  transform: scale(1.02);
+}
+
+/* На мобильных можно скрывать текст, оставляя только огонек */
+@media (max-width: 600px) {
+    .restoreText {
+        display: none;
+    }
+}

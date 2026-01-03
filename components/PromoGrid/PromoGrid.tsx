@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PromoBanner from '@/components/PromoBanner/PromoBanner';
 import styles from './PromoGrid.module.css';
 import { PROMO_LOTS } from '@/app/promo/data/promo-lots';
+import { hot_lot_id } from '../../app/data/constants';
 
 type PromoGridProps = {
   hotSlug?: string;        // если нужно явно указать “лот месяца”
@@ -50,7 +51,7 @@ export default function PromoGrid({
       {featured && (
         <div className={styles.featured}>
           <PromoBanner
-            id = {featured.slug}
+            id = {hot_lot_id}
             badge="🔥 Лот месяца"
             title={featured.lot.title}
             subtitle={featured.lot.subtitle ?? featured.lot.description}

@@ -81,3 +81,5 @@ export const BIDDING_TYPES = ['Открытый аукцион', 'Публичн
 export const PAGE_SIZE = 20;
 
 export const DEBOUNCE_DELAY = 800;
+
+export const hot_lot_id = 'dom-v-glazinino';

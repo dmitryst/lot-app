@@ -6,6 +6,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import styles from './styles.module.css';
+import { usePromoVisibility } from '../../app/hooks/usePromoVisibility';
+import { hot_lot_id } from '../../app/data/constants';
 
 export const Header = () => {
     const { user, logout } = useAuth();
@@ -22,6 +24,10 @@ export const Header = () => {
     // Формируем ссылку для входа
     // encodeURIComponent важен, чтобы спецсимволы не сломали URL
     const loginHref = `/login?returnUrl=${encodeURIComponent(currentPath)}`;
+
+    // Используем ТОТ ЖЕ ID, что и в баннере!
+    const promoId = hot_lot_id;
+    const { isVisible, isMounted, showPromo } = usePromoVisibility(promoId);
 
     return (
         <header className={styles.headerWrapper}>
@@ -43,6 +49,15 @@ export const Header = () => {
 
                 {/* --- ПРАВАЯ ЧАСТЬ: МЕНЮ --- */}
                 <div className={styles.rightSection}>
+
+                    {/* КНОПКА ВОССТАНОВЛЕНИЯ */}
+                    {/* Показываем ТОЛЬКО если баннер СКРЫТ (!isVisible) */}
+                    {isMounted && !isVisible && (
+                        <button onClick={showPromo} className={styles.restorePromoButton}>
+                            🔥 <span className={styles.restoreText}>Лот месяца</span>
+                        </button>
+                    )}
+
                     {user ? (
                         <>
                             <span className={styles.userInfo}>{user.email}</span>
