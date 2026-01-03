@@ -37,6 +37,7 @@ function Page() {
   const priceToParam = searchParams.get('priceTo') || '';
   const searchQueryParam = searchParams.get('searchQuery') || '';
   const categoriesParam = searchParams.getAll('categories');
+  const isSharedOwnershipParam = searchParams.get('isSharedOwnership');
 
   // Утилита: атомарно обновить URL-параметры
   const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
@@ -232,6 +233,7 @@ function Page() {
               priceFrom={priceFromParam}
               priceTo={priceToParam}
               searchQuery={searchQueryParam}
+              isSharedOwnership={isSharedOwnershipParam} 
               onUpdate={updateQuery}
             />
           </aside>

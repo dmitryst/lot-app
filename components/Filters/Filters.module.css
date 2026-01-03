@@ -105,7 +105,8 @@
     gap: 1.5rem;
     grid-template-areas:
       "search categories"
-      "types price";
+      "types price"
+      "ownership ."; /* новая строка: Слева собственность, справа пусто */
     align-items: start; /* Выравнивание по верху, чтобы лейблы были на одной линии */
   }
 
@@ -131,9 +132,71 @@
     max-width: 400px; /* Ограничим ширину */
   }
 
+  .ownershipArea {
+    grid-area: ownership;
+  }
+
   /* На десктопе инпуты цены не должны быть слишком широкими */
   .priceFilterInputs {
     width: auto;
     max-width: 300px;
   }
 }
+
+@media (min-width: 1100px) {
+  .filtersWrapper {
+    /* Меняем сетку на 1:1 для верхнего ряда (Поиск и Категории) */
+    /* И 3 колонки для нижнего ряда, но с другими пропорциями */
+    grid-template-columns: 1.5fr 1.5fr 1.2fr; /* Три колонки */
+    
+    grid-template-areas:
+      "search categories categories" /* Поиск занимает 1.5fr, Категории 2.7fr (очень широко) */
+      /* ИЛИ лучше поровну, если хотите баланса: */
+      /* "search search categories categories" (если колонок 4) */
+  }
+  
+  /* Давайте сделаем проще и эффективнее: 2 колонки, но равные */
+  /* Переопределим логику для 1100px+ */
+  .filtersWrapper {
+     grid-template-columns: 1fr 1fr; /* 50% на 50% */
+     grid-template-areas:
+       "search categories"
+       "types ownership" /* Типы и собственность делят ряд */
+       "price price";    /* Цена на всю ширину (или справа, если хотите) */
+  }
+
+  /* НО, если вы хотите сохранить 3 блока внизу, как было: */
+  .filtersWrapper {
+      grid-template-columns: 1.2fr 1.2fr 1fr; /* Немного изменим пропорции */
+      grid-template-areas:
+        "search categories categories" /* Категории получают 2/3 ширины верха! */
+        "types ownership price";
+  }
+
+  /* 1. Поиск */
+  .searchArea { 
+     grid-area: search; 
+  }
+
+  /* 2. Категории - теперь широкие */
+  .categoriesArea { 
+     grid-area: categories; 
+  }
+
+  /* 3. Нижний ряд */
+  .typeArea { grid-area: types; }
+  .ownershipArea { grid-area: ownership; }
+  
+  /* 4. Цена */
+  .priceArea { 
+     grid-area: price; 
+     justify-self: stretch; /* Растягиваем на всю доступную ширину */
+     max-width: none; /* Убираем лимиты */
+  }
+  
+  .priceFilterInputs {
+      width: 100%;
+      max-width: none; /* Инпуты могут расти */
+  }
+}
+

@@ -14,6 +14,7 @@ interface FiltersProps {
     priceFrom: string;
     priceTo: string;
     searchQuery: string;
+    isSharedOwnership: string | null;
     onUpdate: (updates: Record<string, any>) => void;
 }
 
@@ -23,6 +24,7 @@ export default function Filters({
     priceFrom,
     priceTo,
     searchQuery,
+    isSharedOwnership,
     onUpdate,
 }: FiltersProps) {
     // Локальное состояние для инпутов (чтобы ввод не тормозил)
@@ -113,6 +115,12 @@ export default function Filters({
         debouncedCategoryUpdate(newSelected); // Отправляем запрос с задержкой
     };
 
+    // Хендлер для переключения долевой собственности
+    const handleSharedOwnershipClick = (value: string | null) => {
+        // value может быть 'true', 'false' или null (для "Все")
+        onUpdate({ isSharedOwnership: value, page: 1 });
+    };
+
     // --- HANDLERS ДЛЯ ОЧИСТКИ ---
 
     const handleClearSearch = () => {
@@ -185,6 +193,36 @@ export default function Filters({
                             {type}
                         </button>
                     ))}
+                </div>
+            </div>
+
+            {/* --- Тип собственности (доли) --- */}
+            <div className={`${styles.filterGroup} ${styles.ownershipArea}`}>
+                <label className={styles.filterLabel}>Собственность</label>
+                <div className={styles.filterOptions}>
+                    {/* Кнопка "Все" */}
+                    <button
+                        onClick={() => handleSharedOwnershipClick(null)}
+                        className={!isSharedOwnership ? styles.activeFilter : styles.filterButton}
+                    >
+                        Все
+                    </button>
+
+                    {/* Кнопка "Целиком" (isSharedOwnership = false) */}
+                    <button
+                        onClick={() => handleSharedOwnershipClick('false')}
+                        className={isSharedOwnership === 'false' ? styles.activeFilter : styles.filterButton}
+                    >
+                        Целиком
+                    </button>
+
+                    {/* Кнопка "Только доли" (isSharedOwnership = true) */}
+                    <button
+                        onClick={() => handleSharedOwnershipClick('true')}
+                        className={isSharedOwnership === 'true' ? styles.activeFilter : styles.filterButton}
+                    >
+                        Только доли
+                    </button>
                 </div>
             </div>
 
