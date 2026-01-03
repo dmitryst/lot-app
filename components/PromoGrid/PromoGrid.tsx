@@ -50,6 +50,7 @@ export default function PromoGrid({
       {featured && (
         <div className={styles.featured}>
           <PromoBanner
+            id = {featured.slug}
             badge="🔥 Лот месяца"
             title={featured.lot.title}
             subtitle={featured.lot.subtitle ?? featured.lot.description}
