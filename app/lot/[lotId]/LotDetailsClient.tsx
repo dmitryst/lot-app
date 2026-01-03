@@ -1,3 +1,5 @@
+// app/lot/[id]/LotDetailsClient.tsx
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -42,6 +44,22 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     { label: 'Главная', href: '/' },
     { label: lot.description.substring(0, 50) + '...', href: `/lot/${lot.id}` }
   ];
+
+  // Данные для письма
+  const managerEmail = "info@s-lot.ru";
+  const subject = encodeURIComponent(`Запрос информации по лоту №${lot.id}`);
+  const body = encodeURIComponent(
+    `Здравствуйте!
+
+Прошу сообщить информацию по лоту №${lot.id} (${lot.title || 'Без названия'}).
+Меня интересует, как его можно купить и сколько будут стоить ваши услуги.
+
+Ссылка на лот: ${typeof window !== 'undefined' ? window.location.href : ''}
+
+С уважением,`
+  );
+
+  const mailtoLink = `mailto:${managerEmail}?subject=${subject}&body=${body}`;
 
   return (
     <main className={styles.container}>
@@ -143,7 +161,27 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           title="4. Завершение сделки"
           description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу."
         />
-        <button className={styles.ctaButton}>Оставить заявку на участие</button>
+        <button
+          className={styles.ctaButton}
+          onClick={() => {
+            window.location.href = `${mailtoLink}`;
+          }}>
+          Оставить заявку на участие
+        </button>
+
+        {/* <a
+          href={mailtoLink}
+          className={styles.ctaButton}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textDecoration: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Оставить заявку на участие
+        </a> */}
       </div>
     </main>
   );
