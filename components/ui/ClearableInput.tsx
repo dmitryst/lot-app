@@ -4,6 +4,7 @@ import styles from './ClearableInput.module.css';
 
 interface ClearableInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onClear: () => void;
+  icon?: React.ReactNode; // проп для иконки
 }
 
 const ClearIcon = () => (
@@ -13,13 +14,20 @@ const ClearIcon = () => (
   </svg>
 );
 
-export default function ClearableInput({ onClear, className, ...props }: ClearableInputProps) {
+export default function ClearableInput({ onClear, className, icon, ...props }: ClearableInputProps) {
   return (
     <div className={styles.wrapper}>
+      {/* Если передана иконка, рендерим её */}
+      {icon && <div className={styles.leftIconWrapper}>{icon}</div>}
+
       <input
         {...props}
-        className={`${styles.input} ${className || ''}`}
+        className={`
+          ${styles.input} 
+          ${icon ? styles.withIcon : ''} 
+        `}
       />
+
       {/* Показываем крестик только если есть value */}
       {props.value && (
         <button
