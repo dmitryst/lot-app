@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { PROMO_LOTS } from '../data/promo-lots';
+import { PROMO_LOTS, type PromoLot } from '../data/promo-lots';
 import styles from './promo.module.css';
 import ImageGallery from './ImageGallery';
 
@@ -28,6 +28,43 @@ export async function generateMetadata({ params }: Props) {
       images: lot.img ? [lot.img] : [],
     },
   };
+}
+
+function computeScheduleStatus(
+  schedule: PromoLot['schedule'],
+  lotStatus: string
+) {
+  // Если торги завершены, возвращаем оригинальный график без изменений
+  // Добавляем поле computedStatus, равное исходному status, чтобы не ломать верстку
+  if (lotStatus === 'archive' || lotStatus === 'sold') {
+    return schedule.map(item => ({
+      ...item,
+      computedStatus: item.status
+    }));
+  }
+
+  // Для активных торгов вычисляем статусы
+  const now = new Date();
+  // Сбрасываем время в 00:00:00, чтобы сравнивать только даты
+  now.setHours(0, 0, 0, 0);
+
+  return schedule.map(item => {
+    // Парсим дату из формата "DD.MM.YYYY"
+    const [day, month, year] = item.date.split('.').map(Number);
+    const itemDate = new Date(year, month - 1, day);
+
+    let computedStatus = item.status;
+
+    // Если дата этапа строго меньше текущей даты (т.е. была вчера или раньше)
+    if (itemDate < now) {
+      computedStatus = 'previous';
+    }
+
+    return {
+      ...item,
+      computedStatus
+    };
+  });
 }
 
 export default async function PromoLotPage({ params }: Props) {
@@ -64,6 +101,9 @@ export default async function PromoLotPage({ params }: Props) {
       'url': `https://s-lot.ru/promo/${slug}` // Ссылка на страницу
     }
   };
+
+  // Вычисляем статусы
+  const scheduleWithStatus = computeScheduleStatus(lot.schedule, lot.status);
 
   return (
     <div className={styles.container}>
@@ -125,8 +165,8 @@ export default async function PromoLotPage({ params }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {lot.schedule.map((row, idx) => (
-                      <tr key={idx} className={styles[row.status]}>
+                    {scheduleWithStatus.map((row, idx) => (
+                      <tr key={idx} className={styles[row.computedStatus]}>
                         <td>{row.date}</td>
                         <td className={styles.numCell}>{row.price}</td>
                         <td className={styles.numCell}>{row.deposit}</td>
