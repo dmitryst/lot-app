@@ -56,9 +56,26 @@
 /* ... остальные стили (userInfo, favLink, etc.) */
 
 .userInfo {
-    font-weight: 500;
-    color: #333;
-    font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+  /* Добавьте это, чтобы email не переносился */
+  white-space: nowrap; 
+}
+
+@media (max-width: 768px) {
+  .userInfo {
+    display: none; /* Скрываем email на мобильных */
+  }
+  
+  .rightSection {
+    gap: 10px; /* Уменьшаем отступы между кнопками */
+  }
+  
+  .logoutBtn {
+    padding: 6px 12px; /* Чуть компактнее кнопка выхода */
+    font-size: 0.85rem;
+  }
 }
 
 .favLink {
