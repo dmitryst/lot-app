@@ -340,3 +340,30 @@
     text-align: center;
   }
 }
+
+/* Стили для оберток hero-секции и промо баннера */
+.heroWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Делим экран пополам */
+  gap: 40px; /* Отступ между текстом и баннером */
+  align-items: center; /* Центрируем по вертикали */
+  width: 100%;
+  max-width: 1440px; /* Ограничиваем ширину на огромных экранах */
+  margin: 0 auto 20px; /* Отступ снизу до карты */
+  padding: 0 20px; /* Безопасные отступы по бокам */
+}
+
+/* Обертка для баннера, чтобы он не "схлопывался" */
+.promoWrapper {
+  width: 100%;
+  min-width: 0; /* Важный фикс для Grid/Flex элементов */
+}
+
+/* АДАПТИВ: На планшетах и мобильных возвращаем "столбик" */
+@media (max-width: 1024px) {
+  .heroWrapper {
+    grid-template-columns: 1fr; /* Одна колонка */
+    text-align: center;
+    gap: 30px;
+  }
+}

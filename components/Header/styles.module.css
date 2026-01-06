@@ -59,8 +59,7 @@
   font-weight: 500;
   color: #333;
   font-size: 0.95rem;
-  /* Добавьте это, чтобы email не переносился */
-  white-space: nowrap; 
+  white-space: nowrap;  /* чтобы email не переносился */
 }
 
 @media (max-width: 768px) {

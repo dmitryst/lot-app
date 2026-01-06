@@ -14,6 +14,7 @@ import styles from './page.module.css';
 import { Lot } from '../types';
 
 import PromoGrid from '@/components/PromoGrid/PromoGrid';
+import HeroSection from '@/components/HeroSection/HeroSection';
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -133,8 +134,11 @@ function Page() {
 
   return (
     <main className={styles.main}>
-      {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
-      {/* <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
+      <div className={styles.heroWrapper}>
+        <HeroSection />
+
+        {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
+        {/* <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
 
         <div className={styles.promoContent} style={{
           display: 'flex',
@@ -164,8 +168,8 @@ function Page() {
           </Link>
         </div> */}
 
-      {/* ПЕЧАТЬ */}
-      {/* <div style={{
+        {/* ПЕЧАТЬ */}
+        {/* <div style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
@@ -199,12 +203,10 @@ function Page() {
         </div>
       </div> */}
 
-
-
-
-      <PromoGrid hotSlug="dom-v-glazinino" maxArchived={0} />
-
-
+        <div className={styles.promoWrapper}>
+          <PromoGrid hotSlug="dom-v-glazinino" maxArchived={0} />
+        </div>
+      </div>
 
 
 
@@ -233,7 +235,7 @@ function Page() {
               priceFrom={priceFromParam}
               priceTo={priceToParam}
               searchQuery={searchQueryParam}
-              isSharedOwnership={isSharedOwnershipParam} 
+              isSharedOwnership={isSharedOwnershipParam}
               onUpdate={updateQuery}
             />
           </aside>

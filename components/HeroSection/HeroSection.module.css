@@ -1,0 +1,53 @@
+/* components/HeroSection/HeroSection.module.css */
+
+.container {
+  /* Desktop: выравнивание влево */
+  text-align: left;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 2.5rem; /* Можно сделать чуть крупнее для десктопа */
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 1rem 0;
+  line-height: 1.1;
+}
+
+.highlight {
+  background: linear-gradient(90deg, #0070f3, #00c6ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  color: #555;
+  margin: 0; /* Убираем auto margin, чтобы было слева */
+  max-width: 500px; /* Ограничиваем ширину строки для читаемости */
+  line-height: 1.6;
+}
+
+/* TABLET & MOBILE */
+@media (max-width: 1024px) {
+  .container {
+    text-align: center; /* Возвращаем центр */
+    align-items: center;
+    margin-bottom: 0;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    margin: 0 auto; /* Центрируем блок текста */
+    font-size: 1rem;
+  }
+}
