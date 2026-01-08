@@ -1,14 +1,16 @@
 type BiddingInfo = {
   type: string;
+  bidAcceptancePeriod: string;
   viewingProcedure?: string;
 };
 
 export type Lot = {
   id: string;
+  publicId: number;
   url?: string;
-  startPrice: string | null;
   title: string | null;
   description: string;
+  startPrice: string | null;
   step: string | null;
   deposit: string | null;
   isFavorite: boolean;

@@ -5,6 +5,7 @@ import { Lot } from '@/types';
 import LotCard from '@/components/LotCard';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import styles from './styles.module.css';
+import { generateSlug } from '@/utils/slugify';
 
 interface LotItemProps {
   lot: Lot;
@@ -21,6 +22,12 @@ export const LotItem = ({ lot, className }: LotItemProps) => {
     sessionStorage.setItem('lotListQuery', window.location.search);
   };
 
+  // Если есть PublicId, генерируем красивую ссылку
+  const slug = generateSlug(lot.title || lot.description);
+  const lotUrl = lot.publicId 
+    ? `/lot/${slug}-${lot.publicId}` 
+    : `/lot/${lot.id}`;
+
   return (
     <div
       className={`${styles.container} ${className ?? ''}`}
@@ -29,7 +36,7 @@ export const LotItem = ({ lot, className }: LotItemProps) => {
       <FavoriteButton lotId={lot.id} />
 
       <Link
-        href={`/lot/${lot.id}`}
+        href={lotUrl}
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <LotCard lot={lot} imageUrl={lot.imageUrl} />

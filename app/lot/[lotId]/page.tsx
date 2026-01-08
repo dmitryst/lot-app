@@ -89,9 +89,10 @@ const generateKeywords = (lot: Lot): string => {
 };
 
 // Функция для получения данных лота по ID
-async function getLotData(lotId: string): Promise<Lot | null> {
+async function getLotData(slugOrId: string): Promise<Lot | null> {
+  const publicId = extractIdFromSlug(slugOrId);
   const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
-  const url = `${apiUrl}/api/lots/${lotId}`;
+  const url = `${apiUrl}/api/lots/${publicId}`;
 
   try {
     const res = await fetch(url, { cache: 'no-store' });
@@ -101,9 +102,18 @@ async function getLotData(lotId: string): Promise<Lot | null> {
 
     return res.json();
   } catch (error) {
-    console.error(`Не удалось загрузить данные для лота ${lotId}:`, error);
+    console.error(`Не удалось загрузить данные для лота ${publicId}:`, error);
     return null;
   }
+}
+
+function extractIdFromSlug(slug: string): string {
+  // Ищем дефис и цифры в конце строки
+  const match = slug.match(/-(\d+)$/);
+  if (match) {
+    return match[1]; // Возвращает "45368"
+  }
+  return slug;
 }
 
 // ГЕНЕРАЦИЯ МЕТАДАННЫХ

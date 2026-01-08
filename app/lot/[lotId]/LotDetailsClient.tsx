@@ -45,22 +45,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     { label: lot.description.substring(0, 50) + '...', href: `/lot/${lot.id}` }
   ];
 
-  // Данные для письма
-  const managerEmail = "info@s-lot.ru";
-  const subject = encodeURIComponent(`Запрос информации по лоту №${lot.id}`);
-  const body = encodeURIComponent(
-    `Здравствуйте!
-
-Прошу сообщить информацию по лоту №${lot.id} (${lot.title || 'Без названия'}).
-Меня интересует, как его можно купить и сколько будут стоить ваши услуги.
-
-Ссылка на лот: ${typeof window !== 'undefined' ? window.location.href : ''}
-
-С уважением,`
-  );
-
-  const mailtoLink = `mailto:${managerEmail}?subject=${subject}&body=${body}`;
-
   return (
     <main className={styles.container}>
       <Breadcrumbs crumbs={crumbs} />
@@ -89,8 +73,9 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
         {/* Правая колонка: Информация о лоте */}
         <div className={styles.infoSection}>
-          <p className={styles.lotInfo}><b>Номер лота:</b> {lot.id}</p>
+          <p className={styles.lotInfo}><b>Номер лота:</b> {lot.publicId}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
+          <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
           <div className={styles.priceInfo}>
             {/* Блок для начальной цены */}
             <div>
@@ -144,33 +129,36 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
       {/* Информация о покупке */}
       <div className={styles.purchaseInfo}>
-        <h2>Как купить лот через агента</h2>
+        <h2>Как купить лот</h2>
         <PurchaseStep
-          title="1. Договор"
-          description="Мы заключаем с вами договор, в котором прописаны все условия нашего сотрудничества и наша ответственность."
+          title="1. Осмотр имущества"
+          description={
+            (lot.bidding?.viewingProcedure)
+              ? `Вам необходимо самостоятельно ознакомиться с имуществом. Порядок ознакомления указан выше на этой странице.`
+              : "Вам необходимо самостоятельно связаться с арбитражным управляющим для осмотра имущества. Напишите нам для получения контактов управляющего, если они не указаны в описании лота."
+          }
         />
         <PurchaseStep
-          title="2. Задаток и комиссия"
+          title="2. Договор"
+          description="Если после осмотра вы решили приобрести данный лот с нашей помощью, мы заключаем с вами договор, в котором прописаны все условия сотрудничества и наша ответственность."
+        />
+        <PurchaseStep
+          title="3. Задаток и комиссия"
           description="Вы переводите задаток на специальный счет торговой площадки и оплачиваете нашу комиссию по договору."
         />
         <PurchaseStep
-          title="3. Участие в торгах"
+          title="4. Участие в торгах"
           description="Наш специалист подает заявку, участвует в торгах от вашего имени и борется за победу по согласованной с вами стратегии."
         />
         <PurchaseStep
-          title="4. Завершение сделки"
+          title="5. Завершение сделки"
           description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу."
         />
-        <button
-          className={styles.ctaButton}
-          onClick={() => {
-            window.location.href = `${mailtoLink}`;
-          }}>
-          Оставить заявку на участие
-        </button>
 
-        {/* <a
-          href={mailtoLink}
+        <a
+          href="https://t.me/+79269598508"
+          target="_blank"
+          rel="noopener noreferrer"
           className={styles.ctaButton}
           style={{
             display: 'inline-flex',
@@ -180,8 +168,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             cursor: 'pointer'
           }}
         >
-          Оставить заявку на участие
-        </a> */}
+          Свяжитесь с нами
+        </a>
       </div>
     </main>
   );
