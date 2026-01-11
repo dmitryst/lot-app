@@ -83,6 +83,42 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     ? lot.images
     : (lot.imageUrl ? [lot.imageUrl] : ['/placeholder.png']);
 
+  // --- ИКОНКИ (Копируем из LotCard для единообразия) ---
+  const IconArrowUp = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+    </svg>
+  );
+
+  const IconArrowDown = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+    </svg>
+  );
+
+  // Определяем направление цены
+  const getPriceDirectionIcon = () => {
+    const type = lot.bidding?.type?.toLowerCase() || '';
+
+    if (type.includes('аукцион')) {
+      return (
+        <span className={styles.iconUp} title="Цена повышается">
+          <IconArrowUp />
+        </span>
+      );
+    }
+
+    if (type.includes('предложение')) {
+      return (
+        <span className={styles.iconDown} title="Цена понижается">
+          <IconArrowDown />
+        </span>
+      );
+    }
+
+    return null;
+  };
+
   return (
 
     <main className={styles.container}>
@@ -112,19 +148,36 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <p className={styles.lotInfo}><b>Номер лота:</b> {lot.publicId}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
+          <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
+          
           <div className={styles.priceInfo}>
             {/* Блок для начальной цены */}
             <div>
               <span className={styles.priceLabel}>Начальная цена:</span>
-              <span className={styles.priceValue}>{lot.startPrice ? `${lot.startPrice.toLocaleString()} ₽` : 'Не указана'}</span>
+              <span className={styles.priceValue}>
+                {lot.startPrice ? `${lot.startPrice.toLocaleString()} ₽` : 'Не указана'}
+
+                {/* Вставляем иконку */}
+                {getPriceDirectionIcon()}
+              </span>
             </div>
 
-            {/* === УСЛОВНЫЙ РЕНДЕРИНГ ЗАДАТКА === */}
+            {/* Задаток */}
             {lot.deposit && (
               <div className={styles.depositInfo}>
                 <span className={styles.depositLabel}>Величина задатка:</span>
                 <span className={styles.depositValue}>
                   {lot.deposit.toLocaleString()} ₽
+                </span>
+              </div>
+            )}
+
+            {/* Шаг цены (аукциона) */}
+            {lot.step && (
+              <div className={styles.depositInfo}>
+                <span className={styles.depositLabel}>Шаг цены:</span>
+                <span className={styles.depositValue}>
+                  {lot.step.toLocaleString()} ₽
                 </span>
               </div>
             )}

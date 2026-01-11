@@ -1,6 +1,7 @@
 type BiddingInfo = {
   type: string;
   bidAcceptancePeriod: string;
+  tradePeriod: string;
   viewingProcedure?: string;
   platform: string;
 };

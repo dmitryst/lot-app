@@ -1,13 +1,13 @@
 .lotCardContainer {
   width: 100%;
   border-radius: 14px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.04);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04);
   background: #fff;
   overflow: hidden;
   margin-bottom: 12px;
   display: flex;
   flex-direction: column; /* Для мобильных - все вертикально */
-  padding: 10px; 
+  padding: 10px;
 }
 
 .cardContent {
@@ -37,6 +37,13 @@
   align-items: flex-start;
 }
 
+.lotNumber {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
 /* КЛАСС для параграфов с ценой */
 .priceDetail {
   display: flex;
@@ -54,7 +61,8 @@
 }
 
 /* Изменяем позиционирование иконок */
-.iconUp, .iconDown {
+.iconUp,
+.iconDown {
   display: flex;
   align-items: center;
   /* margin-left: 8px; был раньше, теперь используем gap в .priceDetail */
@@ -187,11 +195,13 @@
   .lotCardContainer {
     flex-direction: row;
   }
+
   .imageWrapper {
     width: 400px;
     height: 286px;
     flex-shrink: 0;
   }
+
   .contentWrapper {
     padding: 18px 16px;
     align-items: flex-start;

@@ -178,6 +178,12 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                         {lot.title ? lot.title : lot.description}
                     </h3>
 
+                    {lot.publicId && (
+                        <div className={styles.lotNumber}>
+                            Лот № {lot.publicId}
+                        </div>
+                    )}
+
                     <p className={styles.priceDetail}>
                         Начальная цена:
                         <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>

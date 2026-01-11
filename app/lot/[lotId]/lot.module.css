@@ -118,10 +118,25 @@
 }
 
 .priceValue {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.5rem;
   font-weight: 700;
   color: #2d3748; /* Темный цвет для основной цены */
+}
+
+/* Добавляем стили для иконок */
+.iconUp {
+  color: #28a745; /* Зеленый */
+  display: flex;
+  align-items: center;
+}
+
+.iconDown {
+  color: #dc3545; /* Красный */
+  display: flex;
+  align-items: center;
 }
 
 .depositInfo {
