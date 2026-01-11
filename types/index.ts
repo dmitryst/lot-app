@@ -2,6 +2,7 @@ type BiddingInfo = {
   type: string;
   bidAcceptancePeriod: string;
   viewingProcedure?: string;
+  platform: string;
 };
 
 export type Lot = {
@@ -10,9 +11,9 @@ export type Lot = {
   url?: string;
   title: string | null;
   description: string;
-  startPrice: string | null;
-  step: string | null;
-  deposit: string | null;
+  startPrice: number | null;
+  step: number | null;
+  deposit: number | null;
   isFavorite: boolean;
   bidding: BiddingInfo;
   imageUrl: string | null;
@@ -21,4 +22,16 @@ export type Lot = {
     id: number;
     name: string;
   }[];
+  priceSchedules: PriceSchedule[];
+  images: string[];
+};
+
+export type PriceSchedule = {
+  number: number;
+  startDate: string;
+  endDate: string;
+  price: number | null;
+  deposit: number | null;
+  estimatedRank: number | null;
+  potentialRoi: number | null;
 };

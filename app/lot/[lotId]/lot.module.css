@@ -1,217 +1,332 @@
-/* app/lot/[lotId]/lot.module.css */
-
+/* --- ОСНОВНОЙ КОНТЕЙНЕР --- */
 .container {
-  /* === Увеличиваем ширину контейнера === */
-  max-width: 1200px; 
-  margin: 40px auto;
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  font-family: inherit;
+  color: #333;
 }
 
+/* Кнопка "Назад" */
 .backLink {
   display: inline-block;
-  margin-bottom: 24px;
-  color: #0070f3;
-  text-decoration: none;
-  font-weight: 500;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
 }
 
 .backLink:hover {
+  color: #0070f3;
   text-decoration: underline;
 }
 
-.centeredMessage {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #666;
-  padding: 5rem 0;
+/* Заголовок страницы */
+.mainLotTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 2rem 0;
+  line-height: 1.3;
 }
 
-/* === ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ ДЕТАЛЕЙ ЛОТА === */
+/* --- СЕТКА ГЛАВНОГО БЛОКА (Галерея + Инфо) --- */
 .lotDetailGrid {
-  display: grid;
-  /* Задаем две колонки с равной шириной */
-  grid-template-columns: 1fr 1fr;
-  gap: 40px; /* Расстояние между колонками и строками */
-  margin-bottom: 40px;
-}
-
-.imageSection {
-  grid-column: 1 / 2; /* Занимает первую колонку */
-  grid-row: 1 / 2;    /* Занимает первую строку */
-  position: relative;
-  width: 100%;
-  max-width: 450px;
-  aspect-ratio: 4 / 3;  /* Задаем соотношение сторон 4:3 */
-  object-fit: cover;    /* Применяем масштабирование к контейнеру */
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.mainImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.infoSection {
-  grid-column: 2 / 3; /* Занимает вторую колонку */
-  grid-row: 1 / 2;    /* Занимает первую строку */
   display: flex;
   flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
-/* Удаляем заголовок .lotTitle, так как он теперь в секции описания */
+.lotDetailGrid .descriptionSection {
+  margin-bottom: 0; 
+}
 
+@media (min-width: 769px) {
+  .lotDetailGrid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+    /* Растягиваем описание на всю ширину сетки (как у Viewing Procedure) */
+  .lotDetailGrid .descriptionSection {
+    grid-column: 1 / -1; 
+  }
+}
+
+/* Секция галереи */
+.imageSection {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* --- ИНФОРМАЦИОННАЯ ПАНЕЛЬ (Справа) --- */
+.infoSection {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Строки информации (номер лота, тип и т.д.) */
 .lotInfo {
+  margin: 0;
   font-size: 1rem;
+  line-height: 1.5;
   color: #4a5568;
-  margin: 0 0 12px 0; /* Увеличиваем нижний отступ */
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 0.5rem;
 }
 
+.lotInfo b {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.lotInfo:last-of-type {
+  border-bottom: none;
+}
+
+/* Блок цены и задатка */
 .priceInfo {
-  margin-top: 16px; /* Уменьшаем отступ */
-  padding: 20px;
+  margin-top: 1rem;
+  padding: 1rem;
   background-color: #f7fafc;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #edf2f7;
 }
 
-.priceLabel {
+.priceLabel, .depositLabel {
   display: block;
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: #718096;
-  margin-bottom: 8px;
+  margin-bottom: 0.25rem;
 }
 
 .priceValue {
   display: block;
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #1a202c;
-}
-
-/* === НОВЫЕ СТИЛИ ДЛЯ СЕКЦИИ ОПИСАНИЯ === */
-.descriptionSection {
-  /* Занимает обе колонки, начиная с первой и заканчивая перед третьей */
-  grid-column: 1 / 3; 
-  grid-row: 2 / 3;    /* Занимает вторую строку */
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0; /* Разделитель */
-}
-
-.sectionTitle {
   font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 16px 0;
+  font-weight: 700;
+  color: #2d3748; /* Темный цвет для основной цены */
 }
-
-.descriptionText {
-  color: #374151;
-  line-height: 1.7;
-  /* Можно добавить стили для форматирования текста, если он приходит как HTML */
-}
-
-
-/* === СТИЛИ ДЛЯ БЛОКА "Информация о покупке" === */
-.purchaseInfo {
-  margin-top: 20px;
-  background: #fff;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.purchaseInfo h2 {
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 32px;
-}
-
-.step {
-  margin-bottom: 24px;
-}
-
-.step h3 {
-  margin-bottom: 8px;
-  color: #1a202c;
-}
-
-.step p {
-  margin: 0;
-  color: #4a5568;
-  line-height: 1.6;
-}
-
-.ctaButton {
-  display: block;
-  width: 100%;
-  padding: 16px;
-  margin-top: 32px;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.ctaButton:hover {
-  background-color: #005bb5;
-}
-
-/* === СТИЛИ ДЛЯ БЛОКА С ЗАДАТКОМ === */
 
 .depositInfo {
-  margin-top: 16px; /* Отступ от блока с начальной ценой */
-  padding-top: 16px;
-  border-top: 1px solid #e9ecef; /* Светлая разделительная линия */
-}
-
-.depositLabel {
-  display: block;
-  font-size: 0.9rem; /* Немного меньше, чем .priceLabel */
-  color: #718096;
-  margin-bottom: 4px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #cbd5e0;
 }
 
 .depositValue {
   display: block;
-  font-size: 1.75rem; /* Заметно меньше, чем основная цена */
-  font-weight: 700;
-  color: #343a40; /* Немного светлее, чем основная цена */
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #4a5568;
 }
 
-/* === СТИЛИ ДЛЯ СЕКЦИИ С КАРТОЙ === */
-.mapSection {
-  margin-bottom: 40px;
+/* --- ОПИСАНИЕ И КАРТА --- */
+.descriptionSection, .mapSection, .priceScheduleSection {
+  margin-bottom: 3rem;
+  background-color: #fff;
+  padding: 2rem;
   border-radius: 12px;
-  overflow: hidden; /* Скрывает углы карты, чтобы они были скругленными */
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* === Стили для Вернуться назад === */
-.backLink {
-  display: inline-block;
-  margin-bottom: 24px;
-  font-size: 18px; /* Увеличиваем размер шрифта */
-  font-weight: 600; /* Делаем шрифт более жирным */
-  color: #007bff; /* Яркий цвет для привлечения внимания */
-  text-decoration: none;
-  padding: 10px 15px;
+.sectionTitle {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.descriptionText {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #2d3748;
+  white-space: pre-wrap; /* Сохраняет форматирование текста */
+}
+
+/* --- ТАБЛИЦА ГРАФИКА ЦЕН --- */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto; /* Горизонтальный скролл на мобильных */
+  -webkit-overflow-scrolling: touch;
+}
+
+.priceScheduleTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Минимальная ширина, чтобы не схлопывалась */
+}
+
+.priceScheduleTable th, 
+.priceScheduleTable td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.priceScheduleTable th {
+  background-color: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.priceScheduleTable tr:last-child td {
+  border-bottom: none;
+}
+
+.priceScheduleTable tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Бейдж ранга */
+.rankCell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* --- АДАПТИВНОСТЬ ТАБЛИЦЫ (Desktop/Mobile switching) --- */
+.desktopOnly {
+  display: table-cell;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+/* Стили для мобильной версии таблицы (до 768px) */
+@media (max-width: 768px) {
+  .desktopOnly {
+    display: none;
+  }
+  
+  .mobileOnly {
+    display: table-cell;
+  }
+  
+  .priceScheduleTable {
+    min-width: 100%; /* На мобильном растягиваем на всю ширину */
+  }
+  
+  .priceScheduleTable th, 
+  .priceScheduleTable td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .thGroup, .cellGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .subHeader {
+    font-size: 0.75rem;
+    color: #718096;
+    font-weight: normal;
+  }
+
+  .priceRow, .depositRow {
+    font-weight: 600;
+    color: #2d3748;
+  }
+  
+  .dateRow {
+    color: #718096;
+    font-size: 0.8rem;
+  }
+}
+
+/* --- БЛОК "КАК КУПИТЬ" --- */
+.purchaseInfo {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #ebf8ff, #fff); /* Легкий голубой градиент */
+  border-radius: 12px;
+  border: 1px solid #bee3f8;
+}
+
+.purchaseInfo h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2b6cb0;
+}
+
+/* Шаг покупки */
+.step {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid #3182ce;
+}
+
+.step h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #2c5282;
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+/* Кнопка действия (CTA) */
+.ctaButton {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto 0;
+  padding: 1rem 2rem;
+  background-color: #0070f3; /* Основной цвет из page.module.css */
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  border: none;
   border-radius: 8px;
-  background-color: #f0f7ff; /* Легкий фон для выделения */
-  border: 1px solid #cce0ff;
-  transition: all 0.2s ease-in-out;
   cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 112, 243, 0.2);
 }
 
-.backLink:hover {
-  background-color: #e0efff;
-  color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.ctaButton:hover {
+  background-color: #0056b3;
   transform: translateY(-2px);
+}
+
+.ctaButton:active {
+  transform: translateY(0);
 }

@@ -3,11 +3,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import LotMap from '../../../components/LotMap';
 import { Lot } from '../../../types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
+import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
 
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
@@ -16,6 +16,27 @@ const PurchaseStep = ({ title, description }: { title: string; description: stri
     <p>{description}</p>
   </div>
 );
+
+// Функция форматирования даты
+const formatDate = (dateString: string) => {
+  if (!dateString || dateString === '0001-01-01T00:00:00') return '-';
+  const date = new Date(dateString);
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+// Функция определения активного этапа (примерная логика)
+const isCurrentStage = (startDate: string, endDate: string) => {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return now >= start && now < end;
+};
 
 // Компонент получает данные через пропсы
 export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
@@ -45,7 +66,25 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     { label: lot.description.substring(0, 50) + '...', href: `/lot/${lot.id}` }
   ];
 
+  const getRankColorClass = (rank: number | null | undefined) => {
+    if (!rank) return styles.rankLow; // Если null или 0 — серый цвет
+
+    if (rank >= 8) return styles.rankHigh;
+    if (rank >= 5) return styles.rankMedium;
+    return styles.rankLow;
+  };
+
+  // TODO: Подготовка бейджей
+  const badges: any[] = [];
+
+  // Подготовка картинок для галереи
+  // Если массив images пуст, пытаемся взять imageUrl или ставим заглушку
+  const galleryImages = (lot.images && lot.images.length > 0)
+    ? lot.images
+    : (lot.imageUrl ? [lot.imageUrl] : ['/placeholder.png']);
+
   return (
+
     <main className={styles.container}>
       <Breadcrumbs crumbs={crumbs} />
 
@@ -59,15 +98,12 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
         {/* --- ЭЛЕМЕНТЫ ПЕРВОЙ СТРОКИ --- */}
 
-        {/* Левая колонка: Фотография */}
+        {/* --- ЛЕВАЯ КОЛОНКА: ФОТОГАЛЕРЕЯ --- */}
         <div className={styles.imageSection}>
-          <Image
-            src={lot.imageUrl || '/placeholder.png'}
-            alt={`Фото лота: ${lot.title ? lot.title : lot.description}`}
-            width={400}
-            height={286}
-            className={styles.mainImage}
-            priority
+          <LotImageGallery
+            images={galleryImages}
+            title={lot.title || ''}
+            badges={badges}
           />
         </div>
 
@@ -93,6 +129,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
               </div>
             )}
           </div>
+
+          <p className={styles.lotInfo}><b>Площадка:</b> {lot.bidding?.platform}</p>
 
           {/* Можно добавить кнопку "купить" прямо сюда */}
           {/* <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button> */}
@@ -127,6 +165,113 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         </div>
       )}
 
+      {/* ГРАФИК СНИЖЕНИЯ ЦЕНЫ */}
+      {lot.priceSchedules && lot.priceSchedules.length > 0 && (
+        <div className={styles.priceScheduleSection}>
+          <h2 className={styles.sectionTitle}>График снижения цены</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.priceScheduleTable}>
+              <thead>
+                <tr>
+                  <th style={{ width: '40px' }}>№</th>
+
+                  {/* Десктоп: Дата начала */}
+                  <th className={styles.desktopOnly}>Дата начала</th>
+                  {/* Мобильный: Дата начала + Цена */}
+                  <th className={styles.mobileOnly}>
+                    <div className={styles.thGroup}>
+                      <span>Дата начала</span>
+                      <span className={styles.subHeader}>Цена, руб.</span>
+                    </div>
+                  </th>
+
+                  {/* Десктоп: Дата окончания */}
+                  <th className={styles.desktopOnly}>Дата окончания</th>
+
+                  {/* Десктоп: Цена */}
+                  <th className={styles.desktopOnly}>Цена, руб.</th>
+
+                  {/* Мобильный: Дата окончания + Задаток */}
+                  <th className={styles.mobileOnly}>
+                    <div className={styles.thGroup}>
+                      <span>Дата окончания</span>
+                      <span className={styles.subHeader}>Задаток, руб.</span>
+                    </div>
+                  </th>
+
+                  {/* Десктоп: Задаток */}
+                  <th className={styles.desktopOnly}>Задаток, руб.</th>
+
+                  {/* <th style={{ textAlign: 'center' }}>Ранг</th> */}
+                </tr>
+              </thead>
+              <tbody>
+                {lot.priceSchedules.map((schedule) => (
+                  <tr key={schedule.number}>
+                    <td style={{ textAlign: 'center', color: '#888' }}>{schedule.number}</td>
+
+                    {/* Десктоп: Дата начала */}
+                    <td className={styles.desktopOnly}>{formatDate(schedule.startDate)}</td>
+
+                    {/* Мобильный: Дата начала + Цена */}
+                    <td className={styles.mobileOnly}>
+                      <div className={styles.cellGroup}>
+                        <div className={styles.dateRow}>{formatDate(schedule.startDate)}</div>
+                        <div className={styles.priceRow}>
+                          {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Десктоп: Дата окончания */}
+                    <td className={styles.desktopOnly}>{formatDate(schedule.endDate)}</td>
+
+                    {/* Десктоп: Цена */}
+                    <td className={styles.desktopOnly} style={{ fontWeight: 600 }}>
+                      {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                    </td>
+
+                    {/* Мобильный: Дата окончания + Задаток */}
+                    <td className={styles.mobileOnly}>
+                      <div className={styles.cellGroup}>
+                        <div className={styles.dateRow}>{formatDate(schedule.endDate)}</div>
+                        <div className={styles.depositRow}>
+                          {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Десктоп: Задаток */}
+                    <td className={styles.desktopOnly}>
+                      {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                    </td>
+
+                    {/* Ранг (Общий) */}
+                    {/* <td className={styles.rankCell}>
+                      {schedule.estimatedRank ? (
+                        <span
+                          className={styles.rankBadge}
+                          style={{
+                            backgroundColor:
+                              schedule.estimatedRank >= 8 ? '#48bb78' :
+                                schedule.estimatedRank >= 5 ? '#ecc94b' :
+                                  '#f56565'
+                          }}
+                        >
+                          {schedule.estimatedRank}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </td> */}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Информация о покупке */}
       <div className={styles.purchaseInfo}>
         <h2>Как купить лот</h2>
@@ -152,7 +297,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         />
         <PurchaseStep
           title="5. Завершение сделки"
-          description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу."
+          description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу. Если торги не выиграны, задаток возвращается вам в полном объеме."
         />
 
         <a

@@ -60,6 +60,8 @@ interface LotCardProps {
 }
 
 export default function LotCard({ lot, imageUrl }: LotCardProps) {
+    //console.log('Lot structure:', lot);
+
     // Состояние для отслеживания статуса копирования
     const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -111,29 +113,33 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         }
     };
 
-    // --- Формирование статической ссылки на карту с лотом ---
-    // Определяем финальный URL для изображения.
-    // Приоритет: статическая карта -> основное изображение -> плейсхолдер.
+    // --- Формирование изображения ---
+    // Приоритет:
+    // 1. Статическая карта (если есть координаты)
+    // 2. Первое фото из массива lot.images
+    // 3. Основное изображение (imageUrl из пропсов)
+    // 4. Плейсхолдер
 
     let finalImageUrl: string | any = imageUrl || placeholderImage;
     let useNextImage = true;
-    let objectFitMode: 'cover' | 'contain' = 'cover'; // Режим по умолчанию
+    let objectFitMode: 'cover' | 'contain' = 'cover';
 
-    // Проверяем, есть ли у лота валидные координаты
-    if (
-        lot.coordinates &&
+    // Проверяем координаты
+    const hasCoordinates = lot.coordinates &&
         Array.isArray(lot.coordinates) &&
         lot.coordinates.length === 2 &&
         typeof lot.coordinates[0] === 'number' &&
-        typeof lot.coordinates[1] === 'number'
-    ) {
-        const [latitude, longitude] = lot.coordinates;
+        typeof lot.coordinates[1] === 'number';
 
-        // Формируем URL для Яндекс.Карты Static API, если координаты есть.
-        // ВАЖНО: API ожидает сначала долготу (longitude), затем широту (latitude).
+    if (hasCoordinates) {
+        const [latitude, longitude] = lot.coordinates!;
+        // Формируем URL для Яндекс.Карты Static API
         finalImageUrl = `https://static-maps.yandex.ru/1.x/?pt=${longitude},${latitude},pm2bll&z=14&l=map&size=450,400`;
-
-        // Для URL Яндекс.Карт отключаем использование next/image
+        useNextImage = false; // Для внешнего URL отключаем оптимизацию next/image (или настраиваем remotePatterns)
+    }
+    // Если координат нет, проверяем массив фотографий
+    else if (lot.images && lot.images.length > 0 && lot.images[0]) {
+        finalImageUrl = lot.images[0];
         useNextImage = false;
     }
 
@@ -158,7 +164,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                 ) : (
                     <img
                         src={finalImageUrl}
-                        alt={`Изображение для лота: ${lot.description}`}
+                        alt={lot.title || 'Карта расположения'}
                         className={styles.lotImage}
                         style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                     />
