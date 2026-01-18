@@ -23,9 +23,10 @@ type Props = {
     categories: CategoryNode[];
     selectedCategories: string[];
     onChange: (selected: string[]) => void;
+    onApply?: () => void; // [page:1] 
 };
 
-export default function CategorySelect({ categories, selectedCategories, onChange }: Props) {
+export default function CategorySelect({ categories, selectedCategories, onChange, onApply }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +71,14 @@ export default function CategorySelect({ categories, selectedCategories, onChang
         onChange([]); // Сбрасываем выбор
     };
 
+    // Обработчик кнопки "Применить"
+    const handleApplyClick = () => {
+        setIsOpen(false);
+        if (onApply) {
+            onApply(); // [page:1] Запускаем поиск
+        }
+    };
+
     return (
         <div className={styles.container} ref={wrapperRef}>
             <div className={styles.inputRow}>
@@ -81,7 +90,7 @@ export default function CategorySelect({ categories, selectedCategories, onChang
                     tabIndex={0}
                     title={tooltipText}
                 >
-                    <span>{getSelectionText()}</span>
+                    <span className={styles.text}>{getSelectionText()}</span>
 
                     {/* Блок с иконками справа */}
                     <div className={styles.iconsWrapper}>
@@ -91,7 +100,7 @@ export default function CategorySelect({ categories, selectedCategories, onChang
                                 type="button"
                                 className={styles.clearButton}
                                 onClick={handleClear}
-                                title="Сбросить категории"
+                                title="Очистить"
                             >
                                 <ClearIcon />
                             </button>
@@ -122,7 +131,7 @@ export default function CategorySelect({ categories, selectedCategories, onChang
                         </button>
                         <button
                             className={styles.applyButton}
-                            onClick={() => setIsOpen(false)}
+                            onClick={handleApplyClick}
                         >
                             Применить
                         </button>

@@ -10,7 +10,8 @@
 /* Общие стили для группы */
 .filterGroup {
   display: flex;
-  flex-direction: column; /* По умолчанию лейбл над полем */
+  flex-direction: column;
+  /* По умолчанию лейбл над полем */
   gap: 0.5rem;
   width: 100%;
 }
@@ -20,10 +21,12 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6c757d; /* Более мягкий серый цвет */
+  color: #6c757d;
+  /* Более мягкий серый цвет */
   margin-left: 2px;
   margin-bottom: 2px;
-  text-align: left; /* Всегда по левому краю */
+  text-align: left;
+  /* Всегда по левому краю */
 }
 
 /* Лейбл сбоку (для вида торгов и цены) */
@@ -33,7 +36,8 @@
   color: #333;
   white-space: nowrap;
   margin-right: 0.5rem;
-  align-self: center; /* Центрируем по вертикали относительно кнопок */
+  align-self: center;
+  /* Центрируем по вертикали относительно кнопок */
 }
 
 /* Контейнеры опций */
@@ -57,7 +61,8 @@
 /* Кнопки фильтров */
 .filterButton {
   padding: 0 16px;
-  height: 42px; /* Такая же высота, как у инпутов */
+  height: 42px;
+  /* Такая же высота, как у инпутов */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -94,20 +99,113 @@
   white-space: nowrap;
 }
 
+/* Кнопка Найти */
+
+.searchButton {
+  padding: 0 24px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  /* Чуть менее скругленная чем фильтры, чтобы выделяться */
+  background-color: #0070f3;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s;
+  width: 100%;
+  /* На мобильных во всю ширину */
+  box-shadow: 0 4px 6px rgba(0, 112, 243, 0.2);
+}
+
+.searchButton:hover {
+  background-color: #0060df;
+}
+
+.searchButton:active {
+  transform: translateY(1px);
+}
+
 /* ========================================= */
-/* DESKTOP LAYOUT (GRID) */
+/* TABLET / SMALL LAPTOP LAYOUT (768px - 959px) */
+/* ========================================= */
+
+@media (min-width: 768px) {
+  .filtersWrapper {
+    /* Переключаемся на Grid уже на планшетах */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Две равные колонки */
+    gap: 1.5rem;
+    grid-template-areas:
+      "search search"
+      "categories categories"
+      "types ownership"
+      "price action";
+    /* Цена и Кнопка теперь в одной строке! */
+    align-items: end;
+    /* Выравнивание по низу, чтобы кнопка и инпуты стояли ровно */
+  }
+
+  .searchArea {
+    grid-area: search;
+  }
+
+  .categoriesArea {
+    grid-area: categories;
+  }
+
+  .typeArea {
+    grid-area: types;
+  }
+
+  .ownershipArea {
+    grid-area: ownership;
+  }
+
+  .priceArea {
+    grid-area: price;
+    width: 100%;
+    /* Ограничиваем ширину, чтобы не растягивалось слишком сильно */
+    max-width: 350px;
+  }
+
+  .actionArea {
+    grid-area: action;
+    display: flex;
+    justify-content: flex-start;
+    /* Кнопка слева в своей ячейке (ближе к цене) */
+    /* Или justify-content: flex-end; если хотите прижать к правому краю */
+  }
+
+  /* На планшетах кнопка уже не должна быть на всю ширину */
+  .searchButton {
+    width: auto;
+    min-width: 160px;
+  }
+}
+
+/* ========================================= */
+/* DESKTOP LAYOUT (960px - 1199px) */
 /* ========================================= */
 @media (min-width: 960px) {
   .filtersWrapper {
     display: grid;
     /* Две колонки: первая широкая (2 части), вторая поменьше (1 часть) */
-    grid-template-columns: 2fr 1.2fr; 
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1.5rem;
     grid-template-areas:
-      "search categories"
-      "types price"
-      "ownership ."; /* новая строка: Слева собственность, справа пусто */
-    align-items: start; /* Выравнивание по верху, чтобы лейблы были на одной линии */
+      "search categories categories"
+      /* Верхний ряд: Поиск (1/3), Категории (2/3) */
+      "types ownership ."
+      /* Средний ряд: Типы, Собственность, Пусто */
+      "price action .";
+    /* Нижний ряд: Цена, Кнопка, Пусто */
+    align-items: start;
+    /* Выравнивание по верху, чтобы лейблы были на одной линии */
   }
 
   /* Назначаем области сетки */
@@ -126,77 +224,118 @@
 
   .priceArea {
     grid-area: price;
-    /* На десктопе цену не обязательно растягивать на всю ширину ячейки */
-    justify-self: start; 
     width: 100%;
-    max-width: 400px; /* Ограничим ширину */
+    max-width: 320px;
   }
 
   .ownershipArea {
     grid-area: ownership;
   }
 
+  .actionArea {
+    grid-area: action;
+    display: flex;
+    justify-content: flex-end;
+    /* Кнопка прижата к правому краю */
+    align-items: flex-end;
+    height: 100%;
+  }
+
+  .searchButton {
+    width: auto;
+    min-width: 140px;
+    height: 42px;
+  }
+
   /* На десктопе инпуты цены не должны быть слишком широкими */
   .priceFilterInputs {
-    width: auto;
+    width: 100%;
+  }
+}
+
+/* ========================================= */
+/* WIDE DESKTOP LAYOUT (1200px+) */
+/* ========================================= */
+
+@media (min-width: 1200px) {
+  .filtersWrapper {
+    /* 4 колонки: Поиск(1.2), Категории(1.2), Типы+Собств(1.5), Цена+Кнопка(1.1) */
+    /* Или лучше в 2 строки, но более плотно */
+    grid-template-columns: 1.5fr 2fr;
+    /* Верхний ряд: Поиск меньше, Категории больше */
+    grid-template-areas:
+      "search categories"
+      "bottom bottom";
+    /* Нижний ряд общий */
+    gap: 1.25rem;
+  }
+
+  .searchArea {
+    grid-area: search;
+  }
+
+  .categoriesArea {
+    grid-area: categories;
+  }
+
+  /* Создаем \"виртуальную\" область для нижнего ряда через grid-area не получится так просто, 
+     поэтому лучше вернемся к 4 колонкам для всей сетки */
+
+  .filtersWrapper {
+    grid-template-columns: 1fr 1fr 1fr auto;
+    /* auto для кнопки в конце */
+    grid-template-areas:
+      "search search categories categories"
+      "types ownership price action";
+    align-items: end;
+    /* Выравнивание по низу строки */
+  }
+
+  /* Поиск */
+  .searchArea {
+    grid-area: search;
+  }
+
+  /* Категории */
+  .categoriesArea {
+    grid-area: categories;
+  }
+
+  /* Типы торгов */
+  .typeArea {
+    grid-area: types;
+    justify-self: start;
+  }
+
+  /* Собственность */
+  .ownershipArea {
+    grid-area: ownership;
+    justify-self: start;
+  }
+
+  /* Цена */
+  .priceArea {
+    grid-area: price;
+    width: 100%;
+    min-width: 250px;
     max-width: 300px;
   }
-}
 
-@media (min-width: 1100px) {
-  .filtersWrapper {
-    /* Меняем сетку на 1:1 для верхнего ряда (Поиск и Категории) */
-    /* И 3 колонки для нижнего ряда, но с другими пропорциями */
-    grid-template-columns: 1.5fr 1.5fr 1.2fr; /* Три колонки */
-    
-    grid-template-areas:
-      "search categories categories" /* Поиск занимает 1.5fr, Категории 2.7fr (очень широко) */
-      /* ИЛИ лучше поровну, если хотите баланса: */
-      /* "search search categories categories" (если колонок 4) */
-  }
-  
-  /* Давайте сделаем проще и эффективнее: 2 колонки, но равные */
-  /* Переопределим логику для 1100px+ */
-  .filtersWrapper {
-     grid-template-columns: 1fr 1fr; /* 50% на 50% */
-     grid-template-areas:
-       "search categories"
-       "types ownership" /* Типы и собственность делят ряд */
-       "price price";    /* Цена на всю ширину (или справа, если хотите) */
+  /* Кнопка */
+  .actionArea {
+    grid-area: action;
+    justify-content: flex-end;
+    margin-top: 0;
+    /* Убираем отступы если были */
+    align-self: end;
+    /* Кнопка прижата к низу */
+    margin-bottom: 2px;
+    /* Чуть поднять, если визуально не ровно с инпутами */
   }
 
-  /* НО, если вы хотите сохранить 3 блока внизу, как было: */
-  .filtersWrapper {
-      grid-template-columns: 1.2fr 1.2fr 1fr; /* Немного изменим пропорции */
-      grid-template-areas:
-        "search categories categories" /* Категории получают 2/3 ширины верха! */
-        "types ownership price";
-  }
-
-  /* 1. Поиск */
-  .searchArea { 
-     grid-area: search; 
-  }
-
-  /* 2. Категории - теперь широкие */
-  .categoriesArea { 
-     grid-area: categories; 
-  }
-
-  /* 3. Нижний ряд */
-  .typeArea { grid-area: types; }
-  .ownershipArea { grid-area: ownership; }
-  
-  /* 4. Цена */
-  .priceArea { 
-     grid-area: price; 
-     justify-self: stretch; /* Растягиваем на всю доступную ширину */
-     max-width: none; /* Убираем лимиты */
-  }
-  
-  .priceFilterInputs {
-      width: 100%;
-      max-width: none; /* Инпуты могут расти */
+  .searchButton {
+    height: 42px;
+    /* Строго по высоте инпутов */
+    min-width: 140px;
   }
 }
-

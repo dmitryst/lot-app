@@ -1,9 +1,8 @@
 // components/Filters/Filters.tsx
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import debounce from 'lodash.debounce';
-import { BIDDING_TYPES, CATEGORIES_TREE, DEBOUNCE_DELAY } from '@/app/data/constants';
+import { useState, useEffect } from 'react';
+import { BIDDING_TYPES, CATEGORIES_TREE } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
 import styles from './Filters.module.css';
 import ClearableInput from '@/components/ui/ClearableInput';
@@ -35,58 +34,49 @@ export default function Filters({
     isSharedOwnership,
     onUpdate,
 }: FiltersProps) {
-    // Локальное состояние для инпутов (чтобы ввод не тормозил)
+    // Локальное состояние для инпутов
     const [localSearch, setLocalSearch] = useState(searchQuery);
     const [localPriceFrom, setLocalPriceFrom] = useState(priceFrom);
     const [localPriceTo, setLocalPriceTo] = useState(priceTo);
-    const [localCategories, setLocalCategories] = useState<string[]>(categories);
+    const [localCategories, setLocalCategories] = useState(categories);
+    const [localBiddingType, setLocalBiddingType] = useState(biddingType);
+    const [localIsSharedOwnership, setLocalIsSharedOwnership] = useState(isSharedOwnership);
 
-    // Синхронизация локального стейта с пропсами (если URL изменился извне, например Back/Forward)
+    // Синхронизация с URL (на случай навигации браузера Вперед/Назад)
     useEffect(() => {
         setLocalSearch(searchQuery);
         setLocalPriceFrom(formatNumber(priceFrom));
         setLocalPriceTo(formatNumber(priceTo));
         setLocalCategories(categories);
-    }, [searchQuery, priceFrom, priceTo, categories]);
+        setLocalBiddingType(biddingType);
+        setLocalIsSharedOwnership(isSharedOwnership);
+    }, [searchQuery, priceFrom, priceTo, categories, biddingType, isSharedOwnership]);
 
-    // --- Debounced Updaters ---
-
-    // Дебаунс для поиска
-    const debouncedSearchUpdate = useMemo(
-        () =>
-            debounce((val: string) => {
-                onUpdate({ searchQuery: val, page: 1 });
-            }, DEBOUNCE_DELAY),
-        [onUpdate]
-    );
-
-    // Дебаунс для цены
-    const debouncedPriceUpdate = useMemo(
-        () =>
-            debounce((from: string, to: string) => {
-                onUpdate({
-                    priceFrom: from,    // Сюда приходят уже чистые числа - 1000, а не 1 000
-                    priceTo: to,
-                    page: 1,
-                });
-            }, DEBOUNCE_DELAY),
-        [onUpdate]
-    );
-
-    const debouncedCategoryUpdate = useMemo(
-        () =>
-            debounce((newCats: string[]) => {
-                onUpdate({ categories: newCats, page: 1 });
-            }, DEBOUNCE_DELAY),
-        [onUpdate]
-    );
+    // --- Основная функция поиска ---
+    const handleApplyFilters = () => {
+        onUpdate({
+            searchQuery: localSearch,
+            priceFrom: localPriceFrom.replace(/\D/g, ''),
+            priceTo: localPriceTo.replace(/\D/g, ''),
+            categories: localCategories,
+            biddingType: localBiddingType,
+            isSharedOwnership: localIsSharedOwnership,
+            page: 1, // Всегда сбрасываем на первую страницу при поиске
+        });
+    };
 
     // --- Handlers ---
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setLocalSearch(val);
-        debouncedSearchUpdate(val);
+    };
+
+    // Добавляем обработку Enter в полях ввода
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleApplyFilters();
+        }
     };
 
     const handlePriceFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,11 +86,6 @@ export default function Filters({
         // Форматируем для отображения в инпуте (1 000)
         const formattedValue = formatNumber(rawValue);
         setLocalPriceFrom(formattedValue);
-
-        // В дебаунс отправляем СЫРОЕ значение текущего поля
-        // и СЫРОЕ значение соседнего поля (очищаем localPriceTo от пробелов)
-        const rawPriceTo = localPriceTo.replace(/\D/g, '');
-        debouncedPriceUpdate(rawValue, rawPriceTo);
     };
 
     const handlePriceToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,44 +93,26 @@ export default function Filters({
 
         const formattedValue = formatNumber(rawValue);
         setLocalPriceTo(formattedValue);
-
-        const rawPriceFrom = localPriceFrom.replace(/\D/g, '');
-        debouncedPriceUpdate(rawPriceFrom, rawValue);
     };
 
     const handleBiddingTypeClick = (type: string) => {
-        // Для кнопок дебаунс не нужен, обновляем сразу
-        onUpdate({ biddingType: type, page: 1 });
+        setLocalBiddingType(type);
     };
 
     const handleCategoryChange = (newSelected: string[]) => {
-        setLocalCategories(newSelected); // Мгновенно обновляем галочки в UI
-        debouncedCategoryUpdate(newSelected); // Отправляем запрос с задержкой
+        setLocalCategories(newSelected);
     };
 
     // Хендлер для переключения долевой собственности
     const handleSharedOwnershipClick = (value: string | null) => {
-        // value может быть 'true', 'false' или null (для "Все")
-        onUpdate({ isSharedOwnership: value, page: 1 });
+        setLocalIsSharedOwnership(value);
     };
 
     // --- HANDLERS ДЛЯ ОЧИСТКИ ---
 
-    const handleClearSearch = () => {
-        setLocalSearch(''); // Очищаем локально
-        debouncedSearchUpdate(''); // Запускаем обновление (можно мгновенно onUpdate, но через debounce надежнее для единообразия)
-    };
-
-    const handleClearPriceFrom = () => {
-        setLocalPriceFrom('');
-        // Передаем пустую строку для 'from' и текущее значение 'to'
-        debouncedPriceUpdate('', localPriceTo.replace(/\D/g, ''));
-    };
-
-    const handleClearPriceTo = () => {
-        setLocalPriceTo('');
-        debouncedPriceUpdate(localPriceFrom.replace(/\D/g, ''), '');
-    };
+    const handleClearSearch = () => setLocalSearch('');
+    const handleClearPriceFrom = () => setLocalPriceFrom('');
+    const handleClearPriceTo = () => setLocalPriceTo('');
 
     const formatNumber = (value: string) => {
         if (value === null || value === undefined || value === '')
@@ -169,6 +136,7 @@ export default function Filters({
                     value={localSearch}
                     onChange={handleSearchChange}
                     onClear={handleClearSearch}
+                    onKeyDown={handleKeyDown}
                     icon={<SearchIcon />}
                 />
             </div>
@@ -180,6 +148,7 @@ export default function Filters({
                     categories={CATEGORIES_TREE}
                     selectedCategories={localCategories}
                     onChange={handleCategoryChange}
+                    onApply={handleApplyFilters}
                 />
             </div>
 
@@ -189,7 +158,7 @@ export default function Filters({
                 <div className={styles.filterOptions}>
                     <button
                         onClick={() => handleBiddingTypeClick('Все')}
-                        className={biddingType === 'Все' ? styles.activeFilter : styles.filterButton}
+                        className={localBiddingType  === 'Все' ? styles.activeFilter : styles.filterButton}
                     >
                         Все
                     </button>
@@ -197,7 +166,7 @@ export default function Filters({
                         <button
                             key={type}
                             onClick={() => handleBiddingTypeClick(type)}
-                            className={biddingType === type ? styles.activeFilter : styles.filterButton}
+                            className={localBiddingType  === type ? styles.activeFilter : styles.filterButton}
                         >
                             {type}
                         </button>
@@ -212,7 +181,7 @@ export default function Filters({
                     {/* Кнопка "Все" */}
                     <button
                         onClick={() => handleSharedOwnershipClick(null)}
-                        className={!isSharedOwnership ? styles.activeFilter : styles.filterButton}
+                        className={!localIsSharedOwnership  ? styles.activeFilter : styles.filterButton}
                     >
                         Все
                     </button>
@@ -220,7 +189,7 @@ export default function Filters({
                     {/* Кнопка "Целиком" (isSharedOwnership = false) */}
                     <button
                         onClick={() => handleSharedOwnershipClick('false')}
-                        className={isSharedOwnership === 'false' ? styles.activeFilter : styles.filterButton}
+                        className={localIsSharedOwnership  === 'false' ? styles.activeFilter : styles.filterButton}
                     >
                         Целиком
                     </button>
@@ -228,7 +197,7 @@ export default function Filters({
                     {/* Кнопка "Только доли" (isSharedOwnership = true) */}
                     <button
                         onClick={() => handleSharedOwnershipClick('true')}
-                        className={isSharedOwnership === 'true' ? styles.activeFilter : styles.filterButton}
+                        className={localIsSharedOwnership === 'true' ? styles.activeFilter : styles.filterButton}
                     >
                         Только доли
                     </button>
@@ -245,6 +214,7 @@ export default function Filters({
                         value={localPriceFrom}
                         onChange={handlePriceFromChange}
                         onClear={handleClearPriceFrom}
+                        onKeyDown={handleKeyDown}
                     />
                     <span className={styles.priceSeparator}>—</span>
                     <ClearableInput
@@ -253,8 +223,16 @@ export default function Filters({
                         value={localPriceTo}
                         onChange={handlePriceToChange}
                         onClear={handleClearPriceTo}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
+            </div>
+
+            {/* Кнопка НАЙТИ */}
+            <div className={styles.actionArea}>
+                <button className={styles.searchButton} onClick={handleApplyFilters}>
+                    Найти лоты
+                </button>
             </div>
         </div>
     );
