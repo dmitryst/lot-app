@@ -119,6 +119,10 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     return null;
   };
 
+  // Проверяем, есть ли хоть одна запись с задатком > 0
+  const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
+
+
   return (
 
     <main className={styles.container}>
@@ -149,7 +153,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
           <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
-          
+
           <div className={styles.priceInfo}>
             {/* Блок для начальной цены */}
             <div>
@@ -248,12 +252,14 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                   <th className={styles.mobileOnly}>
                     <div className={styles.thGroup}>
                       <span>Дата окончания</span>
-                      <span className={styles.subHeader}>Задаток, руб.</span>
+                      {showDepositColumn && (<span className={styles.subHeader}>Задаток, руб.</span>)}
                     </div>
                   </th>
 
                   {/* Десктоп: Задаток */}
-                  <th className={styles.desktopOnly}>Задаток, руб.</th>
+                  {showDepositColumn && (
+                    <th className={styles.desktopOnly}>Задаток, руб.</th>
+                  )}
 
                   {/* <th style={{ textAlign: 'center' }}>Ранг</th> */}
                 </tr>
@@ -288,16 +294,18 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                     <td className={styles.mobileOnly}>
                       <div className={styles.cellGroup}>
                         <div className={styles.dateRow}>{formatDate(schedule.endDate)}</div>
-                        <div className={styles.depositRow}>
+                        {showDepositColumn && (<div className={styles.depositRow}>
                           {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
-                        </div>
+                        </div>)}
                       </div>
                     </td>
 
                     {/* Десктоп: Задаток */}
-                    <td className={styles.desktopOnly}>
-                      {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
-                    </td>
+                    {showDepositColumn && (
+                      <td className={styles.desktopOnly}>
+                        {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                      </td>
+                    )}
 
                     {/* Ранг (Общий) */}
                     {/* <td className={styles.rankCell}>
