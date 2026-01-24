@@ -25,6 +25,14 @@ export type Lot = {
   }[];
   priceSchedules: PriceSchedule[];
   images: string[];
+  documents?: LotDocument[];
+};
+
+export type LotDocument = {
+  id: string;
+  url: string;
+  title: string;
+  extension?: string | null;
 };
 
 export type PriceSchedule = {

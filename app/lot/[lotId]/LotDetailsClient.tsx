@@ -202,6 +202,30 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             {lot.description}
           </div>
         </div>
+
+        {/* Документы лота (если есть) */}
+        {lot.documents && lot.documents.length > 0 && (
+          <div className={styles.descriptionSection}>
+            <h2 className={styles.sectionTitle}>Документы</h2>
+            <ul className={styles.documentList}>
+              {lot.documents.map((doc) => (
+                <li key={doc.id}>
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.documentLink}
+                  >
+                    {doc.title}
+                    {doc.extension && (
+                      <span className={styles.documentExt}> {doc.extension}</span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Показываем карту, только если есть координаты */}
