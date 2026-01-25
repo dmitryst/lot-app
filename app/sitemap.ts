@@ -1,44 +1,63 @@
 import { MetadataRoute } from 'next';
+import { generateSlug } from '../utils/slugify';
 
-async function getAllLotIds(): Promise<string[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
-  if (!apiUrl) return [];
-  
-  try {
-    // Запрос к API для получения всех ID лотов
-    const res = await fetch(`${apiUrl}/api/lots/all-ids`); 
-    if (!res.ok) return [];
-    const ids = await res.json();
-    return ids;
-  } catch (error) {
-    console.error("Failed to fetch lot IDs for sitemap:", error);
-    return [];
-  }
+const BASE_URL = 'https://s-lot.ru';
+
+// Генерируем список sitemap-файлов (id: 0, id: 1 ...)
+export async function generateSitemaps() {
+  // В идеале сделать запрос к API, чтобы узнать общее кол-во (count), 
+  // но можно просто вернуть диапазон, так как знаем примерное число.
+  // Для 50000 лотов и размера чанка 25000 нужно 2 части.
+  return [{ id: 0 }, { id: 1 }, { id: 2 }]; 
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://s-lot.ru';
+export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
+  // Для id=0 (первый чанк) можно добавить статические страницы
+  const staticRoutes: MetadataRoute.Sitemap = [];
+  if (id === 0) {
+      staticRoutes.push({ // можно добавить другие статические страницы
+          url: BASE_URL,
+          lastModified: new Date(),
+          changeFrequency: 'daily',
+          priority: 1,
+      });
+  }
 
-  // Получаем все ID лотов
-  const lotIds = await getAllLotIds();
+  // Запрашиваем чанк данных из API
+  const pageSize = 25000; // Безопасный размер (меньше лимита 50к)
+  const page = id + 1; // API ожидает page начиная с 1
+  
+  const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
+  if (!apiUrl)
+    return staticRoutes;
 
-  // Создаем URL для каждой страницы лота
-  const lotUrls = lotIds.map((id) => ({
-    url: `${baseUrl}/lot/${id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as 'weekly',
-    priority: 0.8,
-  }));
+  try {
+    const res = await fetch(`${apiUrl}/api/lots/sitemap-data?page=${page}&pageSize=${pageSize}`, { 
+        next: { revalidate: 3600 } // Кэшируем на час
+    });
+    
+    if (!res.ok)
+      return staticRoutes;
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    // ... другие статические страницы ...
-    // { url: `${baseUrl}/about`, lastModified: new Date() },
-    ...lotUrls, // Добавляем все страницы лотов
-  ];
+    const lots: any[] = await res.json();
+
+    const lotRoutes = lots.map((lot) => {
+        // Формируем slugify ссылку
+        const slug = generateSlug(lot.title);
+        const url = `${BASE_URL}/lot/${slug}-${lot.publicId}`;
+        
+        return {
+            url: url,
+            lastModified: new Date(),  // new Date(lot.createdAt) когда будут даты
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        };
+    });
+
+    return [...staticRoutes, ...lotRoutes];
+
+  } catch (error) {
+    console.error(`Sitemap error for id ${id}:`, error);
+    return staticRoutes;
+  }
 }
