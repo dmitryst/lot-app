@@ -25,7 +25,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
 
   // Запрашиваем чанк данных из API
   const pageSize = 25000; // Безопасный размер (меньше лимита 50к)
-  const page = id + 1; // API ожидает page начиная с 1
+  const page = Number(id) + 1; // API ожидает page начиная с 1
   
   const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
   if (!apiUrl)
@@ -40,6 +40,10 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       return staticRoutes;
 
     const lots: any[] = await res.json();
+
+    if (!lots || lots.length === 0) {
+        console.warn(`Warning: No lots found for page ${page} (sitemap id ${id})`);
+    }
 
     const lotRoutes = lots.map((lot) => {
         // Формируем slugify ссылку
