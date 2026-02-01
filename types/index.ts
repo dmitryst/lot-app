@@ -21,6 +21,9 @@ export type Lot = {
   coordinates: [number, number] | null,
   propertyRegionName?: string | null;
   marketValue?: number | null;
+  marketValueMin?: number | null;
+  marketValueMax?: number | null;
+  priceConfidence?: string | null;
   investmentSummary?: string | null;
   categories: {
     id: number;

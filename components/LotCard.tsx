@@ -150,16 +150,44 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         objectFitMode = 'contain';
     }
 
-    // Расчет апсайда
-    let upsidePercent: number | null = null;
-    if (lot.marketValue && lot.startPrice && lot.startPrice > 0) {
-        upsidePercent = ((lot.marketValue - lot.startPrice) / lot.startPrice) * 100;
+    // Считаем взвешенную цену: 70% веса на Min (пессимизм), 30% на Max
+    let displayPrice: number | null = null;
+    if (lot.marketValueMin && lot.marketValueMax) {
+        displayPrice = (lot.marketValueMin * 0.7) + (lot.marketValueMax * 0.3);
+    } else if (lot.marketValueMin) {
+        displayPrice = lot.marketValueMin;
     }
+
+    // Считаем апсайд от displayPrice
+    let upsidePercent: number | null = null;
+    if (displayPrice && lot.startPrice && lot.startPrice > 0) {
+        upsidePercent = ((displayPrice - lot.startPrice) / lot.startPrice) * 100;
+    }
+
 
     const getUpsideClass = (percent: number) => {
         if (percent > 20) return styles.upsidePositive;
         if (percent < -5) return styles.upsideNegative;
         return styles.upsideNeutral;
+    }
+
+    // Цвет уверенности
+    const getConfidenceClass = (conf?: string | null) => {
+        switch (conf?.toLowerCase()) {
+            case 'high': return styles.confidenceHigh;
+            case 'medium': return styles.confidenceMedium;
+            case 'low': return styles.confidenceLow;
+            default: return styles.confidenceMedium; // Fallback
+        }
+    };
+
+    const getConfidenceLabel = (conf?: string | null) => {
+        switch (conf?.toLowerCase()) {
+            case 'high': return 'Высокая точность оценки';
+            case 'medium': return 'Средняя точность';
+            case 'low': return 'Низкая точность (мало данных)';
+            default: return 'Точность оценки';
+        }
     };
 
     return (
@@ -231,47 +259,54 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                     )} */}
 
                     {/* Блок рыночной оценки AI */}
-                    {(lot.marketValue || lot.investmentSummary) && (
-                        <div className={styles.investmentBlock}>
-                            <div className={styles.marketValueRow}>
-                                {lot.marketValue ? (
-                                    <>
-                                        <span className={styles.marketLabel}>Оценка AI:</span>
-                                        <span className={styles.marketValue}>{formatMoney(lot.marketValue)}</span>
-                                        {upsidePercent !== null && (
-                                            <span className={`${styles.upsideBadge} ${getUpsideClass(upsidePercent)}`}>
-                                                {upsidePercent > 0 ? '+' : ''}{upsidePercent.toFixed(0)}%
-                                            </span>
-                                        )}
-                                    </>
-                                ) : (
-                                    <span className={styles.marketLabel}>Есть инвест-анализ</span>
-                                )}
+                    {(displayPrice || lot.investmentSummary) && (
+                        <div className={styles.priceRow}>
+                            <span className={styles.priceLabel}>Оценка AI:</span>
 
-                                {/* Кнопка-шеврон для раскрытия */}
-                                {lot.investmentSummary && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault(); // чтобы не сработал клик по карточке, если он есть
-                                            e.stopPropagation();
-                                            setIsInvestmentExpanded(!isInvestmentExpanded);
-                                        }}
-                                        className={styles.expandButton}
-                                        title={isInvestmentExpanded ? "Свернуть" : "Показать анализ"}
-                                    >
-                                        {/* Простая иконка info или шеврон */}
-                                        <span style={{ marginRight: 4 }}>ℹ️</span>
-                                        {isInvestmentExpanded ? 'Скрыть' : 'Анализ'}
-                                    </button>
-                                )}
-                            </div>
+                            {displayPrice ? (
+                                <>
+                                    {/* Точка уверенности (оставляем, это полезный сигнал) */}
+                                    <div
+                                        className={`${styles.confidenceDot} ${getConfidenceClass(lot.priceConfidence)}`}
+                                        title={getConfidenceLabel(lot.priceConfidence)}
+                                    />
 
-                            {/* Раскрывающийся текст */}
-                            {lot.investmentSummary && isInvestmentExpanded && (
-                                <div className={styles.investmentSummary}>
-                                    {lot.investmentSummary}
-                                </div>
+                                    {/* Показываем одну цифру с тильдой */}
+                                    <span className={styles.priceValue} style={{ fontSize: '1rem' }}>
+                                        ~{formatMoney(displayPrice)}
+                                    </span>
+
+                                    {/* Апсайд теперь понятен - он от этой цифры */}
+                                    {upsidePercent !== null && (
+                                        <span className={`${styles.upsideBadge} ${getUpsideClass(upsidePercent)}`}>
+                                            {upsidePercent > 0 ? '+' : ''}{upsidePercent.toFixed(0)}%
+                                        </span>
+                                    )}
+                                </>
+                            ) : (
+                                <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Нет оценки</span>
                             )}
+
+                            {/* Кнопка раскрытия */}
+                            {lot.investmentSummary && (
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setIsInvestmentExpanded(!isInvestmentExpanded);
+                                    }}
+                                    className={styles.expandButton}
+                                >
+                                    <span style={{ fontSize: '1.1rem' }}>ℹ️</span>
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Раскрывающийся текст анализа */}
+                    {lot.investmentSummary && isInvestmentExpanded && (
+                        <div className={styles.investmentSummary}>
+                            {lot.investmentSummary}
                         </div>
                     )}
 
