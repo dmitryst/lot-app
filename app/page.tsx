@@ -203,13 +203,11 @@ function Page() {
         </div>
       </div> */}
 
-        <div className={styles.promoWrapper}>
+      {/* Скрываем дом в Глазинино */}
+        {/* <div className={styles.promoWrapper}>ы
           <PromoGrid hotSlug="dom-v-glazinino" maxArchived={0} />
-        </div>
+        </div> */}
       </div>
-
-
-
 
 
       <div className={styles.mapBanner}>

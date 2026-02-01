@@ -19,6 +19,9 @@ export type Lot = {
   bidding: BiddingInfo;
   imageUrl: string | null;
   coordinates: [number, number] | null,
+  propertyRegionName?: string | null;
+  marketValue?: number | null;
+  investmentSummary?: string | null;
   categories: {
     id: number;
     name: string;

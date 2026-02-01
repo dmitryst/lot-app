@@ -6,7 +6,8 @@
   overflow: hidden;
   margin-bottom: 12px;
   display: flex;
-  flex-direction: column; /* Для мобильных - все вертикально */
+  flex-direction: column;
+  /* Для мобильных - все вертикально */
   padding: 10px;
 }
 
@@ -19,8 +20,10 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   position: relative;
-  border-radius: 8px; /* Скругляем углы самого изображения */
-  overflow: hidden;   /* Обрезаем все, что выходит за рамки скругления */
+  border-radius: 8px;
+  /* Скругляем углы самого изображения */
+  overflow: hidden;
+  /* Обрезаем все, что выходит за рамки скругления */
 }
 
 .lotImage {
@@ -31,7 +34,8 @@
 }
 
 .contentWrapper {
-  padding: 24px 4px 0; /* Уменьшаем боковые отступы, т.к. теперь есть общий */
+  padding: 24px 4px 0;
+  /* Уменьшаем боковые отступы, т.к. теперь есть общий */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -48,16 +52,21 @@
 .priceDetail {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* Позволяет переноситься, если не влезает */
-  gap: 0 8px; /* Отступ 8px по горизонтали, 0 по вертикали */
+  flex-wrap: wrap;
+  /* Позволяет переноситься, если не влезает */
+  gap: 0 8px;
+  /* Отступ 8px по горизонтали, 0 по вертикали */
   margin: 8px 0;
 }
 
 /* КЛАСС для самой цены */
 .priceValue {
-  font-weight: 600; /* Делаем жирнее */
-  font-size: 1.05rem; /* Немного увеличиваем размер */
-  color: #1a202c; /* Делаем темнее, чем основной текст */
+  font-weight: 600;
+  /* Делаем жирнее */
+  font-size: 1.05rem;
+  /* Немного увеличиваем размер */
+  color: #1a202c;
+  /* Делаем темнее, чем основной текст */
 }
 
 /* Изменяем позиционирование иконок */
@@ -81,7 +90,8 @@
   margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px; /* Расстояние между тегами */
+  gap: 8px;
+  /* Расстояние между тегами */
 }
 
 /* Стиль для одного тега категории */
@@ -138,23 +148,30 @@
   top: 12px;
   right: 12px;
   background: none;
-  border: 1px solid #e2e8f0; /* Легкая рамка по умолчанию */
+  border: 1px solid #e2e8f0;
+  /* Легкая рамка по умолчанию */
   cursor: pointer;
   padding: 6px;
-  border-radius: 50%; /* Круглая кнопка */
+  border-radius: 50%;
+  /* Круглая кнопка */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #718096; /* Цвет иконки по умолчанию */
+  color: #718096;
+  /* Цвет иконки по умолчанию */
   transition: all 0.2s ease-in-out;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Легкая тень */
-  z-index: 10; /* Убедимся, что кнопка поверх других элементов */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* Легкая тень */
+  z-index: 10;
+  /* Убедимся, что кнопка поверх других элементов */
 }
 
 .publishButton:hover:not(:disabled) {
-  color: #0070f3; /* Синий при наведении */
+  color: #0070f3;
+  /* Синий при наведении */
   border-color: #0070f3;
-  background-color: rgba(0, 112, 243, 0.1); /* Светло-синий фон при наведении */
+  background-color: rgba(0, 112, 243, 0.1);
+  /* Светло-синий фон при наведении */
 }
 
 .publishButton.loading {
@@ -167,14 +184,16 @@
 
 .publishButton.success {
   cursor: default;
-  color: #28a745; /* Зеленый при успехе */
+  color: #28a745;
+  /* Зеленый при успехе */
   border-color: #28a745;
   background-color: rgba(40, 167, 69, 0.1);
 }
 
 .publishButton.error {
   cursor: default;
-  color: #dc3545; /* Красный при ошибке */
+  color: #dc3545;
+  /* Красный при ошибке */
   border-color: #dc3545;
   background-color: rgba(220, 53, 69, 0.1);
 }
@@ -187,6 +206,126 @@
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Бейдж региона поверх картинки */
+.regionBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  z-index: 5;
+  backdrop-filter: blur(4px);
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Блок инвестиционной оценки */
+.investmentBlock {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  /* Очень светлый серо-голубой */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.marketValueRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.marketLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.marketValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Бейджи апсайда */
+.upsideBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.upsidePositive {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.upsideNegative {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.upsideNeutral {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Кнопка раскрытия */
+.expandButton {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  /* Синий линк */
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: auto;
+  /* Прижимает кнопку к правому краю */
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.expandButton:hover {
+  background-color: #eff6ff;
+  text-decoration: none;
+}
+
+/* Текст саммари */
+.investmentSummary {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  /* Отделитель от цифр */
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #334155;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

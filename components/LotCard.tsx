@@ -4,7 +4,6 @@ import Image from 'next/image';
 import styles from './LotCard.module.css';
 import { Lot } from '../types';
 import { formatMoney } from '../utils/format';
-import Accordion from './Accordion';
 
 // Импортируем картинку как статический ресурс.
 // Путь указывается относительно текущего файла.
@@ -66,6 +65,9 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     const [publishStatus, setPublishStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     const isPublishButtonEnabled = process.env.NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED === 'true';
+
+    // стейт для раскрытия инвест-блока
+    const [isInvestmentExpanded, setIsInvestmentExpanded] = useState(false);
 
     const isDesktop = useIsDesktop();
 
@@ -148,11 +150,31 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         objectFitMode = 'contain';
     }
 
+    // Расчет апсайда
+    let upsidePercent: number | null = null;
+    if (lot.marketValue && lot.startPrice && lot.startPrice > 0) {
+        upsidePercent = ((lot.marketValue - lot.startPrice) / lot.startPrice) * 100;
+    }
+
+    const getUpsideClass = (percent: number) => {
+        if (percent > 20) return styles.upsidePositive;
+        if (percent < -5) return styles.upsideNegative;
+        return styles.upsideNeutral;
+    };
+
     return (
         <div className={styles.lotCardContainer}>
 
             {/* Блок для изображения (1/3 ширины) */}
             <div className={styles.imageWrapper}>
+
+                {/* Бейдж региона */}
+                {lot.propertyRegionName && (
+                    <div className={styles.regionBadge}>
+                        {lot.propertyRegionName}
+                    </div>
+                )}
+
                 {useNextImage ? (
                     <Image
                         src={finalImageUrl}
@@ -194,7 +216,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                         )}
                     </p>
 
-                    {lot.step && (
+                    {/* {lot.step && (
                         <p className={styles.priceDetail}>
                             Шаг цены:
                             <span className={styles.priceValue}>{formatMoney(lot.step)}</span>
@@ -206,6 +228,51 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                             Задаток:
                             <span className={styles.priceValue}>{formatMoney(lot.deposit)}</span>
                         </p>
+                    )} */}
+
+                    {/* Блок рыночной оценки AI */}
+                    {(lot.marketValue || lot.investmentSummary) && (
+                        <div className={styles.investmentBlock}>
+                            <div className={styles.marketValueRow}>
+                                {lot.marketValue ? (
+                                    <>
+                                        <span className={styles.marketLabel}>Оценка AI:</span>
+                                        <span className={styles.marketValue}>{formatMoney(lot.marketValue)}</span>
+                                        {upsidePercent !== null && (
+                                            <span className={`${styles.upsideBadge} ${getUpsideClass(upsidePercent)}`}>
+                                                {upsidePercent > 0 ? '+' : ''}{upsidePercent.toFixed(0)}%
+                                            </span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <span className={styles.marketLabel}>Есть инвест-анализ</span>
+                                )}
+
+                                {/* Кнопка-шеврон для раскрытия */}
+                                {lot.investmentSummary && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault(); // чтобы не сработал клик по карточке, если он есть
+                                            e.stopPropagation();
+                                            setIsInvestmentExpanded(!isInvestmentExpanded);
+                                        }}
+                                        className={styles.expandButton}
+                                        title={isInvestmentExpanded ? "Свернуть" : "Показать анализ"}
+                                    >
+                                        {/* Простая иконка info или шеврон */}
+                                        <span style={{ marginRight: 4 }}>ℹ️</span>
+                                        {isInvestmentExpanded ? 'Скрыть' : 'Анализ'}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Раскрывающийся текст */}
+                            {lot.investmentSummary && isInvestmentExpanded && (
+                                <div className={styles.investmentSummary}>
+                                    {lot.investmentSummary}
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {isDesktop && lot.categories && lot.categories.length > 0 && (

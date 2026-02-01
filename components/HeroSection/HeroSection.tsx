@@ -6,7 +6,7 @@ export const HeroSection = () => {
   return (
     <section className={styles.container}>
       <h1 className={styles.title}>
-        Сервис по поиску торгов <span className={styles.highlight}>по банкротству</span>
+        Сервис по поиску и анализу торгов <span className={styles.highlight}>по банкротству</span>
       </h1>
       <p className={styles.subtitle}>
         Покупайте недвижимость, автомобили и оборудование с дисконтом до 80%.
