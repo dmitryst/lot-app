@@ -232,6 +232,27 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           <p className={styles.lotInfo}><b>Площадка:</b> {lot.bidding?.platform}</p>
 
+          {/* Информация об арбитражном управляющем */}
+          {lot.bidding?.arbitrationManager && (
+            <>
+              <div className={styles.lotInfo}>
+                <b>Арбитражный управляющий:</b>
+                <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <span>{lot.bidding.arbitrationManager.name}</span>
+                  {lot.bidding.arbitrationManager.inn && (
+                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>ИНН: {lot.bidding.arbitrationManager.inn}</span>
+                  )}
+                  {lot.bidding.arbitrationManager.snils && (
+                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>СНИЛС: {lot.bidding.arbitrationManager.snils}</span>
+                  )}
+                  {lot.bidding.arbitrationManager.ogrn && (
+                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>ОГРН: {lot.bidding.arbitrationManager.ogrn}</span>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Можно добавить кнопку "купить" прямо сюда */}
           {/* <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button> */}
         </div>

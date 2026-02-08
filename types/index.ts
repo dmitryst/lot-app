@@ -1,9 +1,17 @@
+type ArbitrationManager = {
+  name: string;
+  inn?: string | null;
+  snils?: string | null;
+  ogrn?: string | null;
+};
+
 type BiddingInfo = {
   type: string;
   bidAcceptancePeriod: string;
   tradePeriod: string;
   viewingProcedure?: string;
   platform: string;
+  arbitrationManager?: ArbitrationManager | null;
 };
 
 export type Lot = {
