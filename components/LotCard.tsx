@@ -296,8 +296,14 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                                         setIsInvestmentExpanded(!isInvestmentExpanded);
                                     }}
                                     className={styles.expandButton}
+                                    title={isInvestmentExpanded ? "Скрыть детали" : "Показать детали оценки"}
+                                    aria-label={isInvestmentExpanded ? "Скрыть детали" : "Показать детали оценки"}
                                 >
-                                    <span style={{ fontSize: '1.1rem' }}>ℹ️</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 16v-4"/>
+                                        <path d="M12 8h.01"/>
+                                    </svg>
                                 </button>
                             )}
                         </div>
