@@ -33,6 +33,7 @@ export type Lot = {
   marketValueMax?: number | null;
   priceConfidence?: string | null;
   investmentSummary?: string | null;
+  createdAt?: string;
   categories: {
     id: number;
     name: string;

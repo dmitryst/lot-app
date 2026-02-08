@@ -9,6 +9,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
 import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
 import { formatMoney } from '../../../utils/format';
+import { generateSlug } from '../../../utils/slugify';
 
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
@@ -62,9 +63,13 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   }
 
   // Формируем "хлебные крошки" для навигации и SEO
+  const slug = generateSlug(lot.title || lot.description);
+  const lotUrl = lot.publicId 
+    ? `/lot/${slug}-${lot.publicId}`
+    : `/lot/${lot.id}`;
   const crumbs = [
     { label: 'Главная', href: '/' },
-    { label: lot.description.substring(0, 50) + '...', href: `/lot/${lot.id}` }
+    { label: lot.description.substring(0, 50) + '...', href: lotUrl }
   ];
 
   const getRankColorClass = (rank: number | null | undefined) => {

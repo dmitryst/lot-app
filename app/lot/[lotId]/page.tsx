@@ -3,37 +3,24 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
-import { CATEGORIES_TREE } from '../../data/constants'; 
+import { CATEGORIES_TREE } from '../../data/constants';
+import { generateLotSchemas, generateLotUrl } from './schemas';
 
 // --- SEO ОПТИМИЗАЦИЯ: Компонент для структурированных данных JSON-LD ---
 // Этот скрипт помогает Яндексу и Google точно понять, что продается на странице.
 function JsonLd({ lot }: { lot: Lot }) {
-  const price = lot.startPrice ?? 0;
-
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": lot.title || lot.description.substring(0, 100),
-    "description": lot.description,
-    "image": lot.imageUrl || 'https://s-lot.ru/placeholder.png',
-    "offers": {
-      "@type": "Offer",
-      "price": price,
-      "priceCurrency": "RUB",
-      "availability": "https://schema.org/InStock", // Товар доступен для торгов
-      "url": `https://s-lot.ru/lot/${lot.id}`
-    },
-    "brand": {
-      "@type": "Organization",
-      "name": "s-lot.ru"
-    }
-  };
+  const schemas = generateLotSchemas(lot);
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      {schemas.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+    </>
   );
 }
 
@@ -135,25 +122,67 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lotTitle = lot.title || lot.description.substring(0, 70);
 
   const title = `Купить ${lotTitle} на торгах по банкротству за ${formattedPrice} ₽ — s-lot.ru`;
-  const description = `${lot.description}. Начальная цена: ${formattedPrice} ₽. Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!`;
+  
+  // Улучшенное описание с большим количеством информации
+  const descriptionParts = [
+    lot.description.substring(0, 120),
+    `Начальная цена: ${formattedPrice} ₽`,
+    lot.bidding?.tradePeriod ? `Торги: ${lot.bidding.tradePeriod}` : null,
+    lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
+    'Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!'
+  ].filter(Boolean);
+  const description = descriptionParts.join('. ');
   
   const keywords = generateKeywords(lot);
+  const baseUrl = 'https://s-lot.ru';
+  const lotUrl = generateLotUrl(lot, baseUrl);
+  
+  // Подготовка изображений для Open Graph
+  const ogImages = [];
+  if (lot.imageUrl) {
+    ogImages.push({ url: lot.imageUrl.startsWith('http') ? lot.imageUrl : `${baseUrl}${lot.imageUrl}` });
+  }
+  if (lot.images && lot.images.length > 0) {
+    lot.images.slice(0, 3).forEach(img => {
+      ogImages.push({ url: img.startsWith('http') ? img : `${baseUrl}${img}` });
+    });
+  }
+  if (ogImages.length === 0) {
+    ogImages.push({ url: `${baseUrl}/placeholder.png` });
+  }
 
   return {
     title,
     description,
     keywords,
     alternates: {
-      canonical: `https://s-lot.ru/lot/${lot.id}`,
+      canonical: lotUrl,
     },
     openGraph: {
       title,
       description,
-      url: `https://s-lot.ru/lot/${lot.id}`,
+      url: lotUrl,
       siteName: 's-lot.ru',
-      images: [{ url: lot.imageUrl || '/placeholder.png' }],
+      images: ogImages,
       locale: 'ru_RU',
       type: 'website',
+      // Дополнительные поля для лучшей индексации
+      ...(lot.bidding?.tradePeriod && {
+        publishedTime: new Date().toISOString(),
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: description.substring(0, 200),
+      ...(ogImages.length > 0 && { images: [ogImages[0].url] }),
+    },
+    // Дополнительные метаданные
+    other: {
+      ...(lot.createdAt && { 'article:published_time': new Date(lot.createdAt).toISOString() }),
+      'article:modified_time': new Date().toISOString(),
+      'article:author': lot.bidding?.arbitrationManager?.name || 's-lot.ru',
+      'article:section': lot.categories?.[0]?.name || 'Торги по банкротству',
     },
   };
 }
