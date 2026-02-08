@@ -22,11 +22,12 @@
 
 .emptyState {
     text-align: center;
-    padding: 60px 0;
+    padding: 2rem;
     background: #fff;
     border-radius: 12px;
     /* Тень как у фильтров */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 1rem;
 }
 
 .emptyState p {

@@ -49,41 +49,45 @@ export default function FavoritesPage() {
     }, [user, authLoading, router]);
 
     if (authLoading || (loading && user)) {
-        return <div className={styles.loading}>Загрузка...</div>;
+        return (
+            <main className={pageStyles.main}>
+                <section className={pageStyles.contentArea}>
+                    <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Загрузка...</div>
+                </section>
+            </main>
+        );
     }
 
     if (!user) return null;
 
     return (
         // Используем те же классы контейнера, что и на главной
-        <div className={pageStyles.main}>
-            <div className={pageStyles.filtersContainer}>
-                {/* Вместо фильтров - просто заголовок */}
-                <h1 className={styles.pageTitle}>Избранное</h1>
-
-                <div className={pageStyles.content}>
-                    {lots.length === 0 ? (
-                        <div className={styles.emptyState}>
-                            <p>В избранном пока ничего нет.</p>
-                            <Link href="/" className={styles.backButton}>
-                                Перейти к поиску лотов
-                            </Link>
-                        </div>
-                    ) : (
-                        // Используем ту же сетку lotsGrid из page.module.css
-                        <div className={styles.lotsGrid}>
-                            {lots.map((lot: Lot) => (
-                                <LotItem
-                                    key={lot.id}
-                                    lot={lot}
-                                // если нужен доп. класс обёртки от page.module.css
-                                // className={styles.lotWrapper}
-                                />
-                            ))}
-                        </div>
-                    )}
+        <main className={pageStyles.main}>
+            <section className={pageStyles.contentArea}>
+                <div className={pageStyles.filtersContainer}>
+                    {/* Вместо фильтров - просто заголовок */}
+                    <h1 className={styles.pageTitle}>Избранное</h1>
                 </div>
-            </div>
-        </div>
+
+                {lots.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <p>В избранном пока ничего нет.</p>
+                        <Link href="/" className={styles.backButton}>
+                            Перейти к поиску лотов
+                        </Link>
+                    </div>
+                ) : (
+                    // Используем ту же сетку lotsGrid из page.module.css
+                    <div className={pageStyles.lotsGrid}>
+                        {lots.map((lot: Lot) => (
+                            <LotItem
+                                key={lot.id}
+                                lot={lot}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+        </main>
     );
 }
