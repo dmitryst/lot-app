@@ -8,6 +8,7 @@ import { Lot } from '../../../types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
 import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
+import { formatMoney } from '../../../utils/format';
 
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
@@ -123,6 +124,48 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
 
 
+  // Считаем взвешенную цену: 70% веса на Min (пессимизм), 30% на Max
+  let displayPrice: number | null = null;
+  if (lot.marketValueMin && lot.marketValueMax) {
+    displayPrice = (lot.marketValueMin * 0.7) + (lot.marketValueMax * 0.3);
+  } else if (lot.marketValueMin) {
+    displayPrice = lot.marketValueMin;
+  } else if (lot.marketValue) {
+    displayPrice = lot.marketValue;
+  }
+
+  // Считаем апсайд от displayPrice
+  let upsidePercent: number | null = null;
+  if (displayPrice && lot.startPrice && lot.startPrice > 0) {
+    upsidePercent = ((displayPrice - lot.startPrice) / lot.startPrice) * 100;
+  }
+
+  const getUpsideClass = (percent: number) => {
+    if (percent > 20) return styles.upsidePositive;
+    if (percent < -5) return styles.upsideNegative;
+    return styles.upsideNeutral;
+  }
+
+  // Цвет уверенности
+  const getConfidenceClass = (conf?: string | null) => {
+    switch (conf?.toLowerCase()) {
+      case 'high': return styles.confidenceHigh;
+      case 'medium': return styles.confidenceMedium;
+      case 'low': return styles.confidenceLow;
+      default: return styles.confidenceMedium; // Fallback
+    }
+  };
+
+  const getConfidenceLabel = (conf?: string | null) => {
+    switch (conf?.toLowerCase()) {
+      case 'high': return 'Высокая точность оценки';
+      case 'medium': return 'Средняя точность';
+      case 'low': return 'Низкая точность (мало данных)';
+      default: return 'Точность оценки';
+    }
+  };
+
+
   return (
 
     <main className={styles.container}>
@@ -202,6 +245,54 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             {lot.description}
           </div>
         </div>
+
+        {/* Оценка AI */}
+        {(displayPrice || lot.investmentSummary) && (
+          <div className={styles.descriptionSection}>
+            <h2 className={styles.sectionTitle}>Оценка инвестиционной привлекательности (AI)</h2>
+            
+            {displayPrice && (
+                <>
+                    <div className={styles.aiPriceRow}>
+                        <span className={styles.priceLabel} style={{ fontSize: '1.1rem', marginBottom: 0 }}>Рыночная цена:</span>
+                        
+                        {/* Точка уверенности с расшифровкой */}
+                        <div className={styles.confidenceBadge}>
+                            <div
+                                className={`${styles.confidenceDot} ${getConfidenceClass(lot.priceConfidence)}`}
+                            />
+                            <span className={styles.confidenceText}>
+                                {getConfidenceLabel(lot.priceConfidence)}
+                            </span>
+                        </div>
+
+                        {/* Цена */}
+                        <span className={styles.aiPriceValue}>
+                            ~{formatMoney(displayPrice)}
+                        </span>
+
+                        {/* Апсайд с подписью */}
+                        {upsidePercent !== null && (
+                            <div className={styles.upsideContainer}>
+                                <span className={`${styles.upsideBadge} ${getUpsideClass(upsidePercent)}`}>
+                                    {upsidePercent > 0 ? '+' : ''}{upsidePercent.toFixed(0)}%
+                                </span>
+                                <span className={styles.upsideLabel}>
+                                    {upsidePercent > 0 ? 'потенциал прибыли' : 'от начальной цены'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+
+            {lot.investmentSummary && (
+                <div className={styles.investmentSummaryText}>
+                    {lot.investmentSummary}
+                </div>
+            )}
+          </div>
+        )}
 
         {/* Документы лота (если есть) */}
         {lot.documents && lot.documents.length > 0 && (
