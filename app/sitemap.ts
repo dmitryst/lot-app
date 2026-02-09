@@ -7,8 +7,10 @@ const BASE_URL = 'https://s-lot.ru';
 export async function generateSitemaps() {
   // В идеале сделать запрос к API, чтобы узнать общее кол-во (count), 
   // но можно просто вернуть диапазон, так как знаем примерное число.
-  // Для 50000 лотов и размера чанка 25000 нужно 2 части.
-  return [{ id: 0 }, { id: 1 }, { id: 2 }]; 
+  // Для 100000 лотов и размера чанка 5000 нужно 20 частей.
+  // Увеличим запас до 30, пустые sitemap не страшны.
+  const totalChunks = 30;
+  return Array.from({ length: totalChunks }, (_, i) => ({ id: i }));
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
@@ -24,7 +26,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   }
 
   // Запрашиваем чанк данных из API
-  const pageSize = 25000; // Безопасный размер (меньше лимита 50к)
+  const pageSize = 5000; // Уменьшаем размер страницы до 5000, чтобы избежать ошибки 2MB cache limit
   const page = Number(id) + 1; // API ожидает page начиная с 1
   
   const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
@@ -33,7 +35,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
 
   try {
     const res = await fetch(`${apiUrl}/api/lots/sitemap-data?page=${page}&pageSize=${pageSize}`, { 
-        next: { revalidate: 3600 } // Кэшируем на час
+        cache: 'no-store' // Отключаем кэширование данных запроса, чтобы не забивать Data Cache и избежать лимита
     });
     
     if (!res.ok)
@@ -42,7 +44,8 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     const lots: any[] = await res.json();
 
     if (!lots || lots.length === 0) {
-        console.warn(`Warning: No lots found for page ${page} (sitemap id ${id})`);
+        // Если лотов нет, просто возвращаем пустой (или со статикой) sitemap
+        return staticRoutes;
     }
 
     const lotRoutes = lots.map((lot) => {
