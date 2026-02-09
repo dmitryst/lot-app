@@ -95,7 +95,7 @@ export default function MapPage() {
                 return (
                     <div className={`${styles.infoPanel} ${styles.warning}`}>
                         Вы видите только {mapData.lots.length} из {mapData.totalCount} объектов.
-                        <Link href="/login?redirect=/map">Войдите</Link> или <Link href="/login/register">зарегистрируйтесь</Link>, чтобы увидеть все.
+                        <Link href="/login?returnUrl=/map">Войдите</Link> или <Link href="/login/register?returnUrl=/map">зарегистрируйтесь</Link>, чтобы увидеть все.
                     </div>
                 );
 

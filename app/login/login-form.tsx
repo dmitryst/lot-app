@@ -45,8 +45,8 @@ export default function LoginForm() {
                 setUser({ email: data.email });
 
                 // Пытаемся получить returnUrl из параметров URL
-                // (например, login?returnUrl=/lots?page=2)
-                const returnUrl = searchParams.get('returnUrl');
+                // (например, login?returnUrl=/lots?page=2 или login?redirect=/map)
+                const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
 
                 // Если returnUrl есть — идем туда. Если нет — идем на /map
                 if (returnUrl) {
@@ -111,7 +111,10 @@ export default function LoginForm() {
                     </button>
                 </form>
                 <p className={styles.linkText}>
-                    Нет аккаунта? <Link href="/login/register">Зарегистрироваться</Link>
+                    Нет аккаунта? <Link href={`/login/register${(() => {
+                        const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
+                        return returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+                    })()}`}>Зарегистрироваться</Link>
                 </p>
             </div>
         </div>
