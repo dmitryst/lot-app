@@ -402,7 +402,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                   {/* Десктоп: Дата начала */}
                   <th className={styles.desktopOnly}>Дата начала</th>
                   {/* Мобильный: Дата начала + Цена */}
-                  <th className={styles.mobileOnly}>
+                  <th className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
                     <div className={styles.thGroup}>
                       <span>Дата начала</span>
                       <span className={styles.subHeader}>Цена, руб.</span>
@@ -416,7 +416,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                   <th className={styles.desktopOnly}>Цена, руб.</th>
 
                   {/* Мобильный: Дата окончания + Задаток */}
-                  <th className={styles.mobileOnly}>
+                  <th className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
                     <div className={styles.thGroup}>
                       <span>Дата окончания</span>
                       {showDepositColumn && (<span className={styles.subHeader}>Задаток, руб.</span>)}
@@ -440,7 +440,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                     <td className={styles.desktopOnly}>{formatDate(schedule.startDate)}</td>
 
                     {/* Мобильный: Дата начала + Цена */}
-                    <td className={styles.mobileOnly}>
+                    <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
                       <div className={styles.cellGroup}>
                         <div className={styles.dateRow}>{formatDate(schedule.startDate)}</div>
                         <div className={styles.priceRow}>
@@ -458,7 +458,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                     </td>
 
                     {/* Мобильный: Дата окончания + Задаток */}
-                    <td className={styles.mobileOnly}>
+                    <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
                       <div className={styles.cellGroup}>
                         <div className={styles.dateRow}>{formatDate(schedule.endDate)}</div>
                         {showDepositColumn && (<div className={styles.depositRow}>

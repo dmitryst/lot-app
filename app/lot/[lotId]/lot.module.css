@@ -295,16 +295,29 @@
     font-size: 0.85rem;
   }
 
+  /* Устанавливаем одинаковую минимальную ширину для столбцов с датами */
+  .priceScheduleTable th.mobileDateColumn,
+  .priceScheduleTable td.mobileDateColumn {
+    min-width: 140px;
+    width: 140px;
+  }
+
   .thGroup, .cellGroup {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .subHeader {
-    font-size: 0.75rem;
-    color: #718096;
-    font-weight: normal;
+  /* Основной текст в заголовке (Дата начала/окончания) - обычный шрифт */
+  .priceScheduleTable th.mobileOnly .thGroup > span:not(.subHeader) {
+    font-weight: 400;
+  }
+
+  /* Подзаголовки (Цена, Задаток) - такой же формат как суммы */
+  .priceScheduleTable th.mobileOnly .subHeader {
+    font-size: 0.85rem; /* Такой же размер как у сумм */
+    color: #2d3748; /* Такой же цвет как у сумм */
+    font-weight: 600 !important; /* Жирный как суммы */
   }
 
   .priceRow, .depositRow {
@@ -315,6 +328,31 @@
   .dateRow {
     color: #718096;
     font-size: 0.8rem;
+    white-space: nowrap; /* Предотвращаем перенос даты и времени */
+  }
+}
+
+/* Дополнительные стили для очень узких экранов (меньше 400px) */
+@media (max-width: 400px) {
+  .priceScheduleTable th, 
+  .priceScheduleTable td {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+  }
+
+  /* Уменьшаем минимальную ширину столбцов, но сохраняем одинаковую ширину */
+  .priceScheduleTable th.mobileDateColumn,
+  .priceScheduleTable td.mobileDateColumn {
+    min-width: 120px;
+    width: 120px;
+  }
+
+  .dateRow {
+    font-size: 0.7rem;
+  }
+
+  .priceRow, .depositRow {
+    font-size: 0.75rem;
   }
 }
 
