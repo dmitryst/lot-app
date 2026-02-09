@@ -142,6 +142,7 @@
     gap: 1.5rem;
     grid-template-areas:
       "search search"
+      "regions regions"
       "categories categories"
       "types ownership"
       "price action";
@@ -154,8 +155,24 @@
     grid-area: search;
   }
 
+  .searchArea .filterGroup {
+    max-width: 600px;
+  }
+
+  .regionsArea {
+    grid-area: regions;
+  }
+
+  .regionsArea .filterGroup {
+    max-width: 600px;
+  }
+
   .categoriesArea {
     grid-area: categories;
+  }
+
+  .categoriesArea .filterGroup {
+    max-width: 600px;
   }
 
   .typeArea {
@@ -198,8 +215,12 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1.5rem;
     grid-template-areas:
-      "search categories categories"
-      /* Верхний ряд: Поиск (1/3), Категории (2/3) */
+      "search search search"
+      /* Верхний ряд: Поиск на всю ширину */
+      "regions regions regions"
+      /* Второй ряд: Регионы на всю ширину */
+      "categories categories categories"
+      /* Третий ряд: Категории на всю ширину */
       "types ownership ."
       /* Средний ряд: Типы, Собственность, Пусто */
       "price action .";
@@ -213,8 +234,24 @@
     grid-area: search;
   }
 
+  .searchArea .filterGroup {
+    max-width: 600px;
+  }
+
+  .regionsArea {
+    grid-area: regions;
+  }
+
+  .regionsArea .filterGroup {
+    max-width: 600px;
+  }
+
   .categoriesArea {
     grid-area: categories;
+  }
+
+  .categoriesArea .filterGroup {
+    max-width: 600px;
   }
 
   /* Для нижнего ряда возвращаем горизонтальное расположение лейблов */
@@ -259,78 +296,77 @@
 
 @media (min-width: 1200px) {
   .filtersWrapper {
-    /* 4 колонки: Поиск(1.2), Категории(1.2), Типы+Собств(1.5), Цена+Кнопка(1.1) */
-    /* Или лучше в 2 строки, но более плотно */
-    grid-template-columns: 1.5fr 2fr;
-    /* Верхний ряд: Поиск меньше, Категории больше */
+    grid-template-columns: 1fr 1fr;
+    /* Две равные колонки для всех полей */
+    gap: 1.5rem;
     grid-template-areas:
-      "search categories"
-      "bottom bottom";
-    /* Нижний ряд общий */
-    gap: 1.25rem;
-  }
-
-  .searchArea {
-    grid-area: search;
-  }
-
-  .categoriesArea {
-    grid-area: categories;
-  }
-
-  /* Создаем \"виртуальную\" область для нижнего ряда через grid-area не получится так просто, 
-     поэтому лучше вернемся к 4 колонкам для всей сетки */
-
-  .filtersWrapper {
-    grid-template-columns: 1fr 1fr 1fr auto;
-    /* auto для кнопки в конце */
-    grid-template-areas:
-      "search search categories categories"
-      "types ownership price action";
+      "search regions"
+      /* Ряд 1: Поиск и Регионы */
+      "categories types"
+      /* Ряд 2: Категории и Вид торгов */
+      "ownership price"
+      /* Ряд 3: Собственность и Цена */
+      "action action";
+    /* Кнопка на всю ширину внизу */
     align-items: end;
-    /* Выравнивание по низу строки */
   }
 
   /* Поиск */
   .searchArea {
     grid-area: search;
+    width: 100%;
+  }
+
+  .searchArea .filterGroup {
+    width: 100%;
+  }
+
+  /* Регионы */
+  .regionsArea {
+    grid-area: regions;
+    width: 100%;
+  }
+
+  .regionsArea .filterGroup {
+    width: 100%;
   }
 
   /* Категории */
   .categoriesArea {
     grid-area: categories;
+    width: 100%;
+  }
+
+  .categoriesArea .filterGroup {
+    width: 100%;
   }
 
   /* Типы торгов */
   .typeArea {
     grid-area: types;
-    justify-self: start;
+    width: 100%;
   }
 
   /* Собственность */
   .ownershipArea {
     grid-area: ownership;
-    justify-self: start;
+    width: 100%;
   }
 
   /* Цена */
   .priceArea {
     grid-area: price;
     width: 100%;
-    min-width: 250px;
-    max-width: 300px;
   }
 
   /* Кнопка */
   .actionArea {
     grid-area: action;
-    justify-content: flex-end;
-    margin-top: 0;
-    /* Убираем отступы если были */
-    align-self: end;
-    /* Кнопка прижата к низу */
-    margin-bottom: 2px;
-    /* Чуть поднять, если визуально не ровно с инпутами */
+    display: flex;
+    justify-content: center;
+    /* Кнопка по центру */
+    margin-top: 0.5rem;
+    width: 100%;
   }
 
   .searchButton {

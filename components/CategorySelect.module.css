@@ -67,8 +67,19 @@
   color: #888;
 }
 
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
 .arrowUp {
   transform: rotate(180deg);
+}
+
+.text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .popover {

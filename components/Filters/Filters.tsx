@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BIDDING_TYPES, CATEGORIES_TREE } from '@/app/data/constants';
+import { BIDDING_TYPES, CATEGORIES_TREE, REGIONS_TREE } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
+import RegionSelect from '@/components/RegionSelect';
 import styles from './Filters.module.css';
 import ClearableInput from '@/components/ui/ClearableInput';
 
@@ -14,6 +15,7 @@ interface FiltersProps {
     priceTo: string;
     searchQuery: string;
     isSharedOwnership: string | null;
+    regions: string[];
     onUpdate: (updates: Record<string, any>) => void;
 }
 
@@ -32,6 +34,7 @@ export default function Filters({
     priceTo,
     searchQuery,
     isSharedOwnership,
+    regions,
     onUpdate,
 }: FiltersProps) {
     // Локальное состояние для инпутов
@@ -41,6 +44,7 @@ export default function Filters({
     const [localCategories, setLocalCategories] = useState(categories);
     const [localBiddingType, setLocalBiddingType] = useState(biddingType);
     const [localIsSharedOwnership, setLocalIsSharedOwnership] = useState(isSharedOwnership);
+    const [localRegions, setLocalRegions] = useState(regions);
 
     // Синхронизация с URL (на случай навигации браузера Вперед/Назад)
     useEffect(() => {
@@ -50,7 +54,8 @@ export default function Filters({
         setLocalCategories(categories);
         setLocalBiddingType(biddingType);
         setLocalIsSharedOwnership(isSharedOwnership);
-    }, [searchQuery, priceFrom, priceTo, categories, biddingType, isSharedOwnership]);
+        setLocalRegions(regions);
+    }, [searchQuery, priceFrom, priceTo, categories, biddingType, isSharedOwnership, regions]);
 
     // --- Основная функция поиска ---
     const handleApplyFilters = () => {
@@ -61,6 +66,7 @@ export default function Filters({
             categories: localCategories,
             biddingType: localBiddingType,
             isSharedOwnership: localIsSharedOwnership,
+            regions: localRegions,
             page: 1, // Всегда сбрасываем на первую страницу при поиске
         });
     };
@@ -103,6 +109,10 @@ export default function Filters({
         setLocalCategories(newSelected);
     };
 
+    const handleRegionChange = (newSelected: string[]) => {
+        setLocalRegions(newSelected);
+    };
+
     // Хендлер для переключения долевой собственности
     const handleSharedOwnershipClick = (value: string | null) => {
         setLocalIsSharedOwnership(value);
@@ -138,6 +148,17 @@ export default function Filters({
                     onClear={handleClearSearch}
                     onKeyDown={handleKeyDown}
                     icon={<SearchIcon />}
+                />
+            </div>
+
+            {/* Регионы */}
+            <div className={`${styles.filterGroup} ${styles.regionsArea}`}>
+                <label className={styles.filterLabel}>Местонахождение имущества</label>
+                <RegionSelect
+                    regions={REGIONS_TREE}
+                    selectedRegions={localRegions}
+                    onChange={handleRegionChange}
+                    onApply={handleApplyFilters}
                 />
             </div>
 
