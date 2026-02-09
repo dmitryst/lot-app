@@ -5,6 +5,13 @@ type ArbitrationManager = {
   ogrn?: string | null;
 };
 
+type Debtor = {
+  name: string;
+  inn?: string | null;
+  snils?: string | null;
+  ogrn?: string | null;
+};
+
 type BiddingInfo = {
   type: string;
   bidAcceptancePeriod: string;
@@ -12,6 +19,7 @@ type BiddingInfo = {
   viewingProcedure?: string;
   platform: string;
   arbitrationManager?: ArbitrationManager | null;
+  debtor?: Debtor | null;
 };
 
 export type Lot = {

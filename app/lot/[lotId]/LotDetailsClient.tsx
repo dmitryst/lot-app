@@ -237,27 +237,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           <p className={styles.lotInfo}><b>Площадка:</b> {lot.bidding?.platform}</p>
 
-          {/* Информация об арбитражном управляющем */}
-          {lot.bidding?.arbitrationManager && (
-            <>
-              <div className={styles.lotInfo}>
-                <b>Арбитражный управляющий:</b>
-                <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <span>{lot.bidding.arbitrationManager.name}</span>
-                  {lot.bidding.arbitrationManager.inn && (
-                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>ИНН: {lot.bidding.arbitrationManager.inn}</span>
-                  )}
-                  {lot.bidding.arbitrationManager.snils && (
-                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>СНИЛС: {lot.bidding.arbitrationManager.snils}</span>
-                  )}
-                  {lot.bidding.arbitrationManager.ogrn && (
-                    <span style={{ fontSize: '0.9rem', color: '#718096' }}>ОГРН: {lot.bidding.arbitrationManager.ogrn}</span>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-
           {/* Можно добавить кнопку "купить" прямо сюда */}
           {/* <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button> */}
         </div>
@@ -271,6 +250,53 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             {lot.description}
           </div>
         </div>
+
+        {/* Отдельный блок для арбитражного управляющего и должника */}
+        {(lot.bidding?.arbitrationManager || lot.bidding?.debtor) && (
+          <div className={styles.descriptionSection}>
+            <h2 className={styles.sectionTitle}>Участники процедуры банкротства</h2>
+            
+            <div className={styles.participantsContainer}>
+              {/* Информация о должнике */}
+              {lot.bidding?.debtor && (
+                <div className={styles.participantBlock}>
+                  <h3 className={styles.participantTitle}>Должник</h3>
+                  <div className={styles.participantInfo}>
+                    <span className={styles.participantName}>{lot.bidding.debtor.name}</span>
+                    {lot.bidding.debtor.inn && (
+                      <span className={styles.participantDetail}>ИНН: {lot.bidding.debtor.inn}</span>
+                    )}
+                    {lot.bidding.debtor.snils && (
+                      <span className={styles.participantDetail}>СНИЛС: {lot.bidding.debtor.snils}</span>
+                    )}
+                    {lot.bidding.debtor.ogrn && (
+                      <span className={styles.participantDetail}>ОГРН: {lot.bidding.debtor.ogrn}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Информация об арбитражном управляющем */}
+              {lot.bidding?.arbitrationManager && (
+                <div className={styles.participantBlock}>
+                  <h3 className={styles.participantTitle}>Арбитражный управляющий</h3>
+                  <div className={styles.participantInfo}>
+                    <span className={styles.participantName}>{lot.bidding.arbitrationManager.name}</span>
+                    {lot.bidding.arbitrationManager.inn && (
+                      <span className={styles.participantDetail}>ИНН: {lot.bidding.arbitrationManager.inn}</span>
+                    )}
+                    {lot.bidding.arbitrationManager.snils && (
+                      <span className={styles.participantDetail}>СНИЛС: {lot.bidding.arbitrationManager.snils}</span>
+                    )}
+                    {lot.bidding.arbitrationManager.ogrn && (
+                      <span className={styles.participantDetail}>ОГРН: {lot.bidding.arbitrationManager.ogrn}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Оценка AI */}
         {(displayPrice || lot.investmentSummary) && (

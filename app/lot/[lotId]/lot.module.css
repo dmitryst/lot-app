@@ -464,3 +464,51 @@
     border-radius: 8px;
     border: 1px solid #e2e8f0;
 }
+
+/* Блок участников процедуры банкротства */
+.participantsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.participantBlock {
+  flex: 1;
+}
+
+.participantTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+}
+
+.participantInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.participantName {
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+.participantDetail {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+/* Двухколоночный макет на десктопе */
+@media (min-width: 769px) {
+  .participantsContainer {
+    flex-direction: row;
+    gap: 3rem;
+  }
+  
+  .participantBlock {
+    flex: 1;
+  }
+}
