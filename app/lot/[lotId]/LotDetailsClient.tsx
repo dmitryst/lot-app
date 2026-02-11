@@ -8,7 +8,7 @@ import { Lot } from '../../../types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
 import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
-import { formatMoney } from '../../../utils/format';
+import AiEvaluationBlock from '@/components/AiEvaluationBlock/AiEvaluationBlock';
 import { generateSlug } from '../../../utils/slugify';
 
 // Компонент для отображения одного этапа покупки
@@ -64,7 +64,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
   // Формируем "хлебные крошки" для навигации и SEO
   const slug = generateSlug(lot.title || lot.description);
-  const lotUrl = lot.publicId 
+  const lotUrl = lot.publicId
     ? `/lot/${slug}-${lot.publicId}`
     : `/lot/${lot.id}`;
   const crumbs = [
@@ -255,7 +255,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         {(lot.bidding?.arbitrationManager || lot.bidding?.debtor) && (
           <div className={styles.descriptionSection}>
             <h2 className={styles.sectionTitle}>Участники процедуры банкротства</h2>
-            
             <div className={styles.participantsContainer}>
               {/* Информация о должнике */}
               {lot.bidding?.debtor && (
@@ -298,53 +297,28 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           </div>
         )}
 
-        {/* Оценка AI */}
-        {(displayPrice || lot.investmentSummary) && (
+        {/* Экспресс-оценка (Quick) */}
+        {displayPrice && (
           <div className={styles.descriptionSection}>
-            <h2 className={styles.sectionTitle}>Оценка инвестиционной привлекательности (AI)</h2>
-            
-            {displayPrice && (
-                <>
-                    <div className={styles.aiPriceRow}>
-                        <span className={styles.priceLabel} style={{ fontSize: '1.1rem', marginBottom: 0 }}>Рыночная цена:</span>
-                        
-                        {/* Точка уверенности с расшифровкой */}
-                        <div className={styles.confidenceBadge}>
-                            <div
-                                className={`${styles.confidenceDot} ${getConfidenceClass(lot.priceConfidence)}`}
-                            />
-                            <span className={styles.confidenceText}>
-                                {getConfidenceLabel(lot.priceConfidence)}
-                            </span>
-                        </div>
-
-                        {/* Цена */}
-                        <span className={styles.aiPriceValue}>
-                            ~{formatMoney(displayPrice)}
-                        </span>
-
-                        {/* Апсайд с подписью */}
-                        {upsidePercent !== null && (
-                            <div className={styles.upsideContainer}>
-                                <span className={`${styles.upsideBadge} ${getUpsideClass(upsidePercent)}`}>
-                                    {upsidePercent > 0 ? '+' : ''}{upsidePercent.toFixed(0)}%
-                                </span>
-                                <span className={styles.upsideLabel}>
-                                    {upsidePercent > 0 ? 'потенциал прибыли' : 'от начальной цены'}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
-
-            {lot.investmentSummary && (
-                <div className={styles.investmentSummaryText}>
-                    {lot.investmentSummary}
-                </div>
-            )}
+            <AiEvaluationBlock
+              type="quick"
+              currentPrice={lot.startPrice}
+              quickData={{
+                estimatedPrice: displayPrice,
+                investmentSummary: lot.investmentSummary,
+              }}
+            />
           </div>
         )}
+
+        {/* Глубокая аналитика (DeepSeek Reasoning Evaluation) */}
+        <div className={styles.descriptionSection}>
+          <AiEvaluationBlock
+            type="deep"
+            lotPublicId={lot.publicId}
+            currentPrice={lot.startPrice}
+          />
+        </div>
 
         {/* Документы лота (если есть) */}
         {lot.documents && lot.documents.length > 0 && (

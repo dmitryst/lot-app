@@ -1,0 +1,252 @@
+/* components/AiEvaluationBlock/aiEvaluationBlock.module.css */
+
+.aiBlock {
+  margin: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%; /* Растягиваем на всю ширину родителя */
+  box-sizing: border-box; 
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.errorBox {
+  color: #dc2626;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: #fef2f2;
+  border-radius: 6px;
+}
+
+.evaluateButton {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.evaluateButton:hover {
+  background-color: #1d4ed8;
+}
+
+.progressContainer {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  width: 0%;
+  animation: progressAnimation 60s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes progressAnimation {
+  0% { width: 0%; }
+  10% { width: 15%; }
+  50% { width: 60%; }
+  90% { width: 90%; }
+  100% { width: 95%; }
+}
+
+.progressText {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.resultContainer {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.priceRow {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+/* обертка для цены и апсайда */
+.priceDataWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap; /* Разрешаем перенос процентов под цену внутри этого блока */
+}
+
+.priceLabelBadge {
+  background-color: #f0fff4;
+  color: #2f855a;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid #c6f6d5;
+  margin-top: 4px;
+}
+
+.estimatedPrice {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  white-space: nowrap;
+}
+
+.upsideContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 8px;
+}
+
+.upsideBadge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.upsidePositive {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.upsideNegative {
+  background-color: #fed7d7;
+  color: #822727;
+}
+
+.upsideLabel {
+  font-size: 0.7rem;
+  color: #718096;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.liquidityRow {
+  margin-bottom: 0.5rem;
+}
+
+.summary {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.summary strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.reasoningDetails {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.75rem;
+}
+
+.reasoningSummary {
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  user-select: none;
+  outline: none;
+}
+
+.reasoningSummary:hover {
+  color: #475569;
+}
+
+.reasoningText {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #475569;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+}
+
+/* --- ТОЧКА УВЕРЕННОСТИ --- */
+.confidenceRow {
+  margin-bottom: 0.5rem;
+}
+
+.confidenceBadge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f7fafc;
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid #e2e8f0;
+}
+
+.confidenceDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+/* Цвета точек */
+.confidenceHigh {
+  background-color: #48bb78; /* Зеленый */
+  box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.2);
+}
+
+.confidenceMedium {
+  background-color: #ecc94b; /* Желтый */
+  box-shadow: 0 0 0 2px rgba(236, 201, 75, 0.2);
+}
+
+.confidenceLow {
+  background-color: #f56565; /* Красный */
+  box-shadow: 0 0 0 2px rgba(245, 101, 101, 0.2);
+}
+
+.confidenceText {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #718096;
+  white-space: nowrap;
+}
+
+/* Адаптив: на маленьких экранах переносим точку на новую строку или скрываем, если не влезает */
+@media (max-width: 480px) {
+  .confidenceBadge {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}
