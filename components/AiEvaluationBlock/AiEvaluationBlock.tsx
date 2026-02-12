@@ -48,33 +48,45 @@ export default function AiEvaluationBlock({
         type === 'quick' ? quickData || null : null
     );
     const [isEvaluating, setIsEvaluating] = useState(false);
-    const [hasCheckedExisting, setHasCheckedExisting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | React.ReactNode>(null);
+    const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 
     const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
     const { user } = useAuth();
     const router = useRouter();
 
-    // Для deep-режима проверяем наличие оценки при загрузке
     useEffect(() => {
-        if (type !== 'deep' || !lotPublicId) return;
+        if (type !== 'deep' || !lotPublicId || !user) {
+            setIsLoadingInitial(false);
+            return;
+        }
 
-        const checkExistingEvaluation = async () => {
+        const checkMyEvaluation = async () => {
             try {
-                const response = await fetch(`${apiUrl}/api/lots/${lotPublicId}/evaluation`);
+                // Пытаемся получить оценку
+                // Бэкенд вернет 200 ТОЛЬКО если пользователь уже тратил лимит на этот лот
+                const response = await fetch(`${apiUrl}/api/lots/${lotPublicId}/evaluation`, {
+                    credentials: 'include'
+                });
+
                 if (response.ok) {
                     const data = await response.json();
                     setEvaluationResult(data);
+                } else {
+                    // 404 или 401 — значит еще не запускали или не авторизованы
+                    // Просто ничего не делаем, останется кнопка "Запустить анализ"
                 }
             } catch (e) {
-                console.error("Ошибка при проверке оценки:", e);
+                console.error("Error checking evaluation:", e);
             } finally {
-                setHasCheckedExisting(true);
+                setIsLoadingInitial(false);
             }
         };
 
-        checkExistingEvaluation();
-    }, [type, lotPublicId, apiUrl]);
+        checkMyEvaluation();
+    }, [type, lotPublicId, apiUrl, user]);
+
+    const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
     // Запуск deep-анализа
     const handleEvaluate = async () => {
@@ -85,27 +97,50 @@ export default function AiEvaluationBlock({
         }
 
         setIsEvaluating(true);
-        setEvaluationResult(null);
         setError(null);
 
         try {
+            // ВАЖНО: всегда дергаем POST /evaluate, чтобы бэкенд мог:
+            //  - проверить лимит/подписку
+            //  - записать вызов в БД
             const response = await fetch(`${apiUrl}/api/lots/${lotPublicId}/evaluate`, {
                 method: 'POST',
                 credentials: 'include'
             });
 
+            // Если ошибка (402, 500 и т.д.)
             if (!response.ok) {
-                if (response.status === 401) {
-                    const returnUrl = encodeURIComponent(window.location.pathname);
-                    router.push(`/login?returnUrl=${returnUrl}`);
-                    return;
+                const err = await response.json().catch(() => ({}));
+
+                // Если это 402 Payment Required — показываем ошибку сразу, без ожидания
+                if (response.status === 402 && err.actionUrl) {
+                    setError(
+                        <span>
+                            {err.message} <br />
+                            <a href={err.actionUrl} style={{ textDecoration: 'underline', fontWeight: 'bold' }}>
+                                Перейти к тарифам →
+                            </a>
+                        </span>
+                    );
+                } else {
+                    // Любая другая ошибка
+                    throw new Error(err.message || 'Ошибка запуска анализа');
                 }
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Ошибка при выполнении анализа');
+
+                // Важно: сразу выключаем лоадер, чтобы не висел "Идет анализ..."
+                setIsEvaluating(false);
+                return;
             }
 
-            const data = await response.json();
+            // Если успех — запускаем таймер "эмуляции размышления"
+            // Мы ждем минимум 5 секунд только если запрос прошел успешно
+            const dataPromise = response.json();
+            const minWaitMs = 5000;
+
+            const [data] = await Promise.all([dataPromise, sleep(minWaitMs)]);
+
             setEvaluationResult(data);
+            setIsEvaluating(false);
         } catch (err: any) {
             setError(err.message || 'Произошла неизвестная ошибка');
         } finally {
@@ -143,13 +178,24 @@ export default function AiEvaluationBlock({
         <div className={styles.aiBlock}>
             <h2 className={styles.title}>{title}</h2>
 
+            {/* Скелетон или спиннер, пока проверяем "покупал ли я?" */}
+            {type === 'deep' && isLoadingInitial && (
+                <div style={{ color: '#aaa', fontSize: '0.9rem' }}>Проверка статуса анализа...</div>
+            )}
+
             {/* Ошибка */}
             {error && (
                 <div className={styles.errorBox}>❌ {error}</div>
             )}
 
-            {/* Кнопка для deep-режима */}
-            {type === 'deep' && !evaluationResult && !isEvaluating && hasCheckedExisting && (
+            {/* Кнопка запуска:
+                Показываем, если:
+                1. Это deep режим
+                2. Результата НЕТ (значит GET вернул 404)
+                3. Процесс не идет (isEvaluating == false)
+                4. Первичная проверка завершена (!isLoadingInitial)
+            */}
+            {type === 'deep' && !evaluationResult && !isEvaluating && !isLoadingInitial && (
                 <button onClick={handleEvaluate} className={styles.evaluateButton}>
                     Запустить анализ
                 </button>
