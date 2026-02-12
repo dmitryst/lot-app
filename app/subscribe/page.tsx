@@ -67,10 +67,19 @@ export default function SubscribePage() {
                     Получите неограниченный доступ ко всем объектам на карте и расширенным фильтрам для максимально эффективного поиска.
                 </p>
 
+                {/* --- информационная плашка --- */}
+                <div className={styles.infoBanner}>
+                    <strong>Внимание:</strong> Онлайн-оплата на сайте временно недоступна по техническим причинам.<br/>
+                    Для подключения PRO-тарифа, пожалуйста, напишите нам на e-mail: {' '}
+                    <a href="mailto:info@s-lot.ru">info@s-lot.ru</a>.
+                    Мы оперативно выставим счет или пришлем ссылку для оплаты.
+                </div>
+
                 {/* Блок с преимуществами */}
                 <div className={styles.featuresWrapper}>
                     <ul className={styles.featuresList}>
                         <li>✓ Полный доступ ко всем объектам</li>
+                        <li>AI-анализ инвестиционной привлекательности</li>
                         <li>✓ Неограниченное использование фильтров</li>
                         <li>✓ Просмотр детальной информации</li>
                     </ul>
@@ -80,7 +89,7 @@ export default function SubscribePage() {
                 <div className={styles.plansContainer}>
                     <div className={styles.planCard}>
                         <h2 className={styles.planTitle}>Месяц</h2>
-                        <p className={styles.planPrice}>500 ₽</p>
+                        <p className={styles.planPrice}>1000 ₽</p>
                         <p className={styles.planDescription}>Полный доступ ко всем лотам и аналитике на 30 дней.</p>
                         <button 
                             onClick={() => handlePayment('pro-month')} 
@@ -94,8 +103,8 @@ export default function SubscribePage() {
                     <div className={`${styles.planCard} ${styles.planCardFeatured}`}>
                         <div className={styles.featuredBadge}>Выгодно</div>
                         <h2 className={styles.planTitle}>Год</h2>
-                        <p className={styles.planPrice}>5000 ₽</p>
-                        <p className={styles.planDescription}>Экономия 1000 ₽! Полный доступ на 365 дней.</p>
+                        <p className={styles.planPrice}>8 000 ₽</p>
+                        <p className={styles.planDescription}>Экономия 4000 ₽! Полный доступ на 365 дней.</p>
                         <button 
                             onClick={() => handlePayment('pro-year')} 
                             disabled={!!isLoading || !hasAgreed} 

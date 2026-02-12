@@ -2,7 +2,8 @@
 .container {
     display: flex;
     justify-content: center;
-    padding: 4rem 1rem 6rem; /* Увеличили отступ снизу */
+    padding: 4rem 1rem 6rem;
+    /* Увеличили отступ снизу */
     background-color: #f7fafc;
     min-height: 100vh;
 }
@@ -23,7 +24,8 @@
 .subtitle {
     font-size: 1.125rem;
     color: #4a5568;
-    margin-bottom: 2.5rem; /* Увеличили отступ */
+    margin-bottom: 2.5rem;
+    /* Увеличили отступ */
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
@@ -50,7 +52,8 @@
     background-color: #ebf8ff;
     color: #3182ce;
     padding: 0.6rem 1.2rem;
-    border-radius: 9999px; /* Делает теги овальными */
+    border-radius: 9999px;
+    /* Делает теги овальными */
     font-size: 0.9rem;
 }
 
@@ -60,7 +63,8 @@
     justify-content: center;
     gap: 2rem;
     flex-wrap: wrap;
-    margin-bottom: 3rem; /* Добавили отступ снизу */
+    margin-bottom: 3rem;
+    /* Добавили отступ снизу */
 }
 
 .planCard {
@@ -95,11 +99,14 @@
     width: 120px;
 }
 
-.planTitle, .sectionTitle {
-    font-size: 1.75rem; /* Увеличили заголовок секции */
+.planTitle,
+.sectionTitle {
+    font-size: 1.75rem;
+    /* Увеличили заголовок секции */
     font-weight: 600;
     color: #2d3748;
-    margin-bottom: 1.5rem; /* Увеличили отступ */
+    margin-bottom: 1.5rem;
+    /* Увеличили отступ */
 }
 
 .planPrice {
@@ -151,7 +158,8 @@
 /* Стили для секции FAQ */
 .faqSection {
     text-align: left;
-    max-width: 700px; /* Сделали секцию шире */
+    max-width: 700px;
+    /* Сделали секцию шире */
     margin: 4rem auto 0;
     border-top: 1px solid #e2e8f0;
     padding-top: 3rem;
@@ -180,28 +188,56 @@
 
 /* стили для соглашения */
 .agreement {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-  color: #4a5568;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    color: #4a5568;
 }
 
 .agreement label {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .agreement a {
-  color: #3182ce;
-  text-decoration: underline;
+    color: #3182ce;
+    text-decoration: underline;
 }
 
 /* Обертка для кнопок, чтобы они были рядом */
 .actionButtons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem; /* Добавляем отступ от чекбокса */
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    /* Добавляем отступ от чекбокса */
+}
+
+/* стили для уведомления */
+.infoBanner {
+    background-color: #ebf8ff;
+    /* Светло-голубой фон */
+    border-left: 4px solid #3182ce;
+    /* Синяя полоска слева */
+    color: #2c5282;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    text-align: left;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+}
+
+.infoBanner a {
+    color: #2b6cb0;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.infoBanner a:hover {
+    color: #2c5282;
 }
