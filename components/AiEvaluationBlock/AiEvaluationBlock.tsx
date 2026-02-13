@@ -132,20 +132,72 @@ export default function AiEvaluationBlock({
                 return;
             }
 
-            // Если успех — запускаем таймер "эмуляции размышления"
-            // Мы ждем минимум 5 секунд только если запрос прошел успешно
-            const dataPromise = response.json();
-            const minWaitMs = 5000;
+            // Обработка успешных ответов (200 или 202)
+        
+            // СЦЕНАРИЙ А: Данные уже готовы (КЭШ) - статус 200
+            if (response.status === 200) {
+                const dataPromise = response.json();
+                const minWaitMs = 5000; // Ждем минимум 5 секунд для красоты
+                
+                // Ждем и данные, и таймер
+                const [data] = await Promise.all([dataPromise, sleep(minWaitMs)]);
+                
+                setEvaluationResult(data);
+                setIsEvaluating(false);
+                
+                return;
+            }
 
-            const [data] = await Promise.all([dataPromise, sleep(minWaitMs)]);
-
-            setEvaluationResult(data);
-            setIsEvaluating(false);
+            // СЦЕНАРИЙ Б: Задача ушла в фон (Fire-and-Forget) - статус 202
+            if (response.status === 202) {
+                // Тут мы не ждем sleep(5000), потому что поллинг сам займет время.             
+                await startPolling(); 
+                // startPolling сам установит результат и выключит isEvaluating
+                return;
+            }
         } catch (err: any) {
             setError(err.message || 'Произошла неизвестная ошибка');
         } finally {
             setIsEvaluating(false);
         }
+    };
+
+    // Функция опроса сервера
+    const startPolling = async () => {
+        const maxAttempts = 60; // 60 раз по 3 сек = 3 минуты макс
+        const delay = 3000;     // 3 секунды интервал
+
+        // начальная задержка, чтобы "подумать" минимум 10 сек
+        await sleep(10000); 
+        
+        for (let i = 0; i < maxAttempts; i++) {
+            try {
+                // Опрашиваем GET эндпоинт
+                const res = await fetch(`${apiUrl}/api/lots/${lotPublicId}/evaluation`, {
+                    credentials: 'include'
+                });
+
+                if (res.ok) {
+                    // УРА! Данные готовы
+                    const data = await res.json();
+                    setEvaluationResult(data);
+                    setIsEvaluating(false);
+                    return;
+                }
+                
+                // Если 404 (еще нет) или 401 - ждем и повторяем
+                
+            } catch (e) {
+                console.error("Polling error", e);
+            }
+
+            // Ждем перед следующей попыткой
+            await new Promise(r => setTimeout(r, delay));
+        }
+
+        // Если цикл кончился, а данных нет
+        setError("Время ожидания истекло. Попробуйте обновить страницу.");
+        setIsEvaluating(false);
     };
 
     // Расчет апсайда
