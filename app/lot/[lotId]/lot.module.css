@@ -63,10 +63,19 @@
 /* Секция галереи */
 .imageSection {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 12px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #e0e0e0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.imageSection img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 /* --- ИНФОРМАЦИОННАЯ ПАНЕЛЬ (Справа) --- */
