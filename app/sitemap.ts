@@ -49,8 +49,8 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     }
 
     const lotRoutes = lots.map((lot) => {
-        // Формируем slugify ссылку
-        const slug = generateSlug(lot.title);
+        // Slug из БД или генерируем на фронте для старых лотов
+        const slug = lot.slug ?? generateSlug(lot.title || lot.description || '');
         const url = `${BASE_URL}/lot/${slug}-${lot.publicId}`;
         
         return {

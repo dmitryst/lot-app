@@ -22,8 +22,8 @@ export const LotItem = ({ lot, className }: LotItemProps) => {
     sessionStorage.setItem('lotListQuery', window.location.search);
   };
 
-  // Если есть PublicId, генерируем красивую ссылку
-  const slug = generateSlug(lot.title || lot.description);
+  // Если есть PublicId: берём slug из БД или генерируем на фронте для старых лотов
+  const slug = lot.slug ?? generateSlug(lot.title || lot.description);
   const lotUrl = lot.publicId 
     ? `/lot/${slug}-${lot.publicId}` 
     : `/lot/${lot.id}`;

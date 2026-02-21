@@ -7,10 +7,10 @@ import { generateSlug } from '../../../utils/slugify';
 const BASE_URL = 'https://s-lot.ru';
 
 /**
- * Генерирует правильный URL лота с slug
+ * Генерирует правильный URL лота с slug (из БД или сгенерированный на фронте для старых лотов)
  */
 export function generateLotUrl(lot: Lot, baseUrl: string = BASE_URL): string {
-  const slug = generateSlug(lot.title || lot.description);
+  const slug = lot.slug ?? generateSlug(lot.title || lot.description);
   return lot.publicId 
     ? `${baseUrl}/lot/${slug}-${lot.publicId}`
     : `${baseUrl}/lot/${lot.id}`;
@@ -84,7 +84,6 @@ function generateProductSchema(lot: Lot): any {
  */
 function generateBreadcrumbSchema(lot: Lot): any {
   const lotUrl = generateLotUrl(lot);
-  const slug = generateSlug(lot.title || lot.description);
   
   return {
     "@context": "https://schema.org",

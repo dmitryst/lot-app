@@ -62,8 +62,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     );
   }
 
-  // Формируем "хлебные крошки" для навигации и SEO
-  const slug = generateSlug(lot.title || lot.description);
+  // Формируем "хлебные крошки" для навигации и SEO (slug из БД или с фронта для старых лотов)
+  const slug = lot.slug ?? generateSlug(lot.title || lot.description);
   const lotUrl = lot.publicId
     ? `/lot/${slug}-${lot.publicId}`
     : `/lot/${lot.id}`;

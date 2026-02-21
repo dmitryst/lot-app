@@ -26,6 +26,8 @@ export type Lot = {
   id: string;
   publicId: number;
   url?: string;
+  /** Slug из БД (бэкенд). Если null — на фронте используется generateSlug(title/description). */
+  slug?: string | null;
   title: string | null;
   description: string;
   startPrice: number | null;
