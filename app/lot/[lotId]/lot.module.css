@@ -559,3 +559,87 @@
     flex: 1;
   }
 }
+
+/* --- БЛОК ИТОГОВ ТОРГОВ (Статус, Победитель, Итоговая цена) --- */
+.tradeResultsInfo {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: #f0fdf4; /* Светло-зеленый фон для успешных торгов */
+  border-radius: 8px;
+  border: 1px solid #c6f6d5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tradeResultsInfo.failed {
+  background-color: #fff5f5; /* Светло-красный фон для отмененных/несостоявшихся */
+  border-color: #fed7d7;
+}
+
+.tradeResultsInfo.neutral {
+  background-color: #f7fafc; /* Серый фон для других финальных статусов */
+  border-color: #edf2f7;
+}
+
+.resultTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resultRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.resultLabel {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.resultValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.resultValue.highlightPrice {
+  font-size: 1.25rem;
+  color: #2f855a; /* Темно-зеленый для итоговой цены */
+}
+
+/* Статус-бейдж */
+.statusBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.statusBadge.active {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}
+
+.statusBadge.completed {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.statusBadge.cancelled {
+  background-color: #fed7d7;
+  color: #822727;
+}
+
+.statusBadge.warning {
+  background-color: #feebc8;
+  color: #c05621;
+}

@@ -51,6 +51,10 @@ export type Lot = {
   priceSchedules: PriceSchedule[];
   images: string[];
   documents?: LotDocument[];
+  tradeStatus?: string;
+  finalPrice?: number;
+  winnerName?: string;
+  winnerInn?: string;
 };
 
 export type LotDocument = {

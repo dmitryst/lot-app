@@ -32,6 +32,41 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const getStatusTheme = (status?: string | null) => {
+  if (!status) return 'active'; // Если статуса нет, считаем активным
+  const s = status.toLowerCase();
+
+  // Конечные успешные
+  if (s.includes('завершенные')) return 'completed';
+
+  // Конечные неуспешные
+  if (
+    s.includes('отменен') ||
+    s.includes('не состоял') ||
+    s.includes('аннулирован')
+  ) {
+    return 'cancelled';
+  }
+
+  // Приостановленные (можно сделать желтым/оранжевым, если добавите .warning в css)
+  if (s.includes('приостановлен')) return 'warning';
+
+  // Все остальные (Открыт прием заявок, Идут торги и т.д.)
+  return 'active';
+};
+
+// Функция для определения, является ли статус конечным
+const isFinalStatus = (status?: string | null) => {
+  if (!status) return false;
+  const s = status.toLowerCase();
+  return (
+    s.includes('завершенные') ||
+    s.includes('отменен') ||
+    s.includes('не состоял') ||
+    s.includes('аннулирован')
+  );
+};
+
 // Функция определения активного этапа (примерная логика)
 const isCurrentStage = (startDate: string, endDate: string) => {
   const now = new Date();
@@ -197,6 +232,12 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
         {/* Правая колонка: Информация о лоте */}
         <div className={styles.infoSection}>
+
+          {/* Динамический бейдж со статусом торгов */}
+          <div className={`${styles.statusBadge} ${styles[getStatusTheme(lot.tradeStatus)]}`}>
+            {lot.tradeStatus ? lot.tradeStatus : 'Торги идут (прием заявок)'}
+          </div>
+
           <p className={styles.lotInfo}><b>Номер лота:</b> {lot.publicId}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
@@ -234,6 +275,44 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
               </div>
             )}
           </div>
+
+          {/* БЛОК ИТОГОВ: показываем только если статус конечный */}
+          {isFinalStatus(lot.tradeStatus) && (
+            <div className={`${styles.tradeResultsInfo} ${styles[getStatusTheme(lot.tradeStatus)]}`}>
+              <h3 className={styles.resultTitle}>Итоги торгов</h3>
+              
+              {lot.finalPrice != null && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>Итоговая цена:</span>
+                  <span className={`${styles.resultValue} ${styles.highlightPrice}`}>
+                    {lot.finalPrice.toLocaleString('ru-RU')} ₽
+                  </span>
+                </div>
+              )}
+
+              {lot.winnerName && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>Победитель:</span>
+                  <span className={styles.resultValue}>{lot.winnerName}</span>
+                </div>
+              )}
+
+              {/* {lot.winnerInn && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>ИНН Победителя:</span>
+                  <span className={styles.resultValue}>{lot.winnerInn}</span>
+                </div>
+              )} */}
+
+              {/* Если торги не состоялись / отменены, и данных о победителе нет */}
+              {!lot.finalPrice && !lot.winnerName && (
+                 <div className={styles.resultRow}>
+                   <span className={styles.resultLabel}>Примечание:</span>
+                   <span className={styles.resultValue}>Торги завершены без определения победителя.</span>
+                 </div>
+              )}
+            </div>
+          )}
 
           <p className={styles.lotInfo}><b>Площадка:</b> {lot.bidding?.platform}</p>
 
