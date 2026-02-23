@@ -37,7 +37,9 @@ const getStatusTheme = (status?: string | null) => {
   const s = status.toLowerCase();
 
   // Конечные успешные
-  if (s.includes('завершенные')) return 'completed';
+  if (s.includes('завершенные') || s.includes('торги завершены')) {
+    return 'completed';
+  }
 
   // Конечные неуспешные
   if (
@@ -163,7 +165,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   // Проверяем, есть ли хоть одна запись с задатком > 0
   const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
 
-
   // Считаем взвешенную цену: 70% веса на Min (пессимизм), 30% на Max
   let displayPrice: number | null = null;
   if (lot.marketValueMin && lot.marketValueMax) {
@@ -173,38 +174,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   } else if (lot.marketValue) {
     displayPrice = lot.marketValue;
   }
-
-  // Считаем апсайд от displayPrice
-  let upsidePercent: number | null = null;
-  if (displayPrice && lot.startPrice && lot.startPrice > 0) {
-    upsidePercent = ((displayPrice - lot.startPrice) / lot.startPrice) * 100;
-  }
-
-  const getUpsideClass = (percent: number) => {
-    if (percent > 20) return styles.upsidePositive;
-    if (percent < -5) return styles.upsideNegative;
-    return styles.upsideNeutral;
-  }
-
-  // Цвет уверенности
-  const getConfidenceClass = (conf?: string | null) => {
-    switch (conf?.toLowerCase()) {
-      case 'high': return styles.confidenceHigh;
-      case 'medium': return styles.confidenceMedium;
-      case 'low': return styles.confidenceLow;
-      default: return styles.confidenceMedium; // Fallback
-    }
-  };
-
-  const getConfidenceLabel = (conf?: string | null) => {
-    switch (conf?.toLowerCase()) {
-      case 'high': return 'Высокая точность оценки';
-      case 'medium': return 'Средняя точность';
-      case 'low': return 'Низкая точность (мало данных)';
-      default: return 'Точность оценки';
-    }
-  };
-
 
   return (
 
@@ -241,7 +210,10 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <p className={styles.lotInfo}><b>Номер лота:</b> {lot.publicId}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
-          <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
+
+          {lot.bidding?.tradePeriod && (
+            <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
+          )}
 
           <div className={styles.priceInfo}>
             {/* Блок для начальной цены */}
@@ -280,7 +252,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           {isFinalStatus(lot.tradeStatus) && (
             <div className={`${styles.tradeResultsInfo} ${styles[getStatusTheme(lot.tradeStatus)]}`}>
               <h3 className={styles.resultTitle}>Итоги торгов</h3>
-              
+
               {lot.finalPrice != null && (
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Итоговая цена:</span>
@@ -306,10 +278,10 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
               {/* Если торги не состоялись / отменены, и данных о победителе нет */}
               {!lot.finalPrice && !lot.winnerName && (
-                 <div className={styles.resultRow}>
-                   <span className={styles.resultLabel}>Примечание:</span>
-                   <span className={styles.resultValue}>Торги завершены без определения победителя.</span>
-                 </div>
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>Примечание:</span>
+                  <span className={styles.resultValue}>Торги завершены без определения победителя.</span>
+                </div>
               )}
             </div>
           )}
