@@ -44,6 +44,9 @@ export default function MapPage() {
     const [loading, setLoading] = useState(true);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+    const [isInfoPanelClosed, setIsInfoPanelClosed] = useState(false);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
     // Обработчик изменения фильтров
     const handleCategoryToggle = (category: string) => {
         setSelectedCategories(prev =>
@@ -88,22 +91,40 @@ export default function MapPage() {
 
     // Функция для рендеринга информационных плашек
     const renderInfoPanel = () => {
-        if (loading || !mapData) return null;
+        // Если плашка закрыта пользователем, не рендерим её
+        if (loading || !mapData || isInfoPanelClosed) return null;
+
+        // Вспомогательная функция для рендера кнопки закрытия
+        const renderCloseBtn = () => (
+            <button
+                className={styles.closeInfoPanelBtn}
+                onClick={() => setIsInfoPanelClosed(true)}
+                aria-label="Закрыть уведомление"
+            >
+                ✕
+            </button>
+        );
 
         switch (mapData.accessLevel) {
             case AccessLevel.Anonymous:
                 return (
                     <div className={`${styles.infoPanel} ${styles.warning}`}>
-                        Вы видите только {mapData.lots.length} из {mapData.totalCount} объектов.
-                        <Link href="/login?returnUrl=/map">Войдите</Link> или <Link href="/login/register?returnUrl=/map">зарегистрируйтесь</Link>, чтобы увидеть все.
+                        <span className={styles.infoText}>
+                            Вы видите только {mapData.lots.length} из {mapData.totalCount} объектов.
+                            <Link href="/login?returnUrl=/map">Войдите</Link> или <Link href="/login/register?returnUrl=/map">зарегистрируйтесь</Link>, чтобы увидеть все.
+                        </span>
+                        {renderCloseBtn()}
                     </div>
                 );
 
             case AccessLevel.Limited:
                 return (
                     <div className={`${styles.infoPanel} ${styles.danger}`}>
-                        Ваша подписка неактивна. Отображено {mapData.lots.length} из {mapData.totalCount} объектов.
-                        <Link href="/subscribe">Оформите подписку</Link>, чтобы получить полный доступ.
+                        <span className={styles.infoText}>
+                            Ваша подписка неактивна. Отображено {mapData.lots.length} из {mapData.totalCount} объектов.
+                            <Link href="/subscribe">Оформите подписку</Link>, чтобы получить полный доступ.
+                        </span>
+                        {renderCloseBtn()}
                     </div>
                 );
 
@@ -111,7 +132,10 @@ export default function MapPage() {
                 // Для пользователей с полным доступом можно ничего не показывать или показать нейтральное сообщение
                 return (
                     <div className={`${styles.infoPanel} ${styles.success}`}>
-                        PRO-доступ активен. Отображено {mapData.lots.length} объектов.
+                        <span className={styles.infoText}>
+                            PRO-доступ активен. Отображено {mapData.lots.length} объектов.
+                        </span>
+                        {renderCloseBtn()}
                     </div>
                 );
 
@@ -122,21 +146,58 @@ export default function MapPage() {
 
     return (
         <div className={styles.mapContainer}>
-            {/* фильтры */}
-            <div className={styles.filterBar}>
-                {PROPERTY_CATEGORIES.map(category => (
-                    <button
-                        key={category}
-                        onClick={() => handleCategoryToggle(category)}
-                        className={`${styles.filterButton} ${selectedCategories.includes(category) ? styles.active : ''}`}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
+            {/* Кнопка-иконка для мобильных экранов (появляется только на мобилках) */}
+            <button
+                className={styles.mobileFilterToggle}
+                onClick={() => setIsMobileFiltersOpen(true)}
+                aria-label="Открыть фильтры"
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
 
-            {/* баннер-уведомление */}
-            {renderInfoPanel()}
+            {/* Затемнение фона при открытом меню на мобилках */}
+            {isMobileFiltersOpen && (
+                <div
+                    className={styles.mobileOverlay}
+                    onClick={() => setIsMobileFiltersOpen(false)}
+                />
+            )}
+
+            {/* Объединяем фильтры и плашку для десктопа */}
+            <div className={styles.topControlsContainer}>
+                {/* Панель фильтров */}
+                <div className={`${styles.filterBar} ${isMobileFiltersOpen ? styles.open : ''}`}>
+
+                    {/* Шапка, которая будет видна только на мобильных устройствах */}
+                    <div className={styles.mobileHeader}>
+                        <h3>Категории</h3>
+                        <button
+                            className={styles.closeButton}
+                            onClick={() => setIsMobileFiltersOpen(false)}
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    {/* Контейнер для самих кнопок */}
+                    <div className={styles.filterButtonsContainer}>
+                        {PROPERTY_CATEGORIES.map(category => (
+                            <button
+                                key={category}
+                                onClick={() => handleCategoryToggle(category)}
+                                className={`${styles.filterButton} ${selectedCategories.includes(category) ? styles.active : ''}`}
+                            >
+                                {category}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* баннер-уведомление */}
+                {renderInfoPanel()}
+            </div>
 
             {/* карта */}
             {loading && <div className={styles.loader}>Загрузка карты и объектов...</div>}
