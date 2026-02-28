@@ -303,11 +303,11 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         </div>
 
         {/* Отдельный блок для арбитражного управляющего и должника */}
+        {/*
         {(lot.bidding?.arbitrationManager || lot.bidding?.debtor) && (
           <div className={styles.descriptionSection}>
             <h2 className={styles.sectionTitle}>Участники процедуры банкротства</h2>
             <div className={styles.participantsContainer}>
-              {/* Информация о должнике */}
               {lot.bidding?.debtor && (
                 <div className={styles.participantBlock}>
                   <h3 className={styles.participantTitle}>Должник</h3>
@@ -326,7 +326,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                 </div>
               )}
 
-              {/* Информация об арбитражном управляющем */}
               {lot.bidding?.arbitrationManager && (
                 <div className={styles.participantBlock}>
                   <h3 className={styles.participantTitle}>Арбитражный управляющий</h3>
@@ -347,6 +346,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             </div>
           </div>
         )}
+        */}
 
         {/* Экспресс-оценка (Quick) */}
         {displayPrice && (
