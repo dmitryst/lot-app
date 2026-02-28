@@ -144,6 +144,43 @@ export default function MapPage() {
         }
     };
 
+    // --- ИКОНКИ ---
+    const IconArrowUp = () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', color: '#28a745' }}>
+            <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+        </svg>
+    );
+
+    const IconArrowDown = () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', color: '#dc3545' }}>
+            <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+        </svg>
+    );
+
+    // Функция генерации HTML для иконок, так как Яндекс.Карты принимают строку
+    const getDirectionIconHtml = (type?: string) => {
+        if (type === 'Публичное предложение' || type === 'Аукцион с понижением') {
+            return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom;"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>`;
+        }
+        return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom;"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>`;
+    };
+
+    // Функция для сокращения заголовка для clusterCaption
+    const getShortTitle = (title: string): string => {
+        if (!title) return '';
+
+        const commaIndex = title.indexOf(',');
+
+        if (commaIndex !== -1 && commaIndex <= 25) {
+            // Если запятая есть и она в пределах первых 25 символов — обрезаем до нее
+            return title.substring(0, commaIndex);
+        }
+
+        // Если запятой нет или она дальше 25 символов
+        const shortText = title.substring(0, 25);
+        return shortText;
+    };
+
     return (
         <div className={styles.mapContainer}>
             {/* Кнопка-иконка для мобильных экранов (появляется только на мобилках) */}
@@ -211,33 +248,60 @@ export default function MapPage() {
             >
                 <Clusterer
                     options={{
-                        preset: 'islands#invertedBlueClusterIcons', // Используем готовый пресет для синих кластеров
-                        groupByCoordinates: false, // Группируем по координатам, а не по индексам
+                        // Используем готовый пресет для синих кластеров
+                        preset: 'islands#invertedBlueClusterIcons',
+                        // Группируем объекты с одинаковыми координатами
+                        groupByCoordinates: true,
+                        // Отключаем зум по клику, чтобы сразу открывался список
+                        clusterDisableClickZoom: true,
+                        // Указываем внешний вид списка: 'cluster#balloonCarousel' (карусель) или 'cluster#balloonAccordion' (аккордеон)
+                        clusterBalloonContentLayout: 'cluster#balloonAccordion',
+                        // Отключаем стандартный заголовок балуна для карусели, 
+                        // чтобы clusterCaption отображался только в навигации, а не дублировался над телом
+                        clusterBalloonItemContentLayout: 'cluster#balloonAccordionItemContent',
+                        // Ограничиваем ширину балуна карусели
+                        clusterBalloonMaxWidth: 330
                     }}
+                    // Подключаем модули балуна для кластера
+                    modules={['clusterer.addon.balloon', 'clusterer.addon.hint']}
                 >
-                    {mapData?.lots.map(lot => (
-                        <Placemark
-                            key={lot.id}
-                            geometry={[lot.latitude, lot.longitude]}
-                            modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
-                            properties={{
-                                // Используем поля из интерфейса GeoLot
-                                balloonContentBody: `
-                                    <div>
-                                        <strong>${lot.title}</strong>
-                                        <br/>
-                                        Начальная цена: ${new Intl.NumberFormat('ru-RU').format(lot.startPrice)} ₽
-                                        <br/>
-                                        <a href="/lot/${lot.id}" target="_blank">Подробнее</a>
-                                    </div>
-                                `,
-                                hintContent: lot.title,
-                            }}
-                            options={{
-                                preset: 'islands#blueDotIcon'
-                            }}
-                        />
-                    ))}
+                    {mapData?.lots.map(lot => {
+                        // Форматируем цену
+                        const formattedPrice = new Intl.NumberFormat('ru-RU').format(lot.startPrice) + ' ₽';
+                        // HTML для стрелки направления цены
+                        const arrowHtml = getDirectionIconHtml((lot as any).bidding?.type);
+
+                        return (
+                            <Placemark
+                                key={lot.id}
+                                geometry={[lot.latitude, lot.longitude]}
+                                modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
+                                properties={{
+                                    // Это будет отображаться в списке сверху (навигации карусели)
+                                    clusterCaption: `<strong>${getShortTitle(lot.title)}</strong>`,
+
+                                    // Содержимое карточки (без дублирования заголовка)
+                                    // Заголовок делаем ссылкой синего цвета
+                                    balloonContentBody: `
+                        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; padding: 5px 0; overflow-x: hidden; word-break: break-word; hyphens: auto; white-space: normal;"">
+                            <a href="/lot/${lot.id}" target="_blank" style="font-weight: bold; color: #0056b3; text-decoration: none; display: block; margin-bottom: 8px;">
+                                ${lot.title}
+                            </a>
+                            <div style="color: #333; margin-bottom: 5px;">
+                                Начальная цена: <strong>${formattedPrice}</strong> ${arrowHtml}
+                            </div>
+                        </div>
+                    `,
+                                    hintContent: lot.title,
+                                }}
+                                options={{
+                                    preset: 'islands#blueDotIcon',
+                                    // Ограничиваем ширину одиночного балуна
+                                    balloonMaxWidth: 300
+                                }}
+                            />
+                        );
+                    })}
                 </Clusterer>
             </Map>
         </div>
