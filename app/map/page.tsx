@@ -22,6 +22,7 @@ enum AccessLevel {
 
 interface GeoLot {
     id: string;
+    type: string;
     title: string;
     startPrice: number;
     latitude: number;
@@ -269,7 +270,7 @@ export default function MapPage() {
                         // Форматируем цену
                         const formattedPrice = new Intl.NumberFormat('ru-RU').format(lot.startPrice) + ' ₽';
                         // HTML для стрелки направления цены
-                        const arrowHtml = getDirectionIconHtml((lot as any).bidding?.type);
+                        const arrowHtml = getDirectionIconHtml(lot.type);
 
                         return (
                             <Placemark
