@@ -41,6 +41,13 @@ function Page() {
   const isSharedOwnershipParam = searchParams.get('isSharedOwnership');
   const regionsParam = searchParams.getAll('regions');
 
+  useEffect(() => {
+    // Сбрасываем флаг Избранного, так как мы на главной странице
+    sessionStorage.setItem('isFromFavorites', 'false');
+    // Сохраняем текущие параметры главной страницы
+    sessionStorage.setItem('lotListQuery', window.location.search);
+  }, [searchParams]);
+
   // Утилита: атомарно обновить URL-параметры
   const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
     const currentParams = new URLSearchParams(window.location.search);
@@ -204,7 +211,7 @@ function Page() {
         </div>
       </div> */}
 
-      {/* Скрываем дом в Глазинино */}
+        {/* Скрываем дом в Глазинино */}
         {/* <div className={styles.promoWrapper}>ы
           <PromoGrid hotSlug="dom-v-glazinino" maxArchived={0} />
         </div> */}

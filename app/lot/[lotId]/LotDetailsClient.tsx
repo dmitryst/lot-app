@@ -10,6 +10,21 @@ import styles from './lot.module.css';
 import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
 import AiEvaluationBlock from '@/components/AiEvaluationBlock/AiEvaluationBlock';
 import { generateSlug } from '../../../utils/slugify';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+
+// Иконки для кнопки
+const HeartOutline = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  </svg>
+);
+
+const HeartFilled = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  </svg>
+);
 
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
@@ -80,10 +95,80 @@ const isCurrentStage = (startDate: string, endDate: string) => {
 // Компонент получает данные через пропсы
 export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const router = useRouter();
+  const { user } = useAuth();
 
+  // Состояния для избранного
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavLoading, setIsFavLoading] = useState(true);
+
+  // Проверка статуса избранного при загрузке
+  useEffect(() => {
+    if (!user || !lot) {
+      setIsFavLoading(false);
+      return;
+    }
+
+    const checkFavorite = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/favorites/ids`, {
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const ids: string[] = await res.json();
+          setIsFavorite(ids.includes(lot.id));
+        }
+      } catch (e) {
+        console.error('Ошибка проверки избранного', e);
+      } finally {
+        setIsFavLoading(false);
+      }
+    };
+
+    checkFavorite();
+  }, [user, lot]);
+
+  // Обработчик клика
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      router.push(`/login?returnUrl=/lot/${lot?.publicId}`);
+      return;
+    }
+
+    setIsFavLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/favorites/toggle/${lot?.id}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setIsFavorite(data.isFavorite);
+      } else if (res.status === 400) {
+        const errorData = await res.json();
+        alert(errorData.message || "Ошибка добавления в избранное");
+      }
+    } catch (e) {
+      console.error('Ошибка при изменении избранного', e);
+    } finally {
+      setIsFavLoading(false);
+    }
+  };
+
+  // Обработчик "Назад"
   const handleBackToList = () => {
+    // Проверяем, откуда мы пришли
+    const isFromFavorites = sessionStorage.getItem('isFromFavorites') === 'true';
     const savedQuery = sessionStorage.getItem('lotListQuery');
-    router.push(`/${savedQuery || ''}`);
+
+    if (isFromFavorites) {
+      // Если пришли из избранного, возвращаемся в избранное (с учетом пагинации, если она была сохранена)
+      const favQuery = sessionStorage.getItem('favoritesQuery') || '';
+      router.push(`/favorites${favQuery}`);
+    } else {
+      // Иначе возвращаемся в основной список
+      router.push(`/${savedQuery || ''}`);
+    }
   };
 
   // Если данные не пришли с сервера
@@ -214,6 +299,18 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           {lot.bidding?.tradePeriod && (
             <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
           )}
+
+          {/* КНОПКА ИЗБРАННОГО размещена после описания (до фотографий в мобильной версии, и сверху в информационной панели на десктопе) */}
+          <div className={styles.favoriteButtonWrap}>
+            <button 
+              onClick={handleToggleFavorite}
+              disabled={isFavLoading}
+              className={`${styles.favoriteButtonDetail} ${isFavorite ? styles.isActive : ''}`}
+            >
+              {isFavorite ? <HeartFilled /> : <HeartOutline />}
+              {isFavorite ? 'В избранном' : 'Добавить в избранное'}
+            </button>
+          </div>
 
           <div className={styles.priceInfo}>
             {/* Блок для начальной цены */}
