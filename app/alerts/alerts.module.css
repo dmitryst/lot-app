@@ -1,0 +1,281 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.createButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 42px;
+}
+
+.createButton:hover {
+  background-color: #0060df;
+}
+
+/* =========================================
+   СЕТКА КАРТОЧЕК
+========================================= */
+.alertsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.alertCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.alertCard.inactive {
+  opacity: 0.7;
+  background: #f7fafc;
+}
+
+.alertCard h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.alertDetail {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+.alertDetail span {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.cardActions {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 5px;
+}
+
+.actionBtn:hover {
+  color: #2d3748;
+}
+
+.deleteBtn {
+  color: #e53e3e;
+}
+.deleteBtn:hover {
+  color: #c53030;
+}
+
+/* =========================================
+   ФОРМА (Сетка)
+========================================= */
+.formModal {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  color: #2d3748;
+}
+
+/* Сетка для полей (Аналог Filters.module.css) */
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    grid-template-areas:
+      "regions categories"
+      "types ownership"
+      "price time";
+    align-items: end;
+  }
+}
+
+@media (min-width: 960px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+      "regions categories types"
+      "price ownership time";
+    align-items: start;
+  }
+}
+
+.regionsArea { grid-area: regions; width: 100%; }
+.categoriesArea { grid-area: categories; width: 100%; }
+.priceArea { grid-area: price; width: 100%; max-width: 320px; }
+.typeArea { grid-area: types; width: 100%; }
+.ownershipArea { grid-area: ownership; width: 100%; }
+
+/* Общие стили группы */
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  text-align: left;
+}
+
+.priceFilterInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.priceSeparator {
+  color: #999;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cancelBtn {
+  background: white;
+  border: 1px solid #cbd5e0;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.cancelBtn:hover {
+  background: #f7fafc;
+}
+
+.proBanner {
+  background: #fffaf0;
+  border: 1px solid #feebc8;
+  color: #c05621;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* --- Стили для кнопок фильтров (Собственность и Вид торгов) --- */
+.filterLabelInline {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.filterOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterButton {
+  padding: 0 16px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #495057;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filterButton:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.activeFilter {
+  padding: 0 16px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #0070f3;
+  border-radius: 20px;
+  background-color: #0070f3;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 112, 243, 0.2);
+  white-space: nowrap;
+}
