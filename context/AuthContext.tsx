@@ -6,7 +6,12 @@ import { createContext, useState, useContext, ReactNode, useCallback, useEffect 
 import { useRouter } from 'next/navigation';
 
 interface User {
+    id?: string;
     email: string;
+    isSubscriptionActive?: boolean;
+    subscriptionEndDate?: string | null;
+    isOnTrial?: boolean;
+    createdAt?: string;
 }
 
 interface AuthContextType {
@@ -34,7 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                 if (res.ok) {
                     const data = await res.json();
-                    setUser({ email: data.email });
+                    setUser({
+                        id: data.id,
+                        email: data.email,
+                        isSubscriptionActive: data.isSubscriptionActive,
+                        subscriptionEndDate: data.subscriptionEndDate,
+                        isOnTrial: data.isOnTrial,
+                        createdAt: data.createdAt,
+                    });
                 } else {
                     setUser(null);
                 }
