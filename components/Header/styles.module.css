@@ -165,3 +165,48 @@
         display: none;
     }
 }
+
+/* --- СТИЛИ ДЛЯ КНОПКИ АККАУНТА --- */
+.accountLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.accountLink:hover {
+  background-color: #f0f7ff; /* Легкий синий фон */
+  color: #0070f3;
+}
+
+.accountIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.accountText {
+  font-size: 0.95rem;
+}
+
+/* --- СТИЛЬ БЕЙДЖИКА СЧЕТЧИКА ДЛЯ ИЗБРАННОГО --- */
+.badge {
+  background-color: #ff4081;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-left: 2px;
+}
+
+/* --- АДАПТИВНОСТЬ ДЛЯ АККАУНТА --- */
+@media (max-width: 768px) {
+  .accountText {
+    display: none; /* На мобилках скрываем слово "Аккаунт", оставляем только иконку */
+  }
+}
