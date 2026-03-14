@@ -8,9 +8,9 @@ import { useRouter } from 'next/navigation';
 interface User {
     id?: string;
     email: string;
-    isSubscriptionActive?: boolean;
+    isSubscriptionActive?: boolean; // означает глобальный доступ к Pro-функциям (так как мы подменили его на HasProAccess на стороне C#)
     subscriptionEndDate?: string | null;
-    isOnTrial?: boolean;
+    isOnTrial?: boolean;            //служит визуальным маркером для правильного отображения текстов и счетчиков
     createdAt?: string;
 }
 
@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                 if (res.ok) {
                     const data = await res.json();
+                    console.log("Данные от бэкенда:", data); 
+                    
                     setUser({
                         id: data.id,
                         email: data.email,
