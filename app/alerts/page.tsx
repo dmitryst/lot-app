@@ -12,6 +12,7 @@ import ClearableInput from '@/components/ui/ClearableInput';
 
 // Импортируем дерево с кодами
 import { REGIONS_TREE, CATEGORIES_TREE, BIDDING_TYPES } from '@/app/data/constants';
+import Link from 'next/link';
 
 interface LotAlert {
     id: string;
@@ -229,10 +230,14 @@ export default function AlertsPage() {
                 <div className={styles.proBanner}>
                     <h2>Доступно только в Pro</h2>
                     <p>Настройка email-уведомлений о новых лотах доступна только пользователям с активной подпиской Pro.</p>
+                    <Link href="/subscribe" className={styles.subscribeButton}>
+                        Оформить подписку
+                    </Link>
                 </div>
             </main>
         );
     }
+
 
     return (
         <main className={styles.container}>

@@ -79,9 +79,10 @@ export default function SubscribePage() {
                 <div className={styles.featuresWrapper}>
                     <ul className={styles.featuresList}>
                         <li>✓ Полный доступ ко всем объектам</li>
-                        <li>AI-анализ инвестиционной привлекательности</li>
+                        <li>✓ AI-анализ инвестиционной привлекательности</li>
                         <li>✓ Неограниченное использование фильтров</li>
-                        <li>✓ Просмотр детальной информации</li>
+                        <li>✓ Просмотр детальной информации по лотам</li>
+                        <li>✓ Email уведомления о новых лотах по вашим фильтрам</li>
                     </ul>
                 </div>
 

@@ -279,3 +279,21 @@
   box-shadow: 0 2px 4px rgba(0, 112, 243, 0.2);
   white-space: nowrap;
 }
+
+.subscribeButton {
+  display: inline-block;
+  background-color: #0070f3;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 112, 243, 0.2);
+  margin-top: 1rem;
+}
+
+.subscribeButton:hover {
+  background-color: #0060df;
+  transform: translateY(-1px);
+}
