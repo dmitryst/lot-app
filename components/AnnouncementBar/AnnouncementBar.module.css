@@ -1,0 +1,83 @@
+.bar {
+    background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 100;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.badge {
+    background-color: #f59e0b;
+    /* Оранжевый цвет для привлечения внимания */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.text {
+    font-weight: 500;
+}
+
+.link {
+    color: #bfdbfe;
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.link:hover {
+    color: #ffffff;
+}
+
+.closeBtn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .text {
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    .closeBtn {
+        right: 8px;
+        top: 12px;
+        transform: none;
+    }
+
+    .bar {
+        padding-right: 40px;
+        /* Отступ чтобы текст не наезжал на крестик */
+    }
+}

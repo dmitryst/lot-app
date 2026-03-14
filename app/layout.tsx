@@ -11,6 +11,7 @@ import Link from "next/link";
 import VersionDisplay from "@/components/VersionDisplay";
 import YandexMetrika from "@/components/YandexMetrika";
 import { Suspense } from 'react';
+import AnnouncementBar from "@/components/AnnouncementBar/AnnouncementBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <FavoritesProvider>
+            <AnnouncementBar />
+
             <Suspense fallback={<div style={{ height: '60px' }} />}>
               <Header />
             </Suspense>
