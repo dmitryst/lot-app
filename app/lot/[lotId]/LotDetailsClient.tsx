@@ -26,6 +26,20 @@ const HeartFilled = () => (
   </svg>
 );
 
+const IconTelegram = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.5 3.5L2.5 11L9.5 13.5L11.5 20.5L14.5 16.5L19 20.5L21.5 3.5Z" />
+  </svg>
+);
+
+const IconMax = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    {/* Стилизованная иконка в виде буквы M для мессенджера MAX */}
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <path d="M7 16V8l5 4 5-4v8" />
+  </svg>
+);
+
 // Компонент для отображения одного этапа покупки
 const PurchaseStep = ({ title, description }: { title: string; description: string }) => (
   <div className={styles.step}>
@@ -302,7 +316,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           {/* КНОПКА ИЗБРАННОГО размещена после описания (до фотографий в мобильной версии, и сверху в информационной панели на десктопе) */}
           <div className={styles.favoriteButtonWrap}>
-            <button 
+            <button
               onClick={handleToggleFavorite}
               disabled={isFavLoading}
               className={`${styles.favoriteButtonDetail} ${isFavorite ? styles.isActive : ''}`}
@@ -650,21 +664,31 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу. Если торги не выиграны, задаток возвращается вам в полном объеме."
         />
 
-        <a
-          href="https://t.me/+79269598508"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.ctaButton}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textDecoration: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          Свяжитесь с нами
-        </a>
+        <div className={styles.contactSection}>
+          <h3 className={styles.contactTitle}>Связаться с менеджером для выкупа лота:</h3>
+          <div className={styles.buttonsWrapper}>
+            <a
+              href="https://t.me/79269598508"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.ctaButton} ${styles.telegramButton}`}
+            >
+              <IconTelegram />
+              Написать в Telegram
+            </a>
+
+            <a
+              href="https://max.ru/u/f9LHodD0cOJk9dQzNqxn7h5DTb0BdyRPGsRxxNiC57Pl81OBY1btJow-xtk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.ctaButton} ${styles.maxButton}`}
+            >
+              <IconMax />
+              Написать в MAX
+            </a>
+          </div>
+        </div>
+
       </div>
     </main>
   );

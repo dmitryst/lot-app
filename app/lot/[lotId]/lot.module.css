@@ -43,7 +43,7 @@
 }
 
 .lotDetailGrid .descriptionSection {
-  margin-bottom: 0; 
+  margin-bottom: 0;
 }
 
 @media (min-width: 769px) {
@@ -54,7 +54,7 @@
     align-items: start;
   }
 
-    /* Растягиваем описание и документы на всю ширину сетки */
+  /* Растягиваем описание и документы на всю ширину сетки */
   .lotDetailGrid .descriptionSection {
     grid-column: 1 / -1;
   }
@@ -119,7 +119,8 @@
   border: 1px solid #edf2f7;
 }
 
-.priceLabel, .depositLabel {
+.priceLabel,
+.depositLabel {
   display: block;
   font-size: 0.875rem;
   color: #718096;
@@ -132,18 +133,21 @@
   gap: 8px;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2d3748; /* Темный цвет для основной цены */
+  color: #2d3748;
+  /* Темный цвет для основной цены */
 }
 
 /* Добавляем стили для иконок */
 .iconUp {
-  color: #28a745; /* Зеленый */
+  color: #28a745;
+  /* Зеленый */
   display: flex;
   align-items: center;
 }
 
 .iconDown {
-  color: #dc3545; /* Красный */
+  color: #dc3545;
+  /* Красный */
   display: flex;
   align-items: center;
 }
@@ -162,7 +166,9 @@
 }
 
 /* --- ОПИСАНИЕ И КАРТА --- */
-.descriptionSection, .mapSection, .priceScheduleSection {
+.descriptionSection,
+.mapSection,
+.priceScheduleSection {
   margin-bottom: 3rem;
   background-color: #fff;
   padding: 2rem;
@@ -182,7 +188,8 @@
   font-size: 1rem;
   line-height: 1.6;
   color: #2d3748;
-  white-space: pre-wrap; /* Сохраняет форматирование текста */
+  white-space: pre-wrap;
+  /* Сохраняет форматирование текста */
 }
 
 /* Список документов лота */
@@ -223,17 +230,19 @@
 /* --- ТАБЛИЦА ГРАФИКА ЦЕН --- */
 .tableWrapper {
   width: 100%;
-  overflow-x: auto; /* Горизонтальный скролл на мобильных */
+  overflow-x: auto;
+  /* Горизонтальный скролл на мобильных */
   -webkit-overflow-scrolling: touch;
 }
 
 .priceScheduleTable {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Минимальная ширина, чтобы не схлопывалась */
+  min-width: 600px;
+  /* Минимальная ширина, чтобы не схлопывалась */
 }
 
-.priceScheduleTable th, 
+.priceScheduleTable th,
 .priceScheduleTable td {
   padding: 12px 16px;
   text-align: left;
@@ -272,7 +281,7 @@
   color: #fff;
   font-weight: bold;
   font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* --- АДАПТИВНОСТЬ ТАБЛИЦЫ (Desktop/Mobile switching) --- */
@@ -289,16 +298,17 @@
   .desktopOnly {
     display: none;
   }
-  
+
   .mobileOnly {
     display: table-cell;
   }
-  
+
   .priceScheduleTable {
-    min-width: 100%; /* На мобильном растягиваем на всю ширину */
+    min-width: 100%;
+    /* На мобильном растягиваем на всю ширину */
   }
-  
-  .priceScheduleTable th, 
+
+  .priceScheduleTable th,
   .priceScheduleTable td {
     padding: 10px 8px;
     font-size: 0.85rem;
@@ -311,39 +321,46 @@
     width: 140px;
   }
 
-  .thGroup, .cellGroup {
+  .thGroup,
+  .cellGroup {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
   /* Основной текст в заголовке (Дата начала/окончания) - обычный шрифт */
-  .priceScheduleTable th.mobileOnly .thGroup > span:not(.subHeader) {
+  .priceScheduleTable th.mobileOnly .thGroup>span:not(.subHeader) {
     font-weight: 400;
   }
 
   /* Подзаголовки (Цена, Задаток) - такой же формат как суммы */
   .priceScheduleTable th.mobileOnly .subHeader {
-    font-size: 0.85rem; /* Такой же размер как у сумм */
-    color: #2d3748; /* Такой же цвет как у сумм */
-    font-weight: 600 !important; /* Жирный как суммы */
+    font-size: 0.85rem;
+    /* Такой же размер как у сумм */
+    color: #2d3748;
+    /* Такой же цвет как у сумм */
+    font-weight: 600 !important;
+    /* Жирный как суммы */
   }
 
-  .priceRow, .depositRow {
+  .priceRow,
+  .depositRow {
     font-weight: 600;
     color: #2d3748;
   }
-  
+
   .dateRow {
     color: #718096;
     font-size: 0.8rem;
-    white-space: nowrap; /* Предотвращаем перенос даты и времени */
+    white-space: nowrap;
+    /* Предотвращаем перенос даты и времени */
   }
 }
 
 /* Дополнительные стили для очень узких экранов (меньше 400px) */
 @media (max-width: 400px) {
-  .priceScheduleTable th, 
+
+  .priceScheduleTable th,
   .priceScheduleTable td {
     padding: 8px 4px;
     font-size: 0.75rem;
@@ -360,7 +377,8 @@
     font-size: 0.7rem;
   }
 
-  .priceRow, .depositRow {
+  .priceRow,
+  .depositRow {
     font-size: 0.75rem;
   }
 }
@@ -369,7 +387,8 @@
 .purchaseInfo {
   margin-top: 3rem;
   padding: 2rem;
-  background: linear-gradient(to bottom right, #ebf8ff, #fff); /* Легкий голубой градиент */
+  background: linear-gradient(to bottom right, #ebf8ff, #fff);
+  /* Легкий голубой градиент */
   border-radius: 12px;
   border: 1px solid #bee3f8;
 }
@@ -400,32 +419,68 @@
   color: #4a5568;
 }
 
-/* Кнопка действия (CTA) */
-.ctaButton {
-  display: block;
-  width: 100%;
-  max-width: 300px;
-  margin: 2rem auto 0;
-  padding: 1rem 2rem;
-  background-color: #0070f3; /* Основной цвет из page.module.css */
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
+/* --- CTA Buttons --- */
+.contactSection {
+  margin-top: 2.5rem;
   text-align: center;
+}
+
+.contactTitle {
+  font-size: 1.1rem;
+  color: #2c5282;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.buttonsWrapper {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 260px;
+  padding: 0.85rem 1.5rem;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  box-shadow: 0 4px 6px rgba(0, 112, 243, 0.2);
+  transition: all 0.2s ease;
 }
 
 .ctaButton:hover {
-  background-color: #0056b3;
   transform: translateY(-2px);
 }
 
 .ctaButton:active {
   transform: translateY(0);
+}
+
+.telegramButton {
+  background-color: #2AABEE;
+  box-shadow: 0 4px 6px rgba(42, 171, 238, 0.2);
+}
+
+.telegramButton:hover {
+  background-color: #2298d6;
+}
+
+.maxButton {
+  background-color: #005FF9;
+  box-shadow: 0 4px 6px rgba(0, 95, 249, 0.2);
+}
+
+.maxButton:hover {
+  background-color: #004ecc;
 }
 
 /* --- ОЦЕНКА AI --- */
@@ -438,10 +493,10 @@
 }
 
 .aiPriceValue {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1a202c;
-    font-feature-settings: "tnum";
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  font-feature-settings: "tnum";
 }
 
 /* Индикатор уверенности */
@@ -452,9 +507,18 @@
   display: inline-block;
   flex-shrink: 0;
 }
-.confidenceHigh { background-color: #10b981; }
-.confidenceMedium { background-color: #f59e0b; }
-.confidenceLow { background-color: #ef4444; }
+
+.confidenceHigh {
+  background-color: #10b981;
+}
+
+.confidenceMedium {
+  background-color: #f59e0b;
+}
+
+.confidenceLow {
+  background-color: #ef4444;
+}
 
 .confidenceBadge {
   display: inline-flex;
@@ -490,9 +554,21 @@
   font-weight: 600;
   white-space: nowrap;
 }
-.upsidePositive { background-color: #dcfce7; color: #166534; }
-.upsideNegative { background-color: #fee2e2; color: #991b1b; }
-.upsideNeutral  { background-color: #f1f5f9; color: #475569; }
+
+.upsidePositive {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.upsideNegative {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.upsideNeutral {
+  background-color: #f1f5f9;
+  color: #475569;
+}
 
 .upsideLabel {
   font-size: 0.75rem;
@@ -503,13 +579,13 @@
 }
 
 .investmentSummaryText {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: #334155;
-    background-color: #f8fafc;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #334155;
+  background-color: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 /* Блок участников процедуры банкротства */
@@ -554,7 +630,7 @@
     flex-direction: row;
     gap: 3rem;
   }
-  
+
   .participantBlock {
     flex: 1;
   }
@@ -564,7 +640,8 @@
 .tradeResultsInfo {
   margin-top: 1.5rem;
   padding: 1.25rem;
-  background-color: #f0fdf4; /* Светло-зеленый фон для успешных торгов */
+  background-color: #f0fdf4;
+  /* Светло-зеленый фон для успешных торгов */
   border-radius: 8px;
   border: 1px solid #c6f6d5;
   display: flex;
@@ -573,12 +650,14 @@
 }
 
 .tradeResultsInfo.failed {
-  background-color: #fff5f5; /* Светло-красный фон для отмененных/несостоявшихся */
+  background-color: #fff5f5;
+  /* Светло-красный фон для отмененных/несостоявшихся */
   border-color: #fed7d7;
 }
 
 .tradeResultsInfo.neutral {
-  background-color: #f7fafc; /* Серый фон для других финальных статусов */
+  background-color: #f7fafc;
+  /* Серый фон для других финальных статусов */
   border-color: #edf2f7;
 }
 
@@ -611,7 +690,8 @@
 
 .resultValue.highlightPrice {
   font-size: 1.25rem;
-  color: #2f855a; /* Темно-зеленый для итоговой цены */
+  color: #2f855a;
+  /* Темно-зеленый для итоговой цены */
 }
 
 /* Статус-бейдж */
@@ -648,7 +728,7 @@
    КНОПКА "В ИЗБРАННОЕ" НА СТРАНИЦЕ ЛОТА
    ========================================= */
 .favoriteButtonWrap {
-  margin: 1.5rem 0;
+  margin: 0.5rem 0;
   width: 100%;
 }
 
