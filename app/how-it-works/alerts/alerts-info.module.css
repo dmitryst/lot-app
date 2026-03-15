@@ -1,0 +1,164 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  color: #2d3748;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #4a5568;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.content h2 {
+  font-size: 1.8rem;
+  color: #1a202c;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 0.5rem;
+}
+
+.section {
+  margin-bottom: 4rem;
+}
+
+.section p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #4a5568;
+  margin-bottom: 2rem;
+}
+
+/* Сетка шагов */
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.stepCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s;
+}
+
+.stepCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.stepNumber {
+  background: #0070f3;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.stepCard h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.stepCard p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: #718096;
+}
+
+/* Блок призыва к действию (CTA) */
+.ctaSection {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.ctaSection h2 {
+  border: none;
+  margin-bottom: 1rem;
+}
+
+.ctaSection p {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.ctaButton {
+  display: inline-block;
+  background-color: #0070f3;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 14px rgba(0, 112, 243, 0.3);
+}
+
+.ctaButton:hover {
+  background-color: #0060df;
+}
+
+/* FAQ секция */
+.faqSection {
+  margin-bottom: 3rem;
+}
+
+.faqItem {
+  margin-bottom: 2rem;
+}
+
+.faqItem h3 {
+  font-size: 1.2rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.faqItem p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
+}

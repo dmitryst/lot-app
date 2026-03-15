@@ -18,6 +18,31 @@
   margin: 0;
 }
 
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Расстояние между заголовком и иконкой */
+}
+
+.infoIcon {
+  color: #718096;
+  /* Серый цвет, чтобы не отвлекать внимание */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.infoIcon:hover {
+  color: #0070f3;
+  /* При наведении становится синим */
+  background-color: #f0f7ff;
+  /* Легкий синий фон для эффекта нажатия */
+}
+
 .createButton {
   background-color: #0070f3;
   color: white;
@@ -101,6 +126,7 @@
 .deleteBtn {
   color: #e53e3e;
 }
+
 .deleteBtn:hover {
   color: #c53030;
 }
@@ -159,11 +185,31 @@
   }
 }
 
-.regionsArea { grid-area: regions; width: 100%; }
-.categoriesArea { grid-area: categories; width: 100%; }
-.priceArea { grid-area: price; width: 100%; max-width: 320px; }
-.typeArea { grid-area: types; width: 100%; }
-.ownershipArea { grid-area: ownership; width: 100%; }
+.regionsArea {
+  grid-area: regions;
+  width: 100%;
+}
+
+.categoriesArea {
+  grid-area: categories;
+  width: 100%;
+}
+
+.priceArea {
+  grid-area: price;
+  width: 100%;
+  max-width: 320px;
+}
+
+.typeArea {
+  grid-area: types;
+  width: 100%;
+}
+
+.ownershipArea {
+  grid-area: ownership;
+  width: 100%;
+}
 
 /* Общие стили группы */
 .filterGroup {
@@ -304,21 +350,33 @@
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
-    align-items: stretch; /* Позволяет дочерним элементам растягиваться */
+    align-items: stretch;
+    /* Позволяет дочерним элементам растягиваться */
     gap: 16px;
     margin-bottom: 1.5rem;
   }
 
   .title {
-    font-size: 1.5rem; /* Уменьшаем заголовок с 2rem (32px) до 1.5rem (24px) */
-    text-align: center; /* Центрируем текст для красоты */
+    font-size: 1.5rem;
+    /* Уменьшаем заголовок с 2rem (32px) до 1.5rem (24px) */
+    text-align: center;
+    /* Центрируем текст для красоты */
     line-height: 1.2;
   }
 
+  @media (max-width: 768px) {
+    .titleWrapper {
+      justify-content: center;
+      /* Центрируем заголовок с иконкой на мобильных */
+    }
+  }
+
   .createButton {
-    width: 100%; /* Растягиваем кнопку на весь экран */
+    width: 100%;
+    /* Растягиваем кнопку на весь экран */
     justify-content: center;
-    display: flex; /* Чтобы текст внутри кнопки был ровно по центру */
+    display: flex;
+    /* Чтобы текст внутри кнопки был ровно по центру */
     align-items: center;
   }
 }
