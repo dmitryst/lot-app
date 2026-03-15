@@ -42,7 +42,14 @@ export default function LoginForm() {
 
             if (res.ok) {
                 const data = await res.json();
-                setUser({ email: data.email });
+                setUser({
+                        id: data.id,
+                        email: data.email,
+                        isSubscriptionActive: data.isSubscriptionActive,
+                        subscriptionEndDate: data.subscriptionEndDate,
+                        isOnTrial: data.isOnTrial,
+                        createdAt: data.createdAt,
+                    });
 
                 // Пытаемся получить returnUrl из параметров URL
                 // (например, login?returnUrl=/lots?page=2 или login?redirect=/map)
