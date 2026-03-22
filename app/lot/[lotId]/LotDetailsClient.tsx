@@ -413,6 +413,79 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           </div>
         </div>
 
+        {/* Информация по кадастровым номерам */}
+        {lot.cadastralInfos && lot.cadastralInfos.length > 0 && (
+          <div className={styles.descriptionSection}>
+            <h2 className={styles.sectionTitle}>Данные из Росреестра</h2>
+
+            {user?.isSubscriptionActive ? (
+              <div className={styles.cadastralList}>
+                {lot.cadastralInfos.map((info, idx) => (
+                  <div key={idx} className={styles.cadastralCard}>
+                    <h3 className={styles.cadastralTitle}>
+                      Кадастровый номер: <span>{info.cadastralNumber}</span>
+                    </h3>
+                    <div className={styles.cadastralGrid}>
+                      {info.area && (
+                        <div className={styles.cadastralItem}>
+                          <span className={styles.cadastralLabel}>Площадь:</span>
+                          <span className={styles.cadastralValue}>{info.area} кв.м.</span>
+                        </div>
+                      )}
+                      {info.cadastralCost && (
+                        <div className={styles.cadastralItem}>
+                          <span className={styles.cadastralLabel}>Кадастровая стоимость:</span>
+                          <span className={styles.cadastralValue}>
+                            {info.cadastralCost.toLocaleString('ru-RU')} ₽
+                          </span>
+                        </div>
+                      )}
+                      {info.category && (
+                        <div className={styles.cadastralItem}>
+                          <span className={styles.cadastralLabel}>Категория земель:</span>
+                          <span className={styles.cadastralValue}>{info.category}</span>
+                        </div>
+                      )}
+                      {info.permittedUse && (
+                        <div className={styles.cadastralItem}>
+                          <span className={styles.cadastralLabel}>Разрешенное использование:</span>
+                          <span className={styles.cadastralValue}>{info.permittedUse}</span>
+                        </div>
+                      )}
+                      {info.status && (
+                        <div className={styles.cadastralItem}>
+                          <span className={styles.cadastralLabel}>Статус:</span>
+                          <span className={styles.cadastralValue}>{info.status}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Заглушка для пользователей без подписки/триала */
+              <div className={styles.lockedProBlock}>
+                <div className={styles.lockedContent}>
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#718096" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <h3>Скрытая информация</h3>
+                  <p>Полные данные из Росреестра (площадь, стоимость, категория земель и ВРИ) доступны пользователям с активной подпиской или в период пробного доступа (7 дней после регистрации).</p>
+                  {/* Кнопка ведет на тарифы или регистрацию в зависимости от того, авторизован ли пользователь */}
+                  <button
+                    className={`${styles.ctaButton} ${styles.maxButton}`}
+                    onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
+                    style={{ marginTop: '1rem' }}
+                  >
+                    {user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Отдельный блок для арбитражного управляющего и должника */}
         {/*
         {(lot.bidding?.arbitrationManager || lot.bidding?.debtor) && (
