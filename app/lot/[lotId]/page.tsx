@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
-import { CATEGORIES_TREE } from '../../data/constants';
+import { CATEGORIES_TREE, FINAL_TRADE_STATUSES } from '../../data/constants';
 import { generateLotSchemas, generateLotUrl } from './schemas';
 
 // --- SEO ОПТИМИЗАЦИЯ: Компонент для структурированных данных JSON-LD ---
@@ -103,6 +103,11 @@ function extractIdFromSlug(slug: string): string {
   return slug;
 }
 
+function isLotActive(tradeStatus?: string | null): boolean {
+  if (!tradeStatus) return true;
+  return !FINAL_TRADE_STATUSES.includes(tradeStatus);
+}
+
 // ГЕНЕРАЦИЯ МЕТАДАННЫХ
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lotId } = await params;
@@ -119,18 +124,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const price = lot.startPrice ?? 0;
   const formattedPrice = price.toLocaleString('ru-RU').replace(/\s/g, ' ');
 
-  const lotTitle = lot.title || lot.description.substring(0, 70);
+  const lotTitle = lot.title || lot.description.substring(0, 120);
 
-  const title = `Купить ${lotTitle} на торгах по банкротству за ${formattedPrice} ₽ — s-lot.ru`;
+  // Проверяем, активен ли лот
+  const isActive = isLotActive(lot.tradeStatus);
+
+  // Формируем Title в зависимости от статуса
+  const title = isActive
+    ? `Купить ${lotTitle} на торгах по банкротству за ${formattedPrice} ₽ — s-lot.ru`
+    : `[Архив] ${lotTitle} — ${lot.tradeStatus || 'Торги завершены'}`;
   
-  // Улучшенное описание с большим количеством информации
-  const descriptionParts = [
-    lot.description.substring(0, 120),
-    `Начальная цена: ${formattedPrice} ₽`,
-    lot.bidding?.tradePeriod ? `Торги: ${lot.bidding.tradePeriod}` : null,
-    lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
-    'Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!'
-  ].filter(Boolean);
+  // Формируем Description в зависимости от статуса
+  const descriptionParts = isActive 
+    ? [
+        lot.description.substring(0, 120),
+        `Начальная цена: ${formattedPrice} ₽`,
+        lot.bidding?.tradePeriod ? `Торги: ${lot.bidding.tradePeriod}` : null,
+        lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
+        'Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!'
+      ].filter(Boolean)
+    : [
+        `ВНИМАНИЕ: Торги по данному лоту завершены. Статус: ${lot.tradeStatus || 'Архив'}.`,
+        lot.description.substring(0, 100),
+        `Начальная цена составляла: ${formattedPrice} ₽`,
+        lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
+        'Исторические данные об аукционе по банкротству на s-lot.ru.'
+      ].filter(Boolean);
+
   const description = descriptionParts.join('. ');
   
   const keywords = generateKeywords(lot);

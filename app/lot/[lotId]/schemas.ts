@@ -3,6 +3,7 @@
 
 import { Lot } from '../../../types';
 import { generateSlug } from '../../../utils/slugify';
+import { FINAL_TRADE_STATUSES } from '../../data/constants';
 
 const BASE_URL = 'https://s-lot.ru';
 
@@ -11,9 +12,8 @@ const BASE_URL = 'https://s-lot.ru';
  */
 export function generateLotUrl(lot: Lot, baseUrl: string = BASE_URL): string {
   const slug = lot.slug ?? generateSlug(lot.title || lot.description);
-  return lot.publicId 
-    ? `${baseUrl}/lot/${slug}-${lot.publicId}`
-    : `${baseUrl}/lot/${lot.id}`;
+
+  return `${baseUrl}/lot/${slug}-${lot.publicId}`;
 }
 
 /**
@@ -35,15 +35,22 @@ function cleanSchema(obj: any): any {
   return obj;
 }
 
+function isLotActive(tradeStatus?: string): boolean {
+  if (!tradeStatus) return true;
+  return !FINAL_TRADE_STATUSES.includes(tradeStatus);
+}
+
 /**
  * Генерирует Product schema для лота
  */
 function generateProductSchema(lot: Lot): any {
   const price = lot.startPrice ?? 0;
   const lotUrl = generateLotUrl(lot);
-  const images = lot.images && lot.images.length > 0 
+  const images = lot.images && lot.images.length > 0
     ? lot.images.map(img => img.startsWith('http') ? img : `${BASE_URL}${img}`)
     : [lot.imageUrl || `${BASE_URL}/placeholder.png`];
+
+  const active = isLotActive(lot.tradeStatus);
 
   return {
     "@context": "https://schema.org",
@@ -61,7 +68,7 @@ function generateProductSchema(lot: Lot): any {
       "@type": "Offer",
       "price": price,
       "priceCurrency": "RUB",
-      "availability": "https://schema.org/InStock",
+      "availability": active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "url": lotUrl,
       "priceValidUntil": lot.bidding?.tradePeriod || undefined,
       "seller": {
@@ -84,7 +91,7 @@ function generateProductSchema(lot: Lot): any {
  */
 function generateBreadcrumbSchema(lot: Lot): any {
   const lotUrl = generateLotUrl(lot);
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -169,7 +176,7 @@ function generateFAQSchema(lot: Lot): any {
         "name": "Когда проходят торги?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": lot.bidding?.tradePeriod 
+          "text": lot.bidding?.tradePeriod
             ? `Период торгов: ${lot.bidding.tradePeriod}. Прием заявок: ${lot.bidding.bidAcceptancePeriod || 'уточняйте на площадке'}.`
             : "Информация о датах торгов указана на странице лота."
         }

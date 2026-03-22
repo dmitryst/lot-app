@@ -42,6 +42,7 @@ export type Lot = {
   marketValueMin?: number | null;
   marketValueMax?: number | null;
   priceConfidence?: string | null;
+  cadastralInfos?: CadastralInfo[];
   investmentSummary?: string | null;
   createdAt?: string;
   categories: {
@@ -73,3 +74,17 @@ export type PriceSchedule = {
   estimatedRank: number | null;
   potentialRoi: number | null;
 };
+
+export interface CadastralInfo {
+  cadastralNumber: string;
+  area?: number;
+  cadastralCost?: number;
+  category?: string;
+  permittedUse?: string;
+  address?: string;
+  status?: string;
+  objectType?: string;
+  rightType?: string;
+  ownershipType?: string;
+  regDate?: string;
+}

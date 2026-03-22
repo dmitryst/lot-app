@@ -237,3 +237,11 @@ export const REGIONS_TREE: CategoryNode[] = [
     ],
   },
 ];
+
+export const FINAL_TRADE_STATUSES = [
+  "Завершенные",
+  "Торги отменены",
+  "Торги не состоялись",
+  "Торги завершены (нет данных)",
+  "Аннулированные"
+];

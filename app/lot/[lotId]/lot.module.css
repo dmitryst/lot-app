@@ -769,3 +769,114 @@
 .favoriteButtonDetail.isActive:hover:not(:disabled) {
   background-color: #fed7d7;
 }
+
+/* =========================================
+   КАДАСТРОВАЯ ИНФОРМАЦИЯ (Росреестр)
+   ========================================= */
+.cadastralList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cadastralCard {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.cadastralTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed #cbd5e0;
+}
+
+.cadastralTitle span {
+  color: #2b6cb0;
+}
+
+.cadastralGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cadastralGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cadastralItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cadastralLabel {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.cadastralValue {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+/* Заглушка для PRO контента */
+.lockedProBlock {
+  position: relative;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 3rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Добавляем легкий эффект размытия текста на фоне (имитация скрытых данных) */
+.lockedProBlock::before {
+  content: "Кадастровая стоимость: 1 500 000 ₽ Площадь: 1200 кв.м. Статус: Учтенный Категория: Земли населенных пунктов";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #a0aec0;
+  opacity: 0.15;
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lockedContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+}
+
+.lockedContent h3 {
+  font-size: 1.25rem;
+  color: #2d3748;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.lockedContent p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
