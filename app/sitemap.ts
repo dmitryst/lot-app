@@ -17,48 +17,49 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   // Для id=0 (первый чанк) можно добавить статические страницы
   const staticRoutes: MetadataRoute.Sitemap = [];
   if (id === 0) {
-      staticRoutes.push({ // можно добавить другие статические страницы
-          url: BASE_URL,
-          lastModified: new Date(),
-          changeFrequency: 'daily',
-          priority: 1,
-      });
+    staticRoutes.push({ // можно добавить другие статические страницы
+      url: BASE_URL,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1,
+    });
   }
 
   // Запрашиваем чанк данных из API
   const pageSize = 5000; // Уменьшаем размер страницы до 5000, чтобы избежать ошибки 2MB cache limit
   const page = Number(id) + 1; // API ожидает page начиная с 1
-  
+
   const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
   if (!apiUrl)
     return staticRoutes;
 
   try {
-    const res = await fetch(`${apiUrl}/api/lots/sitemap-data?page=${page}&pageSize=${pageSize}`, { 
-        cache: 'no-store' // Отключаем кэширование данных запроса, чтобы не забивать Data Cache и избежать лимита
+    const res = await fetch(`${apiUrl}/api/lots/sitemap-data?page=${page}&pageSize=${pageSize}`, {
+      cache: 'no-store' // Отключаем кэширование данных запроса, чтобы не забивать Data Cache и избежать лимита
     });
-    
+
     if (!res.ok)
       return staticRoutes;
 
     const lots: any[] = await res.json();
 
     if (!lots || lots.length === 0) {
-        // Если лотов нет, просто возвращаем пустой (или со статикой) sitemap
-        return staticRoutes;
+      // Если лотов нет, просто возвращаем пустой (или со статикой) sitemap
+      return staticRoutes;
     }
 
     const lotRoutes = lots.map((lot) => {
-        // Slug из БД или генерируем на фронте для старых лотов
-        const slug = lot.slug ?? generateSlug(lot.title || lot.description || '');
-        const url = `${BASE_URL}/lot/${slug}-${lot.publicId}`;
-        
-        return {
-            url: url,
-            lastModified: new Date(),  // new Date(lot.createdAt) когда будут даты
-            changeFrequency: 'weekly' as const,
-            priority: 0.8,
-        };
+      // Берем slug напрямую из БД, если его нет — генерируем (с фоллбэком на 'lot')
+      const slug = lot.slug ?? generateSlug(lot.title || lot.description || 'lot');
+      const url = `${BASE_URL}/lot/${slug}-${lot.publicId}`;
+
+      return {
+        url: url,
+        // Используем реальную дату создания лота из БД
+        lastModified: lot.createdAt ? new Date(lot.createdAt) : new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      };
     });
 
     return [...staticRoutes, ...lotRoutes];
