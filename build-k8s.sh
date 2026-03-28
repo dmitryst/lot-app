@@ -74,9 +74,9 @@ docker push $IMAGE_NAME:latest
 # Но лучше всего работает добавление аннотации с текущим временем.
 # Это гарантирует изменение PodSpec, что вызывает пересоздание подов.
 
-echo "🔄 Triggering rollout with timestamp annotation..."
-kubectl patch deployment $DEPLOYMENT_NAME -p \
-  "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
+# echo "🔄 Triggering rollout with timestamp annotation..."
+# kubectl patch deployment $DEPLOYMENT_NAME -p \
+#   "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
 
 echo "✅ Done! v$FULL_TAG deployed."
 
