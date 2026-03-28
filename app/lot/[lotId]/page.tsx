@@ -95,11 +95,18 @@ async function getLotData(slugOrId: string): Promise<Lot | null> {
 }
 
 function extractIdFromSlug(slug: string): string {
-  // Ищем дефис и цифры в конце строки
-  const match = slug.match(/-(\d+)$/);
-  if (match) {
-    return match[1]; // Возвращает "45368"
+  // Проверяем, является ли строка валидным GUID (формат: 8-4-4-4-12)
+  const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  
+  if (guidRegex.test(slug)) {
+    // Если это GUID, возвращаем его целиком без обрезки
+    return slug;
   }
+
+  // Если это не GUID, значит это SEO-slug. Ищем PublicId в конце.
+  const match = slug.match(/-(\d+)$/);
+  if (match) return match[1]; 
+  
   return slug;
 }
 
