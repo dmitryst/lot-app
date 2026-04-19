@@ -1,0 +1,240 @@
+/* calendar.module.css */
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pageTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.monthLabel {
+    font-weight: 600;
+    min-width: 120px;
+    text-align: center;
+}
+
+.navBtn {
+    padding: 4px 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    background: #fff;
+}
+
+.weekday {
+    padding: 10px;
+    text-align: center;
+    background: #f9f9f9;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.dayCell {
+    min-height: 140px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 6px;
+    position: relative;
+}
+
+.dayNum {
+    font-size: 0.8rem;
+    color: #999;
+    display: block;
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.emptyCell {
+    background: #fafafa;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lotBadge {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 6px;
+    background: #eef6ff;
+    border-left: 3px solid #0070f3;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-bottom: 4px;
+}
+
+.lotBadge:hover {
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+.lotBadge img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.lotText {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.lotId {
+    font-weight: 700;
+    font-size: 0.65rem;
+    color: #0070f3;
+}
+
+.lotTitle {
+    white-space: pre-wrap;
+    /* Позволяет символу \n переносить строку */
+    word-break: break-word;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    display: block;
+    color: #333;
+}
+
+.lotThumb {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* Адаптив для мобильных - превращаем в список только активные дни */
+@media (max-width: 768px) {
+    .calendarGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .dayCell:not(:has(.lotBadge)) {
+        display: none;
+    }
+
+    .dayCell {
+        min-height: auto;
+        padding: 15px;
+    }
+}
+
+/* --- Новые стили для цены --- */
+
+.lotPriceRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.lotPrice {
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #111;
+    white-space: nowrap;
+}
+
+.arrowDown {
+    color: #d32f2f;
+    /* Красный цвет для падения цены */
+    font-weight: 900;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.arrowUp {
+    color: #2e7d32;
+    /* Зеленый цвет для роста цены */
+    font-weight: 900;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* --- СТИЛИ ДЛЯ ЦИФР И ВЫДЕЛЕНИЯ ТЕКУЩЕГО ДНЯ --- */
+
+.dayNumContainer {
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.dayNum {
+    font-size: 0.85rem;
+    color: #888;
+    display: inline-block;
+    width: 26px;
+    /* Фиксированная ширина для идеального круга */
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+/* Стили для сегодняшней ячейки (фон) */
+.todayCell {
+    background-color: #f4faff;
+    /* Очень легкий голубой оттенок */
+}
+
+/* Стили для сегодняшней цифры (синий кружок) */
+.todayNum {
+    background-color: #0070f3;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0, 112, 243, 0.4);
+    /* Красивое свечение */
+}
+
+
+/* --- АДАПТИВ ДЛЯ МОБИЛЬНЫХ --- */
+@media (max-width: 768px) {
+    .calendarGrid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Скрываем дни без лотов, НО оставляем сегодняшний день в любом случае */
+    .dayCell:not(:has(.lotBadge)):not(.todayCell) {
+        display: none;
+    }
+
+    .dayCell {
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .dayNumContainer {
+        text-align: left;
+        /* На мобилках красивее слева */
+        margin-bottom: 10px;
+    }
+}
