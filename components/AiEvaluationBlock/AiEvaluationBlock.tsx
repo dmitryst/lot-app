@@ -261,7 +261,7 @@ export default function AiEvaluationBlock({
                     </div>
                     <p className={styles.progressText}>
                         Идет анализ... Это может занять до 2 минут.
-                        <br /><span style={{ fontSize: '0.8em', color: '#94a3b8' }}>DeepSeek думает...</span>
+                        <br /><span style={{ fontSize: '0.8em', color: '#94a3b8' }}>AI модель думает...</span>
                     </p>
                 </div>
             )}
