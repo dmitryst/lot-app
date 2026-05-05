@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Map, Placemark, Clusterer } from '@pbe/react-yandex-maps';
 import styles from './map.module.css';
 import { CATEGORIES_TREE } from '../data/constants';
@@ -48,6 +48,11 @@ export default function MapClient() {
     const [isInfoPanelClosed, setIsInfoPanelClosed] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
+    // --- СОСТОЯНИЯ ДЛЯ BOUNDING BOX ---
+    // bounds: [[minLat, minLon], [maxLat, maxLon]] (левый нижний и правый верхний углы)
+    const [bounds, setBounds] = useState<number[][] | null>(null);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
     // Обработчик изменения фильтров
     const handleCategoryToggle = (category: string) => {
         setSelectedCategories(prev =>
@@ -57,12 +62,37 @@ export default function MapClient() {
         );
     };
 
+    // --- ОБРАБОТЧИК ИЗМЕНЕНИЯ ГРАНИЦ КАРТЫ ---
+    const handleBoundsChange = (event: any) => {
+        const newBounds = event.get('newBounds');
+        
+        // Очищаем предыдущий таймер, если пользователь все еще двигает карту
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        // Ждем 500 мс после того, как пользователь отпустит мышь/перестанет скроллить
+        debounceTimerRef.current = setTimeout(() => {
+            setBounds(newBounds);
+        }, 500);
+    };
+
     useEffect(() => {
         const fetchGeoLots = async () => {
+            // Не делаем запрос, пока карта не передала нам свои первоначальные границы
+            if (!bounds) return;
+
             setLoading(true);
 
             const params = new URLSearchParams();
             selectedCategories.forEach(cat => params.append('categories', cat));
+
+            // Добавляем координаты Bounding Box в запрос
+            // Yandex Maps возвращает массив: [[minLat, minLon], [maxLat, maxLon]]
+            params.append('minLat', bounds[0][0].toString());
+            params.append('minLon', bounds[0][1].toString());
+            params.append('maxLat', bounds[1][0].toString());
+            params.append('maxLon', bounds[1][1].toString());
 
             const queryString = params.toString();
             const apiUrl = `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/with-coordinates?${queryString}`;
@@ -88,7 +118,7 @@ export default function MapClient() {
         };
 
         fetchGeoLots();
-    }, [selectedCategories]);
+    }, [selectedCategories, bounds]);
 
     // Функция для рендеринга информационных плашек
     const renderInfoPanel = () => {
@@ -111,8 +141,8 @@ export default function MapClient() {
                 return (
                     <div className={`${styles.infoPanel} ${styles.warning}`}>
                         <span className={styles.infoText}>
-                            Вы видите только {mapData.lots.length} из {mapData.totalCount} объектов.
-                            <Link href="/login?returnUrl=/map">Войдите</Link> или <Link href="/login/register?returnUrl=/map">зарегистрируйтесь</Link>, чтобы увидеть все.
+                            В этой области вы видите {mapData.lots.length} из {mapData.totalCount} объектов.
+                            <Link href="/login?returnUrl=/map">Войдите</Link>, чтобы увидеть все.
                         </span>
                         {renderCloseBtn()}
                     </div>
@@ -122,7 +152,7 @@ export default function MapClient() {
                 return (
                     <div className={`${styles.infoPanel} ${styles.danger}`}>
                         <span className={styles.infoText}>
-                            Ваша подписка неактивна. Отображено {mapData.lots.length} из {mapData.totalCount} объектов.
+                            Ваша подписка неактивна. В этой области показано {mapData.lots.length} из {mapData.totalCount} объектов.
                             <Link href="/subscribe">Оформите подписку</Link>, чтобы получить полный доступ.
                         </span>
                         {renderCloseBtn()}
@@ -134,7 +164,7 @@ export default function MapClient() {
                 return (
                     <div className={`${styles.infoPanel} ${styles.success}`}>
                         <span className={styles.infoText}>
-                            PRO-доступ активен. Отображено {mapData.lots.length} объектов.
+                            PRO-доступ активен. В этой области найдено: {mapData.lots.length} объектов.
                         </span>
                         {renderCloseBtn()}
                     </div>
@@ -144,19 +174,6 @@ export default function MapClient() {
                 return null;
         }
     };
-
-    // --- ИКОНКИ ---
-    const IconArrowUp = () => (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', color: '#28a745' }}>
-            <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
-        </svg>
-    );
-
-    const IconArrowDown = () => (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', color: '#dc3545' }}>
-            <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
-        </svg>
-    );
 
     // Функция генерации HTML для иконок, так как Яндекс.Карты принимают строку
     const getDirectionIconHtml = (type?: string) => {
@@ -239,6 +256,7 @@ export default function MapClient() {
 
             {/* карта */}
             {loading && <div className={styles.loader}>Загрузка карты и объектов...</div>}
+
             <Map
                 defaultState={{
                     center: [55.751574, 37.573856],
@@ -246,6 +264,14 @@ export default function MapClient() {
                 }}
                 width="100%"
                 height="100%"
+                // Привязываемся к событию изменения границ (зум, перемещение)
+                onBoundsChange={handleBoundsChange}
+                // Получаем инстанс карты при загрузке, чтобы установить первичные границы
+                instanceRef={(ref) => {
+                    if (ref && !bounds) {
+                        setBounds(ref.getBounds());
+                    }
+                }}
             >
                 <Clusterer
                     options={{
