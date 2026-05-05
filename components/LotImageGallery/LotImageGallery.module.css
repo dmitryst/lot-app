@@ -1,3 +1,4 @@
+/* === ОСНОВНОЙ КОНТЕЙНЕР НА СТРАНИЦЕ === */
 .galleryContainer {
   display: flex;
   flex-direction: column;
@@ -21,19 +22,30 @@
 .mainImageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3; /* Фиксированная пропорция, как на скрине */
-  background-color: #e5e7eb; /* Серый фон на случай загрузки */
+  aspect-ratio: 4 / 3;
+  max-height: 450px; /* Строго ограничиваем максимальную высоту на десктопе */
+  background-color: #f8fafc;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e5e7eb;
+  cursor: pointer;
+  
+  /* Добавляем flex, чтобы при достижении max-height фото оставалось по центру */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mainImage {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Заполняет весь блок. Если нужно видеть фото целиком, поставьте 'contain' */
+  object-fit: contain; /* фото целиком вмещается в блок без обрезки */
   display: block;
-  transition: opacity 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+}
+
+.mainImageWrapper:hover .mainImage {
+  transform: scale(1.02); /* Легкий зум при наведении */
 }
 
 /* === БЕЙДЖИ === */
@@ -45,11 +57,11 @@
   flex-wrap: wrap;
   gap: 8px;
   z-index: 10;
-  pointer-events: none; /* Чтобы можно было кликнуть сквозь бейджи, если надо */
+  pointer-events: none;
 }
 
 .badge {
-  background-color: rgba(30, 30, 30, 0.85); /* Темный полупрозрачный фон */
+  background-color: rgba(30, 30, 30, 0.85);
   color: #fff;
   padding: 6px 12px;
   border-radius: 6px;
@@ -59,44 +71,28 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Цвета для специфичных бейджей (опционально) */
-.badge:first-child {
-  /* Пример: первый бейдж (например, скидка) будет зеленым */
-  /* background-color: #10b981; */
-}
-
-/* === ЛЕНТА МИНИАТЮР === */
+/* === ЛЕНТА МИНИАТЮР НА СТРАНИЦЕ === */
 .thumbnailsScrollWrapper {
   width: 100%;
-  overflow: hidden; /* Скрываем скроллбар самого контейнера, если хотим кастомный вид */
+  overflow: hidden;
 }
 
 .thumbnailsTrack {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px; /* Место под скроллбар */
+  padding-bottom: 4px;
   scroll-behavior: smooth;
-  
-  /* Стилизация скроллбара */
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
 
-/* Webkit скроллбар */
-.thumbnailsTrack::-webkit-scrollbar {
-  height: 6px;
-}
-.thumbnailsTrack::-webkit-scrollbar-track {
-  background: transparent;
-}
-.thumbnailsTrack::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 3px;
-}
+.thumbnailsTrack::-webkit-scrollbar { height: 6px; }
+.thumbnailsTrack::-webkit-scrollbar-track { background: transparent; }
+.thumbnailsTrack::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
 
 .thumbnailBtn {
-  flex: 0 0 80px; /* Фиксированная ширина миниатюры */
+  flex: 0 0 80px;
   height: 60px;
   padding: 0;
   border: 2px solid transparent;
@@ -108,12 +104,10 @@
   opacity: 0.7;
 }
 
-.thumbnailBtn:hover {
-  opacity: 1;
-}
+.thumbnailBtn:hover { opacity: 1; }
 
 .activeThumb {
-  border-color: #0070f3; /* Синяя рамка для активного */
+  border-color: #0070f3;
   opacity: 1;
   box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
 }
@@ -125,14 +119,137 @@
   display: block;
 }
 
+/* === ПОЛНОЭКРАННОЕ МОДАЛЬНОЕ ОКНО === */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(5px);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 25px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s;
+}
+
+.closeButton:hover { background: rgba(255, 255, 255, 0.25); }
+
+.modalMainArea {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 10px;
+}
+
+.modalImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none; /* Запрет стандартного перетаскивания для свайпов */
+}
+
+/* Кнопки навигации модалки (стрелки) */
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.navButton:hover { background: rgba(255, 255, 255, 0.3); }
+.prevButton { left: 20px; }
+.nextButton { right: 20px; }
+
+/* Карусель миниатюр в модальном окне */
+.modalThumbnails {
+  height: 100px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 15px;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  align-items: center;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Прячем скроллбар в модалке */
+}
+.modalThumbnails::-webkit-scrollbar { display: none; }
+
+@media (min-width: 768px) {
+  .modalThumbnails { justify-content: center; } /* Центрируем, если экран большой */
+}
+
+.modalThumbBtn {
+  width: 90px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.4;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  background-color: #333;
+}
+
+.modalThumbBtn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modalThumbBtn.activeModalThumb {
+  opacity: 1;
+  border-color: #3182ce;
+  transform: scale(1.05);
+}
+
 /* === АДАПТИВ === */
-@media (max-width: 640px) {
-  .mainImageWrapper {
-    aspect-ratio: 16 / 9; /* На мобилках делаем чуть пониже */
+@media (max-width: 768px) {
+  .mainImageWrapper { 
+    aspect-ratio: 16 / 9; 
+    max-height: 350px; /* Ограничиваем высоту для мобильных устройств */
   }
+  .thumbnailBtn { flex: 0 0 60px; height: 45px; }
   
-  .thumbnailBtn {
-    flex: 0 0 60px;
-    height: 45px;
-  }
+  /* Скрываем кнопки по бокам в модалке, т.к. есть свайпы */
+  .navButton { display: none; }
+  .modalThumbBtn { width: 70px; height: 50px; }
+  .modalThumbnails { height: 80px; padding: 10px; justify-content: flex-start; }
 }
