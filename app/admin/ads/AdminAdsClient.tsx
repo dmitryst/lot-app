@@ -11,6 +11,7 @@ interface AdForModeration {
     description: string;
     price: number;
     region?: string;
+    category?: string;
     createdAt: string;
     authorEmail: string;
     authorName: string;
@@ -100,6 +101,11 @@ export default function AdminAdsClient() {
                                 {ad.region && (
                                     <div className={styles.adAuthor}>
                                         Регион: {ad.region}
+                                    </div>
+                                )}
+                                {ad.category && (
+                                    <div className={styles.adAuthor}>
+                                        Категория: {ad.category}
                                     </div>
                                 )}
                                 <div className={styles.adAuthor}>

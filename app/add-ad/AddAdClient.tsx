@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './add-ad.module.css';
 import MapPicker from './MapPicker';
-import { REGIONS_TREE } from '../data/constants';
+import { REGIONS_TREE, CATEGORIES_TREE } from '../data/constants';
 
 export default function AddAdClient() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function AddAdClient() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [region, setRegion] = useState('');
+  const [category, setCategory] = useState('');
   const [address, setAddress] = useState('');
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -68,6 +69,7 @@ export default function AddAdClient() {
       formData.append('description', description);
       formData.append('price', price);
       formData.append('region', region);
+      formData.append('category', category);
       
       if (coordinates) {
         formData.append('latitude', coordinates[0].toString());
@@ -137,6 +139,23 @@ export default function AddAdClient() {
               value={title} 
               onChange={e => setTitle(e.target.value)} 
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Категория *</label>
+            <select 
+              required
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="" disabled>Выберите категорию</option>
+              {CATEGORIES_TREE.find(c => c.name === 'Недвижимость')?.children?.map(sub => (
+                <option key={sub.name} value={sub.name}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.formGroup}>

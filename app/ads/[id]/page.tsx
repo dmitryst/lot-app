@@ -13,6 +13,7 @@ interface UserAd {
   description: string;
   price: number;
   region?: string;
+  category?: string;
   createdAt: string;
   status: number;
   imageUrls: string[];
@@ -100,6 +101,7 @@ export default function AdDetailsPage() {
           <div className={styles.metaRow}>
             <span>Опубликовано: {new Date(ad.createdAt).toLocaleDateString('ru-RU')}</span>
             <span>ID: {ad.id.split('-')[0]}</span>
+            {ad.category && <span>Категория: {ad.category}</span>}
           </div>
 
           <div className={styles.divider} />
