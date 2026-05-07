@@ -112,9 +112,9 @@
   align-items: flex-start;
 }
 
-.badge {
-  background-color: #dcfce7; /* Светло-зеленый фон */
-  color: #166534; /* Темно-зеленый текст */
+.regionBadge {
+  background-color: #f1f5f9; /* Светло-серый фон */
+  color: #475569; /* Темно-серый текст */
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.85rem;

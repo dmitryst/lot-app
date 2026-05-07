@@ -5,6 +5,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './add-ad.module.css';
 import MapPicker from './MapPicker';
+import { REGIONS_TREE } from '../data/constants';
 
 export default function AddAdClient() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function AddAdClient() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [region, setRegion] = useState('');
   const [address, setAddress] = useState('');
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -65,6 +67,7 @@ export default function AddAdClient() {
       formData.append('title', title);
       formData.append('description', description);
       formData.append('price', price);
+      formData.append('region', region);
       
       if (coordinates) {
         formData.append('latitude', coordinates[0].toString());
@@ -134,6 +137,27 @@ export default function AddAdClient() {
               value={title} 
               onChange={e => setTitle(e.target.value)} 
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Регион *</label>
+            <select 
+              required
+              value={region}
+              onChange={e => setRegion(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="" disabled>Выберите регион</option>
+              {REGIONS_TREE.map(district => (
+                <optgroup key={district.name} label={district.name}>
+                  {district.children?.map(reg => (
+                    <option key={reg.name} value={reg.name}>
+                      {reg.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
 
           <div className={styles.formGroup}>

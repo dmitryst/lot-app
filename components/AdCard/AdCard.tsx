@@ -8,6 +8,7 @@ interface UserAd {
   title: string;
   description: string;
   price: number;
+  region?: string;
   createdAt: string;
   status: number;
   imageUrls: string[];
@@ -37,7 +38,7 @@ export default function AdCard({ ad }: AdCardProps) {
       <div className={styles.adCard}>
         <div className={styles.imageContainer}>
           <img src={coverImage} alt={ad.title} className={styles.image} />
-          <div className={styles.badge}>Частное объявление</div>
+          {ad.region && <div className={styles.regionBadge}>{ad.region}</div>}
         </div>
         
         <div className={styles.contentContainer}>

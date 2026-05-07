@@ -17,6 +17,7 @@ interface UserAd {
   title: string;
   description: string;
   price: number;
+  region?: string;
   createdAt: string;
   status: number;
   imageUrls: string[];

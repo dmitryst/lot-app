@@ -12,6 +12,7 @@ interface UserAd {
   title: string;
   description: string;
   price: number;
+  region?: string;
   createdAt: string;
   status: number;
   imageUrls: string[];
@@ -91,7 +92,7 @@ export default function AdDetailsPage() {
 
         {/* ПРАВАЯ КОЛОНКА: Информация */}
         <div className={styles.infoSection}>
-          <div className={styles.badge}>Частное объявление</div>
+          {ad.region && <div className={styles.regionBadge}>{ad.region}</div>}
           
           <h1 className={styles.title}>{ad.title}</h1>
           <div className={styles.price}>{formatPrice(ad.price)}</div>
