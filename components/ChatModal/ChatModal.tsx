@@ -3,9 +3,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './ChatModal.module.css';
+import { useChat } from '@/context/ChatContext';
 
 interface Message {
     id: string;
+    roomId?: string;
     senderId: string;
     text: string;
     createdAt: string;
@@ -17,14 +19,15 @@ interface ChatModalProps {
     adTitle: string;
     isOpen: boolean;
     onClose: () => void;
-    // В будущем сюда нужно будет передавать currentUserId, чтобы отличать свои сообщения
 }
 
 export default function ChatModal({ adId, adTitle, isOpen, onClose }: ChatModalProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [roomId, setRoomId] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const { connection } = useChat();
 
     // Имитация загрузки истории сообщений
     useEffect(() => {
@@ -33,10 +36,68 @@ export default function ChatModal({ adId, adTitle, isOpen, onClose }: ChatModalP
                 credentials: 'include' // Важно для передачи Cookie/Токена авторизации
             })
                 .then(res => res.json())
-                .then(data => setMessages(data))
+                .then((data: Message[]) => {
+                    setMessages(data);
+                    if (data.length > 0 && data[0].roomId) {
+                        setRoomId(data[0].roomId);
+                        // Помечаем как прочитанные
+                        fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/chat/read`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ roomId: data[0].roomId })
+                        });
+                    }
+                })
                 .catch(err => console.error(err));
         }
     }, [isOpen, adId]);
+
+    // Обработка входящих сообщений через SignalR
+    useEffect(() => {
+        if (connection && isOpen) {
+            const handleReceiveMessage = (message: Message) => {
+                // Если сообщение для текущего объявления
+                // В идеале проверять по roomId, но если чат только начат, roomId может еще не быть.
+                // Поэтому проверяем, если roomId совпадает или если это первое сообщение (тогда просто перезагрузим историю)
+                if (roomId && message.roomId?.toLowerCase() === roomId.toLowerCase() && message.senderId !== 'me') {
+                    setMessages(prev => [...prev, message]);
+                    
+                    fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/chat/read`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ roomId: roomId })
+                    });
+                } else if (!roomId) {
+                    // Если комнаты еще не было, но пришло сообщение (например, мы сами только что написали и нам ответили)
+                    // Просто перезагрузим историю
+                    fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/chat/history?adId=${adId}`, {
+                        credentials: 'include'
+                    })
+                        .then(res => res.json())
+                        .then((data: Message[]) => {
+                            setMessages(data);
+                            if (data.length > 0 && data[0].roomId) setRoomId(data[0].roomId);
+                        });
+                }
+            };
+
+            const handleMessagesRead = (data: { roomId?: string, RoomId?: string }) => {
+                const rId = data.roomId || data.RoomId;
+                if (roomId && rId && roomId.toLowerCase() === rId.toLowerCase()) {
+                    setMessages(prev => prev.map(m => m.senderId === 'me' ? { ...m, isRead: true } : m));
+                }
+            };
+
+            connection.on('ReceiveMessage', handleReceiveMessage);
+            connection.on('MessagesRead', handleMessagesRead);
+            return () => {
+                connection.off('ReceiveMessage', handleReceiveMessage);
+                connection.off('MessagesRead', handleMessagesRead);
+            };
+        }
+    }, [connection, isOpen, roomId, adId]);
 
     // Прокрутка вниз при новом сообщении
     useEffect(() => {
@@ -57,12 +118,16 @@ export default function ChatModal({ adId, adTitle, isOpen, onClose }: ChatModalP
 
         try {
             // Отправляем на бэкенд
-            await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/chat/send`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/chat/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ adId, text: tempMessage.text })
             });
+            const data = await res.json();
+            if (data.roomId && !roomId) {
+                setRoomId(data.roomId);
+            }
             // Если все ок - бэкенд сохранил сообщение. 
             // При обновлении страницы оно придет из истории.
         } catch (e) {

@@ -4,6 +4,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './add-ad.module.css';
+import MapPicker from './MapPicker';
 
 export default function AddAdClient() {
   const router = useRouter();
@@ -11,6 +12,8 @@ export default function AddAdClient() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [address, setAddress] = useState('');
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [images, setImages] = useState<File[]>([]);
   
   const [loading, setLoading] = useState(false);
@@ -37,6 +40,18 @@ export default function AddAdClient() {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Форматирование цены (разделение тысяч)
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Удаляем все нецифровые символы
+    const rawValue = e.target.value.replace(/\D/g, '');
+    setPrice(rawValue);
+  };
+
+  const formatPrice = (val: string) => {
+    if (!val) return '';
+    return val.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -50,6 +65,11 @@ export default function AddAdClient() {
       formData.append('title', title);
       formData.append('description', description);
       formData.append('price', price);
+      
+      if (coordinates) {
+        formData.append('latitude', coordinates[0].toString());
+        formData.append('longitude', coordinates[1].toString());
+      }
       
       images.forEach(image => {
         formData.append('images', image);
@@ -68,7 +88,20 @@ export default function AddAdClient() {
       }
 
       if (!res.ok) {
-        throw new Error('Не удалось сохранить объявление. Проверьте данные.');
+        const errorData = await res.json().catch(() => null);
+        console.error('Ошибка сервера:', errorData);
+        
+        let errorMessage = 'Не удалось сохранить объявление. Проверьте данные.';
+        if (errorData && errorData.errors) {
+            const messages = Object.values(errorData.errors).flat();
+            errorMessage = messages.join(' ');
+        } else if (errorData && errorData.title) {
+            errorMessage = errorData.title;
+        } else if (errorData && errorData.message) {
+            errorMessage = errorData.message;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       // Успешно! Редиректим на главную (или можно на страницу "Мои объявления")
@@ -106,12 +139,11 @@ export default function AddAdClient() {
           <div className={styles.formGroup}>
             <label>Цена (₽) *</label>
             <input 
-              type="number" 
+              type="text" 
               required 
-              min="1"
               placeholder="0"
-              value={price} 
-              onChange={e => setPrice(e.target.value)} 
+              value={formatPrice(price)} 
+              onChange={handlePriceChange} 
             />
           </div>
 
@@ -124,6 +156,16 @@ export default function AddAdClient() {
               placeholder="Опишите характеристики, расположение, состояние..."
               value={description} 
               onChange={e => setDescription(e.target.value)} 
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Адрес объекта и расположение на карте</label>
+            <MapPicker 
+              address={address}
+              setAddress={setAddress}
+              coordinates={coordinates}
+              setCoordinates={setCoordinates}
             />
           </div>
 

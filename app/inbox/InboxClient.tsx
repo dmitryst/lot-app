@@ -56,7 +56,7 @@ export default function InboxClient() {
         if (connection) {
             const handleReceiveMessage = (message: Message) => {
                 // Если сообщение для текущего активного чата
-                if (activeRoom && message.roomId === activeRoom.roomId && message.senderId !== 'me') {
+                if (activeRoom && message.roomId?.toLowerCase() === activeRoom.roomId.toLowerCase() && message.senderId !== 'me') {
                     setMessages(prev => [...prev, message]);
                     
                     // Сразу помечаем как прочитанное
@@ -72,7 +72,7 @@ export default function InboxClient() {
 
             const handleMessagesRead = (data: { roomId?: string, RoomId?: string }) => {
                 const rId = data.roomId || data.RoomId;
-                if (activeRoom && activeRoom.roomId === rId) {
+                if (activeRoom && rId && activeRoom.roomId.toLowerCase() === rId.toLowerCase()) {
                     setMessages(prev => prev.map(m => m.senderId === 'me' ? { ...m, isRead: true } : m));
                 }
             };

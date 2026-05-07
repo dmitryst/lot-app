@@ -80,6 +80,16 @@ export const Header = () => {
                                 {favoritesCount > 0 && <span className={styles.badge}>{favoritesCount}</span>}
                             </Link>
 
+                            {/* Админка */}
+                            {user.isAdmin && (
+                                <Link href="/admin/ads" className={styles.accountLink} title="Модерация">
+                                    <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    </svg>
+                                    <span className={styles.accountText}>Модерация</span>
+                                </Link>
+                            )}
+
                             {/* Аккаунт / Профиль */}
                             <Link href="/account" className={styles.accountLink} title="Аккаунт">
                                 <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

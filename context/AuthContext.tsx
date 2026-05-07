@@ -13,6 +13,7 @@ interface User {
     subscriptionEndDate?: string | null;
     isOnTrial?: boolean;            //служит визуальным маркером для правильного отображения текстов и счетчиков
     createdAt?: string;
+    isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -50,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         subscriptionEndDate: data.subscriptionEndDate,
                         isOnTrial: data.isOnTrial,
                         createdAt: data.createdAt,
+                        isAdmin: data.isAdmin,
                     });
                 } else {
                     setUser(null);

@@ -1,0 +1,116 @@
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.heading {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.adCard {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.adHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.adTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+}
+
+.adPrice {
+    font-size: 1.1rem;
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.adAuthor {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.adDescription {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #333;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+.imageGrid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.imageItem {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.approveBtn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.approveBtn:hover {
+    background: #15803d;
+}
+
+.rejectBtn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rejectBtn:hover {
+    background: #b91c1c;
+}
