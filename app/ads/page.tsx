@@ -44,6 +44,20 @@ function AdsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'ad_created') {
+      setShowSuccessAlert(true);
+      // Убираем параметр из URL, чтобы при обновлении страницы алерт не появлялся снова
+      const newUrl = pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Скрываем через 5 секунд
+      setTimeout(() => setShowSuccessAlert(false), 5000);
+    }
+  }, [searchParams, pathname]);
+
   const page = Number(searchParams.get('page')) || 1;
 
   const [ads, setAds] = useState<UserAd[]>([]);
@@ -96,6 +110,12 @@ function AdsPage() {
           + Добавить объявление
         </Link>
       </div>
+
+      {showSuccessAlert && (
+        <div className={styles.successAlert}>
+          Объявление успешно создано и отправлено на модерацию. Оно появится в списке после проверки администратором.
+        </div>
+      )}
 
       {loading ? (
         <div className={styles.loading}>Загрузка объявлений...</div>

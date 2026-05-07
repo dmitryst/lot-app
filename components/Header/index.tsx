@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useChat } from '@/context/ChatContext';
+import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import { usePromoVisibility } from '../../app/hooks/usePromoVisibility';
 import { hot_lot_id } from '../../app/data/constants';
@@ -14,6 +15,22 @@ export const Header = () => {
     const { user, logout } = useAuth();
     const { favoritesCount } = useFavorites();
     const { unreadCount } = useChat();
+    const [moderationCount, setModerationCount] = useState(0);
+
+    useEffect(() => {
+        if (user?.isAdmin) {
+            fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/ads/moderation/count`, {
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.count === 'number') {
+                    setModerationCount(data.count);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки счетчика модерации', err));
+        }
+    }, [user]);
 
     // --- ПОЛУЧАЕМ ТЕКУЩИЙ URL ---
     const pathname = usePathname();
@@ -83,9 +100,12 @@ export const Header = () => {
                             {/* Админка */}
                             {user.isAdmin && (
                                 <Link href="/admin/ads" className={styles.accountLink} title="Модерация">
-                                    <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                    </svg>
+                                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                        <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        </svg>
+                                        {moderationCount > 0 && <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>{moderationCount}</span>}
+                                    </div>
                                     <span className={styles.accountText}>Модерация</span>
                                 </Link>
                             )}

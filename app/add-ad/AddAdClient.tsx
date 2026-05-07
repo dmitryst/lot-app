@@ -104,8 +104,8 @@ export default function AddAdClient() {
         throw new Error(errorMessage);
       }
 
-      // Успешно! Редиректим на главную (или можно на страницу "Мои объявления")
-      router.push('/?success=ad_created');
+      // Успешно! Редиректим на страницу "Мои объявления" (или каталог)
+      router.push('/ads?success=ad_created');
       
     } catch (err: any) {
       setError(err.message || 'Произошла ошибка при отправке');
