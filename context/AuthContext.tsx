@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 interface User {
     id?: string;
+    name?: string;
     email: string;
     isSubscriptionActive?: boolean; // означает глобальный доступ к Pro-функциям (так как мы подменили его на HasProAccess на стороне C#)
     subscriptionEndDate?: string | null;
@@ -43,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     
                     setUser({
                         id: data.id,
+                        name: data.name,
                         email: data.email,
                         isSubscriptionActive: data.isSubscriptionActive,
                         subscriptionEndDate: data.subscriptionEndDate,

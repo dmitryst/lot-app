@@ -1,3 +1,5 @@
+/* components/LotItem/style.module.css */
+
 /* Обертка для карточки, чтобы позиционировать кнопку Добавить в избранное */
 .container {
   position: relative;

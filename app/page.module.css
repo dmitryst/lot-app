@@ -1,3 +1,5 @@
+/* app/page.module.css */
+
 /* =================================================================== */
 /* ЧАСТЬ 1: НОВЫЕ СТИЛИ ДЛЯ АДАПТИВНОГО МАКЕТА (Mobile-First) */
 /* Эти стили отвечают за базовый макет и поведение на мобильных */
@@ -5,7 +7,8 @@
 
 .main {
   display: flex;
-  flex-direction: column; /* Вертикальный макет для мобильных */
+  flex-direction: column;
+  /* Вертикальный макет для мобильных */
   gap: 1.5rem;
   padding-top: 0;
 }
@@ -20,7 +23,8 @@
 
 /* Кнопка для показа/скрытия фильтров на мобильных */
 .toggleFiltersButton {
-  display: block; /* По умолчанию видна */
+  display: block;
+  /* По умолчанию видна */
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
@@ -62,7 +66,8 @@
 /* --- НОВЫЙ ДВУХКОЛОНОЧНЫЙ МАКЕТ --- */
 .mainLayout {
   display: flex;
-  gap: 32px; /* Расстояние между сайдбаром и контентом */
+  gap: 32px;
+  /* Расстояние между сайдбаром и контентом */
   align-items: flex-start;
   max-width: 1200px;
   margin-top: 0;
@@ -71,17 +76,21 @@
 
 /* --- САЙДБАР --- */
 .filtersSidebar {
-  flex: 0 0 260px; /* Не будет расти, не будет сжиматься, базовая ширина 260px */
+  flex: 0 0 260px;
+  /* Не будет расти, не будет сжиматься, базовая ширина 260px */
   background: #fff;
   padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: relative; /* Создаем новый контекст наложения */
-  z-index: 20;        /* Устанавливаем его выше, чем у соседнего .mainContent */
+  position: relative;
+  /* Создаем новый контекст наложения */
+  z-index: 20;
+  /* Устанавливаем его выше, чем у соседнего .mainContent */
 }
 
 .contentArea {
-  flex: 1; /* Занимает всё оставшееся пространство */
+  flex: 1;
+  /* Занимает всё оставшееся пространство */
 }
 
 /* --- СТИЛИ СПИСКА ЛОТОВ (остаются без изменений) --- */
@@ -111,21 +120,28 @@
   /* Контейнер теперь занимает всю ширину */
   .filtersContainer {
     width: 100%;
-    margin-bottom: 2rem; /* Отступ от списка лотов */
+    margin-bottom: 2rem;
+    /* Отступ от списка лотов */
   }
 
   /* --- ПАНЕЛЬ ФИЛЬТРОВ --- */
   .filtersSidebar {
-    display: flex; /* Фильтры всегда видны на десктопе */
-    flex-direction: row; /* горизонтальное расположение */
-    flex-wrap: wrap; /* Позволяем фильтрам переноситься на новую строку */
-    align-items: center; /* Выравниваем группы фильтров по центру */
-    gap: 1.5rem; /* Расстояние между группами фильтров */
+    display: flex;
+    /* Фильтры всегда видны на десктопе */
+    flex-direction: row;
+    /* горизонтальное расположение */
+    flex-wrap: wrap;
+    /* Позволяем фильтрам переноситься на новую строку */
+    align-items: center;
+    /* Выравниваем группы фильтров по центру */
+    gap: 1.5rem;
+    /* Расстояние между группами фильтров */
 
     /* Убираем стили сайдбара */
     position: static;
     width: 100%;
-    padding: 1rem 1.5rem; /* Уменьшаем вертикальные отступы */
+    padding: 1rem 1.5rem;
+    /* Уменьшаем вертикальные отступы */
     border-radius: 12px;
     background-color: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -141,19 +157,22 @@
    * Начиная с 962px, снова отображаем 1 колонку
   */
   .lotsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Убрал отсюда, так как переопределяем ниже */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    /* Убрал отсюда, так как переопределяем ниже */
   }
 }
 
 @media (min-width: 769px) and (max-width: 961px) {
   .lotsGrid {
-    grid-template-columns: 1fr 1fr; /* Две колонки между 769px и 961px */
+    grid-template-columns: 1fr 1fr;
+    /* Две колонки между 769px и 961px */
   }
 }
 
 @media (min-width: 962px) {
   .lotsGrid {
-    grid-template-columns: 1fr; /* Одна колонка с 962px и выше */
+    grid-template-columns: 1fr;
+    /* Одна колонка с 962px и выше */
   }
 }
 
@@ -200,11 +219,13 @@
   display: block;
   width: 100%;
   padding: 12px;
-  margin-top: 1.5rem; /* Отступ сверху */
+  margin-top: 1.5rem;
+  /* Отступ сверху */
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background-color: #28a745; /* Зеленый цвет для акцента */
+  background-color: #28a745;
+  /* Зеленый цвет для акцента */
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -219,19 +240,23 @@
 
 /* Контейнер для баннера */
 .mapBanner {
-  position: relative; /* Необходимо для позиционирования псевдо-элемента */
+  position: relative;
+  /* Необходимо для позиционирования псевдо-элемента */
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 140px; /* Примерная высота, равная ~2 высотам кнопки */
+  height: 140px;
+  /* Примерная высота, равная ~2 высотам кнопки */
   margin-top: 0;
   margin-bottom: 0;
-  background-image: url('/map-bg.jpg'); /* Путь к вашему фоновому изображению */
+  background-image: url('/map-bg.jpg');
+  /* Путь к вашему фоновому изображению */
   background-size: cover;
   background-position: center;
   border-radius: 12px;
-  overflow: hidden; /* Скрываем все, что выходит за пределы скругленных углов */
+  overflow: hidden;
+  /* Скрываем все, что выходит за пределы скругленных углов */
 }
 
 /* Затемняющий слой поверх картинки для лучшей читаемости текста */
@@ -242,24 +267,30 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4); /* Черный полупрозрачный слой */
-  z-index: 1; /* Размещаем под кнопкой */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Черный полупрозрачный слой */
+  z-index: 1;
+  /* Размещаем под кнопкой */
 }
 
 /* Кнопка-ссылка, которая теперь находится поверх баннера */
 .mapLinkButton {
-  position: relative; /* Чтобы кнопка была над затемняющим слоем */
+  position: relative;
+  /* Чтобы кнопка была над затемняющим слоем */
   z-index: 2;
-  display: inline-flex; /* Используем inline-flex для центрирования текста */
+  display: inline-flex;
+  /* Используем inline-flex для центрирования текста */
   align-items: center;
   justify-content: center;
-  height: 60px; /* Фиксированная высота кнопки */
+  height: 60px;
+  /* Фиксированная высота кнопки */
   padding: 0 32px;
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
   background-color: #007bff;
-  border: 2px solid #fff; /* Белая рамка для контраста */
+  border: 2px solid #fff;
+  /* Белая рамка для контраста */
   border-radius: 10px;
   text-decoration: none;
   box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
@@ -334,7 +365,7 @@
     align-items: flex-start;
     padding: 20px;
   }
-  
+
   .promoButton {
     width: 100%;
     text-align: center;
@@ -344,26 +375,136 @@
 /* Стили для оберток hero-секции и промо баннера */
 .heroWrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Делим экран пополам */
-  gap: 40px; /* Отступ между текстом и баннером */
-  align-items: center; /* Центрируем по вертикали */
+  grid-template-columns: 1fr 1fr;
+  /* Делим экран пополам */
+  gap: 40px;
+  /* Отступ между текстом и баннером */
+  align-items: center;
+  /* Центрируем по вертикали */
   width: 100%;
-  max-width: 1440px; /* Ограничиваем ширину на огромных экранах */
-  margin: 0 auto 20px; /* Отступ снизу до карты */
-  padding: 0 20px; /* Безопасные отступы по бокам */
+  max-width: 1440px;
+  /* Ограничиваем ширину на огромных экранах */
+  margin: 0 auto 20px;
+  /* Отступ снизу до карты */
+  padding: 0 20px;
+  /* Безопасные отступы по бокам */
 }
 
 /* Обертка для баннера, чтобы он не "схлопывался" */
 .promoWrapper {
   width: 100%;
-  min-width: 0; /* Важный фикс для Grid/Flex элементов */
+  min-width: 0;
+  /* Важный фикс для Grid/Flex элементов */
 }
 
 /* АДАПТИВ: На планшетах и мобильных возвращаем "столбик" */
 @media (max-width: 1024px) {
   .heroWrapper {
-    grid-template-columns: 1fr; /* Одна колонка */
+    grid-template-columns: 1fr;
+    /* Одна колонка */
     text-align: center;
     gap: 30px;
   }
+}
+
+/* --- СЕТКА ДЛЯ БАННЕРОВ (Карта + Добавить объявление) --- */
+.actionBannersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* На мобилках друг под другом */
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 769px) {
+  .actionBannersGrid {
+    grid-template-columns: 1fr 1fr;
+    /* На десктопе рядом */
+    gap: 24px;
+  }
+}
+
+/* Стили для нового баннера "Добавить объявление" */
+.addAdBanner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 32px;
+  height: 140px;
+  /* Такая же высота как у карты */
+  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.addAdContent h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.addAdContent p {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Контейнер для двух кнопок */
+.addAdButtons {
+  display: flex;
+  flex-wrap: wrap;
+  /* Чтобы на узких экранах кнопки переносились */
+  gap: 12px;
+  margin-top: 4px;
+  /* Небольшой отступ от текста */
+}
+
+.addAdLinkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #28a745;
+  /* Зеленая кнопка для целевого действия */
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.addAdLinkButton:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Кнопка "Смотреть объявления" */
+.viewAdsLinkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #28a745;
+  /* Зеленый текст */
+  background-color: transparent;
+  border: 2px solid #28a745;
+  /* Зеленая рамка */
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.viewAdsLinkButton:hover {
+  background-color: rgba(40, 167, 69, 0.05); /* Легкий зеленый фон при наведении */
+  transform: translateY(-2px);
 }

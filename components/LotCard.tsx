@@ -1,3 +1,5 @@
+// components/LotCard.tsx
+
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -50,6 +52,23 @@ const PublishIcon = ({ status }: { status: 'idle' | 'loading' | 'success' | 'err
     return ( // Облако для стандартного состояния
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-upload-cloud"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M12 12v6" /><path d="m15 15-3 3-3-3" /></svg>
     );
+};
+
+// --- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ СТАТУСА ---
+const getStatusClass = (status?: string | null) => {
+    if (!status) return styles.statusDefault;
+    const s = status.toLowerCase();
+
+    if (s.includes('завершен') || s.includes('состоял') || s.includes('продан')) {
+        return styles.statusCompleted;
+    }
+    if (s.includes('отменен') || s.includes('приостановлен') || s.includes('не состоял') || s.includes('аннулирован')) {
+        return styles.statusCanceled;
+    }
+    if (s.includes('прием заявок') || s.includes('идут торги') || s.includes('опубликован')) {
+        return styles.statusActive;
+    }
+    return styles.statusDefault;
 };
 
 // --- ПРОПСЫ КОМПОНЕНТА ---
@@ -196,10 +215,17 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
             {/* Блок для изображения (1/3 ширины) */}
             <div className={styles.imageWrapper}>
 
-                {/* Бейдж региона */}
+                {/* Бейдж региона (слева) */}
                 {lot.propertyRegionName && (
                     <div className={styles.regionBadge}>
                         {lot.propertyRegionName}
+                    </div>
+                )}
+
+                {/* Бейдж статуса (справа) */}
+                {lot.tradeStatus && (
+                    <div className={`${styles.statusBadge} ${getStatusClass(lot.tradeStatus)}`}>
+                        {lot.tradeStatus}
                     </div>
                 )}
 
@@ -234,15 +260,35 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                         </div>
                     )}
 
-                    <p className={styles.priceDetail}>
-                        Начальная цена:
-                        <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>
-                        {lot.bidding.type === 'Публичное предложение' ? (
-                            <span className={styles.iconDown}><IconArrowDown /></span>
-                        ) : (
-                            <span className={styles.iconUp}><IconArrowUp /></span>
-                        )}
-                    </p>
+                    {/* --- БЛОК ЦЕНЫ --- */}
+                    {lot.finalPrice ? (
+                        <div className={styles.finalPriceContainer}>
+                            <p className={styles.priceDetailFinal}>
+                                <span className={styles.priceLabelFinal}>Продано за:</span>
+                                <span className={styles.priceValueFinal}>{formatMoney(lot.finalPrice)}</span>
+                            </p>
+                            <p className={styles.priceDetailOld}>
+                                <span className={styles.priceLabel}>Начальная цена:</span>
+                                <span className={styles.priceValueOld}>{formatMoney(lot.startPrice)}</span>
+                                {/* ДОБАВЛЕНО: Стрелка направления торгов (вверх/вниз) */}
+                                {lot.bidding?.type === 'Публичное предложение' ? (
+                                    <span className={styles.iconDown}><IconArrowDown /></span>
+                                ) : (
+                                    <span className={styles.iconUp}><IconArrowUp /></span>
+                                )}
+                            </p>
+                        </div>
+                    ) : (
+                        <p className={styles.priceDetail}>
+                            <span className={styles.priceLabel}>Начальная цена:</span>
+                            <span className={styles.priceValue}>{formatMoney(lot.startPrice)}</span>
+                            {lot.bidding?.type === 'Публичное предложение' ? (
+                                <span className={styles.iconDown}><IconArrowDown /></span>
+                            ) : (
+                                <span className={styles.iconUp}><IconArrowUp /></span>
+                            )}
+                        </p>
+                    )}
 
                     {/* {lot.step && (
                         <p className={styles.priceDetail}>
@@ -300,9 +346,9 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                                     aria-label={isInvestmentExpanded ? "Скрыть детали" : "Показать детали оценки"}
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <path d="M12 16v-4"/>
-                                        <path d="M12 8h.01"/>
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 16v-4" />
+                                        <path d="M12 8h.01" />
                                     </svg>
                                 </button>
                             )}

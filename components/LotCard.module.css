@@ -1,3 +1,5 @@
+/* components/LotCard.module.css */
+
 .lotCardContainer {
   width: 100%;
   border-radius: 14px;
@@ -7,7 +9,6 @@
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
-  /* Для мобильных - все вертикально */
   padding: 10px;
 }
 
@@ -230,10 +231,14 @@
 
 .priceRow {
   display: flex;
-  align-items: center; /* Выравнивание по центру по вертикали */
-  flex-wrap: wrap;     /* Разрешаем перенос, если не влезает */
-  gap: 8px;            /* Отступ между элементами внутри строки */
-  margin-bottom: 8px;  /* Отступ между строками */
+  align-items: center;
+  /* Выравнивание по центру по вертикали */
+  flex-wrap: wrap;
+  /* Разрешаем перенос, если не влезает */
+  gap: 8px;
+  /* Отступ между элементами внутри строки */
+  margin-bottom: 8px;
+  /* Отступ между строками */
   width: 100%;
 }
 
@@ -260,9 +265,18 @@
   flex-shrink: 0;
   /* margin-right не нужен из-за gap */
 }
-.confidenceHigh { background-color: #10b981; }
-.confidenceMedium { background-color: #f59e0b; }
-.confidenceLow { background-color: #ef4444; }
+
+.confidenceHigh {
+  background-color: #10b981;
+}
+
+.confidenceMedium {
+  background-color: #f59e0b;
+}
+
+.confidenceLow {
+  background-color: #ef4444;
+}
 
 /* Бейджи апсайда */
 .upsideBadge {
@@ -274,9 +288,21 @@
   font-weight: 600;
   white-space: nowrap;
 }
-.upsidePositive { background-color: #dcfce7; color: #166534; }
-.upsideNegative { background-color: #fee2e2; color: #991b1b; }
-.upsideNeutral  { background-color: #f1f5f9; color: #475569; }
+
+.upsidePositive {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.upsideNegative {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.upsideNeutral {
+  background-color: #f1f5f9;
+  color: #475569;
+}
 
 /* Кнопка раскрытия */
 .expandButton {
@@ -290,11 +316,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: auto; /* Прижимаем кнопку вправо */
+  margin-left: auto;
+  /* Прижимаем кнопку вправо */
   min-width: 28px;
   min-height: 28px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
+
 .expandButton:hover {
   background-color: #3b82f6;
   color: white;
@@ -302,6 +330,7 @@
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   transform: translateY(-1px);
 }
+
 .expandButton:active {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);
@@ -323,8 +352,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Для десктопа - размещение в строку */
@@ -350,4 +386,108 @@
   .buyButton {
     display: none;
   }
+}
+
+/* ========================================================
+   НОВЫЕ СТИЛИ ДЛЯ СТАТУСА ТОРГОВ И ИТОГОВОЙ ЦЕНЫ
+   ======================================================== */
+
+/* Бейдж статуса поверх картинки (справа) */
+.statusBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  z-index: 5;
+
+  /* Эффект матового стекла */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Обязательно для поддержки Safari/iOS */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  /* Защита от слишком длинного текста статуса */
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Цвета для разных статусов */
+.statusActive {
+  background-color: rgba(5, 150, 105, 0.7);
+  /* Изумрудный */
+}
+
+.statusCompleted {
+  background-color: rgba(71, 85, 105, 0.7);
+  /* Серо-синий */
+}
+
+.statusCanceled {
+  background-color: rgba(220, 38, 38, 0.7);
+  /* Красный */
+}
+
+.statusDefault {
+  background-color: rgba(37, 99, 235, 0.7);
+  /* Синий */
+}
+
+
+/* Блок цены для ПРОДАННЫХ лотов */
+.finalPriceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background-color: #f0fdf4;
+  /* Очень легкий зеленый фон */
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.priceDetailFinal {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.priceLabelFinal {
+  font-size: 0.9rem;
+  color: #166534;
+  /* Темно-зеленый */
+  font-weight: 600;
+}
+
+.priceValueFinal {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #059669;
+  /* Изумрудный */
+  font-feature-settings: "tnum";
+}
+
+.priceDetailOld {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Начальная цена в блоке проданного лота */
+.priceValueOld {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1a202c;
+  font-feature-settings: "tnum";
 }

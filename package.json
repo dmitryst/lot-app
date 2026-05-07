@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "@pbe/react-yandex-maps": "^1.2.5",
     "lodash.debounce": "^4.0.8",
     "next": "16.2.4",

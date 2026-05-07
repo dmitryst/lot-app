@@ -8,6 +8,7 @@ import Link from 'next/link';
 import styles from '../login.module.css';
 
 export default function RegisterForm() {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function RegisterForm() {
             const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ name, email, password }),
             });
 
             if (res.ok) {
@@ -60,6 +61,18 @@ export default function RegisterForm() {
             <div className={styles.formWrapper}>
                 <h1 className={styles.title}>Регистрация</h1>
                 <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.inputGroup}>
+                        <label htmlFor="name" className={styles.label}>Имя</label>
+                        <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            className={styles.input}
+                            placeholder="Иван Иванов"
+                        />
+                    </div>
                     <div className={styles.inputGroup}>
                         <label htmlFor="email" className={styles.label}>Email</label>
                         <input

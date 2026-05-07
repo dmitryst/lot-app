@@ -218,10 +218,28 @@ function Page() {
       </div>
 
 
-      <div className={styles.mapBanner}>
-        <Link href="/map" className={styles.mapLinkButton}>
-          Смотреть недвижимость на карте
-        </Link>
+      <div className={styles.actionBannersGrid}>
+        <div className={styles.mapBanner}>
+          <Link href="/map" className={styles.mapLinkButton}>
+            Смотреть недвижимость на карте
+          </Link>
+        </div>
+
+        <div className={styles.addAdBanner}>
+          <div className={styles.addAdContent}>
+            <h3>Частные объявления</h3>
+            <p>Разместите объявление бесплатно или найдите предложения от других инвесторов.</p>
+          </div>
+          {/* Обертка для двух кнопок */}
+          <div className={styles.addAdButtons}>
+            <Link href="/add-ad" className={styles.addAdLinkButton}>
+              + Добавить объявление
+            </Link>
+            <Link href="/ads" className={styles.viewAdsLinkButton}>
+              Смотреть объявления
+            </Link>
+          </div>
+        </div>
       </div>
 
       <section className={styles.contentArea}>

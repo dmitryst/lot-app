@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useFavorites } from '@/context/FavoritesContext';
+import { useChat } from '@/context/ChatContext';
 import styles from './styles.module.css';
 import { usePromoVisibility } from '../../app/hooks/usePromoVisibility';
 import { hot_lot_id } from '../../app/data/constants';
@@ -12,6 +13,7 @@ import { hot_lot_id } from '../../app/data/constants';
 export const Header = () => {
     const { user, logout } = useAuth();
     const { favoritesCount } = useFavorites();
+    const { unreadCount } = useChat();
 
     // --- ПОЛУЧАЕМ ТЕКУЩИЙ URL ---
     const pathname = usePathname();
@@ -61,6 +63,14 @@ export const Header = () => {
                     {user ? (
                         <>
                             <span className={styles.userInfo}>{user.email}</span>
+
+                            {/* Сообщения */}
+                            <Link href="/inbox" className={styles.favLink} title="Сообщения">
+                                <svg viewBox="0 0 24 24" className={styles.favIcon} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
+                            </Link>
 
                             {/* Избранное */}
                             <Link href="/favorites" className={styles.favLink} title="Избранное">
