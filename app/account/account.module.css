@@ -201,3 +201,10 @@
   background-color: #fff5f5;
 }
 
+/* Сетка для моих объявлений */
+.adsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
