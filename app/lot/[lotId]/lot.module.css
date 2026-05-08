@@ -94,6 +94,13 @@
   justify-content: space-between;
   border-bottom: 1px solid #edf2f7;
   padding-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.lotInfoColumn {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .lotInfo b {
@@ -874,4 +881,31 @@
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
+}
+
+/* Элегантная заглушка PRO-доступа */
+.proBadgeWrapper {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: #ebf8ff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #bee3f8;
+  transition: all 0.2s ease;
+}
+
+.proBadgeWrapper:hover {
+  background-color: #e0f2fe;
+  border-color: #90cdf4;
+  box-shadow: 0 4px 6px rgba(49, 130, 206, 0.1);
+  transform: translateY(-1px);
+}
+
+.proBadgeContent {
+  display: flex;
+  align-items: center;
+  color: #2b6cb0;
+  font-size: 0.95rem;
+  font-weight: 600;
 }

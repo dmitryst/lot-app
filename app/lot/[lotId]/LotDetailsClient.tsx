@@ -314,6 +314,36 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
           )}
 
+          {lot.bidding?.bankruptMessageId && (
+            <div className={`${styles.lotInfo} ${styles.lotInfoColumn}`}>
+              <b>Объявление о проведении торгов:</b>
+              {user?.isSubscriptionActive ? (
+                <a
+                  href={`https://fedresurs.ru/bankruptmessages/${lot.bidding.bankruptMessageId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.documentLink}
+                >
+                  Открыть объявление
+                </a>
+              ) : (
+                <div 
+                  className={styles.proBadgeWrapper}
+                  onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
+                  title={user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
+                >
+                  <div className={styles.proBadgeContent}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', flexShrink: 0 }}>
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Доступно пользователям с PRO доступом
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* КНОПКА ИЗБРАННОГО размещена после описания (до фотографий в мобильной версии, и сверху в информационной панели на десктопе) */}
           <div className={styles.favoriteButtonWrap}>
             <button
