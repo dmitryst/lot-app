@@ -15,6 +15,7 @@ import { Lot } from '../types';
 
 import PromoGrid from '@/components/PromoGrid/PromoGrid';
 import HeroSection from '@/components/HeroSection/HeroSection';
+import { useAuth } from '@/context/AuthContext';
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -30,6 +31,7 @@ function Page() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   // ЕДИНСТВЕННЫЙ источник данных для API — URL
   const page = Number(searchParams.get('page')) || 1;
@@ -225,21 +227,23 @@ function Page() {
           </Link>
         </div>
 
-        <div className={styles.addAdBanner}>
-          <div className={styles.addAdContent}>
-            <h3>Частные объявления</h3>
-            <p>Разместите объявление бесплатно или найдите предложения от других инвесторов.</p>
+        {user?.isAdmin && (
+          <div className={styles.addAdBanner}>
+            <div className={styles.addAdContent}>
+              <h3>Частные объявления</h3>
+              <p>Разместите объявление бесплатно или найдите предложения от других инвесторов.</p>
+            </div>
+            {/* Обертка для двух кнопок */}
+            <div className={styles.addAdButtons}>
+              <Link href="/add-ad" className={styles.addAdLinkButton}>
+                + Добавить объявление
+              </Link>
+              <Link href="/ads" className={styles.viewAdsLinkButton}>
+                Смотреть объявления
+              </Link>
+            </div>
           </div>
-          {/* Обертка для двух кнопок */}
-          <div className={styles.addAdButtons}>
-            <Link href="/add-ad" className={styles.addAdLinkButton}>
-              + Добавить объявление
-            </Link>
-            <Link href="/ads" className={styles.viewAdsLinkButton}>
-              Смотреть объявления
-            </Link>
-          </div>
-        </div>
+        )}
       </div>
 
       <section className={styles.contentArea}>
