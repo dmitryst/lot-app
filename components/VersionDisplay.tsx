@@ -4,7 +4,8 @@
 import { useEffect, useState } from 'react';
 
 export default function VersionDisplay() {
-  const [backendVersion, setBackendVersion] = useState('...');
+  const [webApiVersion, setWebApiVersion] = useState('...');
+  const [scraperVersion, setScraperVersion] = useState('...');
 
   useEffect(() => {
     async function fetchVersion() {
@@ -12,12 +13,15 @@ export default function VersionDisplay() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/health/version`);
         if (res.ok) {
           const data = await res.json();
-          setBackendVersion(data.version);
+          setWebApiVersion(data.webApiVersion || data.version || 'unknown');
+          setScraperVersion(data.scraperVersion || 'unknown');
         } else {
-          setBackendVersion('error');
+          setWebApiVersion('error');
+          setScraperVersion('error');
         }
       } catch (error) {
-        setBackendVersion('n/a');
+        setWebApiVersion('n/a');
+        setScraperVersion('n/a');
       }
     }
 
@@ -29,7 +33,7 @@ export default function VersionDisplay() {
 
   return (
     <div style={{ fontSize: '0.8rem', color: '#718096' }}>
-      <span>Frontend: {frontendVersion}</span> | <span>Backend: {backendVersion}</span>
+      <span>Frontend: {frontendVersion}</span> | <span>Backend: {webApiVersion}</span> | <span>{scraperVersion}</span>
     </div>
   );
 }
