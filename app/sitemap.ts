@@ -23,6 +23,18 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       changeFrequency: 'daily',
       priority: 1,
     });
+    staticRoutes.push({
+      url: `${BASE_URL}/how-it-works/alerts`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    });
+    staticRoutes.push({
+      url: `${BASE_URL}/how-it-works/similar-lots`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    });
   }
 
   // Запрашиваем чанк данных из API

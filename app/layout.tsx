@@ -56,6 +56,8 @@ export default function RootLayout({
                   <VersionDisplay />
                   <nav>
                     <Link href="/subscribe" className="footer-link">Тарифы</Link>
+                    <Link href="/how-it-works/alerts" className="footer-link">Умная рассылка</Link>
+                    <Link href="/how-it-works/similar-lots" className="footer-link">Похожие лоты</Link>
                     {/* <Link href="/terms" className="footer-link">Публичная оферта</Link> */}
                     <Link href="/requisites" className="footer-link">Реквизиты</Link>
                   </nav>

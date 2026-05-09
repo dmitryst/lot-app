@@ -57,6 +57,17 @@ export type Lot = {
   finalPrice?: number;
   winnerName?: string;
   winnerInn?: string;
+  similarLots?: SimilarLot[];
+  sameCadastralLots?: SimilarLot[];
+};
+
+export type SimilarLot = {
+  id: string;
+  publicId: number;
+  title: string | null;
+  slug?: string | null;
+  startPrice: number | null;
+  imageUrl: string | null;
 };
 
 export type LotDocument = {

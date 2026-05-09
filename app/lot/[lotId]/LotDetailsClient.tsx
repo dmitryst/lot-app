@@ -306,6 +306,34 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             {lot.tradeStatus ? lot.tradeStatus : 'Торги идут (прием заявок)'}
           </div>
 
+          {/* Активные лоты с этим кадастровым номером (под статусом) */}
+          {lot.sameCadastralLots && lot.sameCadastralLots.length > 0 && (
+            <div className={styles.sameCadastralTopBlock}>
+              <h3 className={styles.sameCadastralTopTitle}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Внимание: найдены активные торги по этому объекту!
+              </h3>
+              <div className={styles.sameCadastralTopList}>
+                {lot.sameCadastralLots.map((sl) => {
+                  const slSlug = sl.slug ?? generateSlug(sl.title || '');
+                  const slUrl = `/lot/${slSlug}-${sl.publicId}`;
+                  return (
+                    <a key={sl.id} href={slUrl} className={styles.sameCadastralTopLink}>
+                      <span className={styles.sameCadastralTopLinkTitle}>{sl.title}</span>
+                      {sl.startPrice != null && (
+                        <span className={styles.sameCadastralTopLinkPrice}>{sl.startPrice.toLocaleString('ru-RU')} ₽</span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <p className={styles.lotInfo}><b>Номер лота:</b> {lot.publicId}</p>
           <p className={styles.lotInfo}><b>Тип торгов:</b> {lot.bidding?.type}</p>
           <p className={styles.lotInfo}><b>Прием заявок:</b> {lot.bidding?.bidAcceptancePeriod}</p>
@@ -316,30 +344,35 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           {lot.bidding?.bankruptMessageId && (
             <div className={`${styles.lotInfo} ${styles.lotInfoColumn}`}>
-              <b>Объявление о проведении торгов:</b>
               {user?.isSubscriptionActive ? (
-                <a
-                  href={`https://fedresurs.ru/bankruptmessages/${lot.bidding.bankruptMessageId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.documentLink}
-                >
-                  Открыть объявление
-                </a>
+                <>
+                  <b>Объявление о проведении торгов:</b>
+                  <a
+                    href={`https://fedresurs.ru/bankruptmessages/${lot.bidding.bankruptMessageId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.documentLink}
+                  >
+                    Открыть на Федресурсе
+                  </a>
+                </>
               ) : (
-                <div 
-                  className={styles.proBadgeWrapper}
-                  onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
-                  title={user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
-                >
-                  <div className={styles.proBadgeContent}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', flexShrink: 0 }}>
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    Доступно пользователям с PRO доступом
+                <>
+                  <b>Объявление о проведении торгов:</b>
+                  <div 
+                    className={styles.proBadgeWrapper}
+                    onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
+                    title={user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
+                  >
+                    <div className={styles.proBadgeContent}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', flexShrink: 0 }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                      Доступно пользователям с PRO доступом
+                    </div>
                   </div>
-                </div>
+                </>
               )}
             </div>
           )}
@@ -563,7 +596,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         */}
 
         {/* Экспресс-оценка (Quick) */}
-        {displayPrice && (
+        {!isFinalStatus(lot.tradeStatus) && displayPrice && (
           <div className={styles.descriptionSection}>
             <AiEvaluationBlock
               type="quick"
@@ -577,13 +610,15 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         )}
 
         {/* Глубокая аналитика (DeepSeek Reasoning Evaluation) */}
-        <div className={styles.descriptionSection}>
-          <AiEvaluationBlock
-            type="deep"
-            lotPublicId={lot.publicId}
-            currentPrice={lot.startPrice}
-          />
-        </div>
+        {!isFinalStatus(lot.tradeStatus) && lot.startPrice != null && lot.startPrice > 1000000 && (
+          <div className={styles.descriptionSection}>
+            <AiEvaluationBlock
+              type="deep"
+              lotPublicId={lot.publicId}
+              currentPrice={lot.startPrice}
+            />
+          </div>
+        )}
 
         {/* Документы лота (если есть) */}
         {lot.documents && lot.documents.length > 0 && (
@@ -739,60 +774,95 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         </div>
       )}
 
-      {/* Информация о покупке */}
-      <div className={styles.purchaseInfo}>
-        <h2>Как купить лот</h2>
-        <PurchaseStep
-          title="1. Осмотр имущества"
-          description={
-            (lot.bidding?.viewingProcedure)
-              ? `Вам необходимо самостоятельно ознакомиться с имуществом. Порядок ознакомления указан выше на этой странице.`
-              : "Вам необходимо самостоятельно связаться с арбитражным управляющим для осмотра имущества. Напишите нам для получения контактов управляющего, если они не указаны в описании лота."
-          }
-        />
-        <PurchaseStep
-          title="2. Договор"
-          description="Если после осмотра вы решили приобрести данный лот с нашей помощью, мы заключаем с вами договор, в котором прописаны все условия сотрудничества и наша ответственность."
-        />
-        <PurchaseStep
-          title="3. Задаток и комиссия"
-          description="Вы переводите задаток на специальный счет торговой площадки и оплачиваете нашу комиссию по договору."
-        />
-        <PurchaseStep
-          title="4. Участие в торгах"
-          description="Наш специалист подает заявку, участвует в торгах от вашего имени и борется за победу по согласованной с вами стратегии."
-        />
-        <PurchaseStep
-          title="5. Завершение сделки"
-          description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу. Если торги не выиграны, задаток возвращается вам в полном объеме."
-        />
+        {/* Информация о покупке или Похожие лоты */}
+        {isFinalStatus(lot.tradeStatus) ? (
+          <div className={styles.purchaseInfo}>
+            <h2>Похожие лоты</h2>
+            {lot.similarLots && lot.similarLots.length > 0 ? (
+              <div className={styles.similarLotsGrid}>
+                {lot.similarLots.map((sl) => {
+                  const slSlug = sl.slug ?? generateSlug(sl.title || '');
+                  const slUrl = `/lot/${slSlug}-${sl.publicId}`;
+                  return (
+                    <a key={sl.id} href={slUrl} className={styles.similarLotCard}>
+                      <div className={styles.similarLotImageWrap}>
+                        <img
+                          src={sl.imageUrl || '/placeholder.png'}
+                          alt={sl.title || 'Лот'}
+                          className={styles.similarLotImage}
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className={styles.similarLotInfo}>
+                        <h3 className={styles.similarLotTitle}>{sl.title}</h3>
+                        {sl.startPrice != null && (
+                          <div className={styles.similarLotPrice}>
+                            {sl.startPrice.toLocaleString('ru-RU')} ₽
+                          </div>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            ) : (
+              <p>Похожих лотов не найдено.</p>
+            )}
+          </div>
+        ) : (
+        <div className={styles.purchaseInfo}>
+          <h2>Как купить лот</h2>
+          <PurchaseStep
+            title="1. Осмотр имущества"
+            description={
+              (lot.bidding?.viewingProcedure)
+                ? `Вам необходимо самостоятельно ознакомиться с имуществом. Порядок ознакомления указан выше на этой странице.`
+                : "Вам необходимо самостоятельно связаться с арбитражным управляющим для осмотра имущества. Напишите нам для получения контактов управляющего, если они не указаны в описании лота."
+            }
+          />
+          <PurchaseStep
+            title="2. Договор"
+            description="Если после осмотра вы решили приобрести данный лот с нашей помощью, мы заключаем с вами договор, в котором прописаны все условия сотрудничества и наша ответственность."
+          />
+          <PurchaseStep
+            title="3. Задаток и комиссия"
+            description="Вы переводите задаток на специальный счет торговой площадки и оплачиваете нашу комиссию по договору."
+          />
+          <PurchaseStep
+            title="4. Участие в торгах"
+            description="Наш специалист подает заявку, участвует в торгах от вашего имени и борется за победу по согласованной с вами стратегии."
+          />
+          <PurchaseStep
+            title="5. Завершение сделки"
+            description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу. Если торги не выиграны, задаток возвращается вам в полном объеме."
+          />
 
-        <div className={styles.contactSection}>
-          <h3 className={styles.contactTitle}>Связаться с менеджером для выкупа лота:</h3>
-          <div className={styles.buttonsWrapper}>
-            <a
-              href="https://t.me/79269598508"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.ctaButton} ${styles.telegramButton}`}
-            >
-              <IconTelegram />
-              Написать в Telegram
-            </a>
+          <div className={styles.contactSection}>
+            <h3 className={styles.contactTitle}>Связаться с менеджером для выкупа лота:</h3>
+            <div className={styles.buttonsWrapper}>
+              <a
+                href="https://t.me/79269598508"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.ctaButton} ${styles.telegramButton}`}
+              >
+                <IconTelegram />
+                Написать в Telegram
+              </a>
 
-            <a
-              href="https://max.ru/u/f9LHodD0cOJk9dQzNqxn7h5DTb0BdyRPGsRxxNiC57Pl81OBY1btJow-xtk"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.ctaButton} ${styles.maxButton}`}
-            >
-              <IconMax />
-              Написать в MAX
-            </a>
+              <a
+                href="https://max.ru/u/f9LHodD0cOJk9dQzNqxn7h5DTb0BdyRPGsRxxNiC57Pl81OBY1btJow-xtk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.ctaButton} ${styles.maxButton}`}
+              >
+                <IconMax />
+                Написать в MAX
+              </a>
+            </div>
           </div>
         </div>
-
-      </div>
+      )}
     </main>
   );
 }
