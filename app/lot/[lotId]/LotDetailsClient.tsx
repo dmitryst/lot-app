@@ -10,6 +10,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import styles from './lot.module.css';
 import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery';
 import AiEvaluationBlock from '@/components/AiEvaluationBlock/AiEvaluationBlock';
+import ContractModal from '@/components/ContractModal/ContractModal';
 import { generateSlug } from '../../../utils/slugify';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -116,7 +117,11 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavLoading, setIsFavLoading] = useState(true);
 
-  // Проверка статуса избранного при загрузке
+  // Состояния для договора
+  const [hasContractPermission, setHasContractPermission] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+
+  // Проверка статуса избранного и прав на договор при загрузке
   useEffect(() => {
     if (!user || !lot) {
       setIsFavLoading(false);
@@ -139,7 +144,22 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       }
     };
 
+    const checkContractPermission = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/contracts/permission/${lot.id}`, {
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setHasContractPermission(data.hasPermission);
+        }
+      } catch (e) {
+        console.error('Ошибка проверки прав на договор', e);
+      }
+    };
+
     checkFavorite();
+    checkContractPermission();
   }, [user, lot]);
 
   // Обработчик клика
@@ -388,6 +408,23 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
               {isFavorite ? <HeartFilled /> : <HeartOutline />}
               {isFavorite ? 'В избранном' : 'Добавить в избранное'}
             </button>
+
+            {hasContractPermission && (
+              <button 
+                className={styles.favoriteButtonDetail}
+                style={{ marginTop: '0.75rem', borderColor: '#3182ce', color: '#3182ce' }}
+                onClick={() => setIsContractModalOpen(true)}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+                Сформировать договор
+              </button>
+            )}
           </div>
 
           <div className={styles.priceInfo}>
@@ -870,6 +907,13 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           </div>
         </div>
       )}
+
+      {/* Модальное окно для формирования договора */}
+      <ContractModal 
+        isOpen={isContractModalOpen} 
+        onClose={() => setIsContractModalOpen(false)} 
+        lotId={lot.id} 
+      />
     </main>
   );
 }
