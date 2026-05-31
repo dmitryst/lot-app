@@ -113,8 +113,18 @@
   font-size: 1.1rem;
 }
 
+.buttonsWrapper {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .ctaButton {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   background-color: #0070f3;
   color: white;
   padding: 14px 32px;
@@ -128,6 +138,24 @@
 
 .ctaButton:hover {
   background-color: #0060df;
+}
+
+.telegramButton {
+  background-color: #2AABEE;
+  box-shadow: 0 4px 14px rgba(42, 171, 238, 0.3);
+}
+
+.telegramButton:hover {
+  background-color: #2298d6;
+}
+
+.maxButton {
+  background-color: #005FF9;
+  box-shadow: 0 4px 14px rgba(0, 95, 249, 0.3);
+}
+
+.maxButton:hover {
+  background-color: #004ecc;
 }
 
 /* FAQ секция */

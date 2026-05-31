@@ -3,6 +3,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import LotMap from '../../../components/LotMap';
 import { Lot } from '../../../types';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -836,6 +837,12 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             title="5. Завершение сделки"
             description="В случае победы мы подписываем протокол торгов. Вы оплачиваете оставшуюся стоимость лота напрямую продавцу. Если торги не выиграны, задаток возвращается вам в полном объеме."
           />
+
+          <div style={{ margin: '2rem 0', textAlign: 'center' }}>
+            <Link href="/agent-info" className={styles.documentLink} style={{ fontSize: '1.1rem', fontWeight: 600 }}>
+              Зачем нужен агент на торгах и за что вы платите? &rarr;
+            </Link>
+          </div>
 
           <div className={styles.contactSection}>
             <h3 className={styles.contactTitle}>Связаться с менеджером для выкупа лота:</h3>
