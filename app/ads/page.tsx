@@ -66,12 +66,12 @@ function AdsPage() {
   const [totalPages, setTotalPages] = useState(0);
 
   const updateQuery = useCallback((updates: Record<string, string | number>) => {
-    const currentParams = new URLSearchParams(window.location.search);
+    const currentParams = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       currentParams.set(key, String(value));
     });
     router.push(`${pathname}?${currentParams.toString()}`);
-  }, [pathname, router]);
+  }, [pathname, router, searchParams]);
 
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage });

@@ -39,16 +39,17 @@ function FavoritesPage() {
         // Помечаем, что мы находимся в разделе Избранное
         sessionStorage.setItem('isFromFavorites', 'true');
         // Сохраняем текущую страницу избранного, чтобы вернуться на неё
-        sessionStorage.setItem('favoritesQuery', window.location.search);
+        const query = searchParams.toString();
+        sessionStorage.setItem('favoritesQuery', query ? `?${query}` : '');
     }, [searchParams]);
 
     const updateQuery = useCallback((updates: Record<string, string | number>) => {
-        const currentParams = new URLSearchParams(window.location.search);
+        const currentParams = new URLSearchParams(searchParams.toString());
         Object.entries(updates).forEach(([key, value]) => {
             currentParams.set(key, String(value));
         });
         router.push(`${pathname}?${currentParams.toString()}`);
-    }, [pathname, router]);
+    }, [pathname, router, searchParams]);
 
     const onPageChange = (nextPage: number) => {
         updateQuery({ page: nextPage });

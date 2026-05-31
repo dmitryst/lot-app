@@ -47,12 +47,13 @@ function Page() {
     // Сбрасываем флаг Избранного, так как мы на главной странице
     sessionStorage.setItem('isFromFavorites', 'false');
     // Сохраняем текущие параметры главной страницы
-    sessionStorage.setItem('lotListQuery', window.location.search);
+    const query = searchParams.toString();
+    sessionStorage.setItem('lotListQuery', query ? `?${query}` : '');
   }, [searchParams]);
 
   // Утилита: атомарно обновить URL-параметры
   const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
-    const currentParams = new URLSearchParams(window.location.search);
+    const currentParams = new URLSearchParams(searchParams.toString());
 
     Object.entries(updates).forEach(([key, value]) => {
       if (Array.isArray(value)) {
@@ -66,7 +67,7 @@ function Page() {
     });
 
     router.push(`${pathname}?${currentParams.toString()}`);
-  }, [pathname, router]);
+  }, [pathname, router, searchParams]);
 
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage });
