@@ -121,6 +121,12 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [hasContractPermission, setHasContractPermission] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 
+  // Состояния для редактирования (Admin)
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [descriptionText, setDescriptionText] = useState(lot?.description || '');
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   // Проверка статуса избранного и прав на договор при загрузке
   useEffect(() => {
     if (!user || !lot) {
@@ -203,6 +209,61 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     } else {
       // Иначе возвращаемся в основной список
       router.push(`/${savedQuery || ''}`);
+    }
+  };
+
+  const handleSaveDescription = async () => {
+    if (!lot) return;
+    setIsSavingDescription(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/description`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description: descriptionText }),
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setIsEditingDescription(false);
+        lot.description = descriptionText;
+      } else {
+        alert('Ошибка при сохранении описания');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка при сохранении описания');
+    } finally {
+      setIsSavingDescription(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!lot || !e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+    
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    setIsUploadingImage(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/images`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Ошибка при загрузке фото');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при загрузке фото');
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -317,6 +378,21 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             title={lot.title || ''}
             badges={badges}
           />
+          {user?.isAdmin && (
+            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+              <label className={styles.ctaButton} style={{ cursor: 'pointer', display: 'inline-block', padding: '0.5rem 1rem', background: '#3182ce', color: '#fff' }}>
+                {isUploadingImage ? 'Загрузка...' : 'Добавить фото'}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  multiple
+                  style={{ display: 'none' }} 
+                  onChange={handleImageUpload} 
+                  disabled={isUploadingImage}
+                />
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Правая колонка: Информация о лоте */}
@@ -508,9 +584,51 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
         {/* Описание лота (занимает всю ширину) */}
         <div className={styles.descriptionSection}>
-          <h2 className={styles.sectionTitle}>Описание лота</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 className={styles.sectionTitle}>Описание лота</h2>
+            {user?.isAdmin && !isEditingDescription && (
+              <button 
+                onClick={() => setIsEditingDescription(true)}
+                className={styles.ctaButton}
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', background: '#e2e8f0', color: '#2d3748' }}
+              >
+                Редактировать
+              </button>
+            )}
+          </div>
           <div className={styles.descriptionText}>
-            {lot.description}
+            {isEditingDescription ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <textarea 
+                  value={descriptionText}
+                  onChange={(e) => setDescriptionText(e.target.value)}
+                  style={{ width: '100%', minHeight: '200px', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                />
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    onClick={handleSaveDescription} 
+                    disabled={isSavingDescription}
+                    className={styles.ctaButton}
+                    style={{ padding: '0.5rem 1rem', background: '#3182ce', color: '#fff' }}
+                  >
+                    {isSavingDescription ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIsEditingDescription(false);
+                      setDescriptionText(lot.description || '');
+                    }}
+                    disabled={isSavingDescription}
+                    className={styles.ctaButton}
+                    style={{ padding: '0.5rem 1rem', background: '#e2e8f0', color: '#2d3748' }}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            ) : (
+              lot.description
+            )}
           </div>
         </div>
 
