@@ -59,6 +59,7 @@ export type Lot = {
   winnerInn?: string;
   similarLots?: SimilarLot[];
   sameCadastralLots?: SimilarLot[];
+  attributes?: Record<string, string>;
 };
 
 export type SimilarLot = {

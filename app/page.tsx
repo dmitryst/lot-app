@@ -43,6 +43,14 @@ function Page() {
   const isSharedOwnershipParam = searchParams.get('isSharedOwnership');
   const regionsParam = searchParams.getAll('regions');
 
+  // Извлекаем динамические фильтры из URL
+  const dynamicFiltersParam: Record<string, string> = {};
+  searchParams.forEach((value, key) => {
+    if (key.startsWith('attr_')) {
+      dynamicFiltersParam[key.substring(5)] = value;
+    }
+  });
+
   useEffect(() => {
     // Сбрасываем флаг Избранного, так как мы на главной странице
     sessionStorage.setItem('isFromFavorites', 'false');
@@ -266,6 +274,7 @@ function Page() {
               searchQuery={searchQueryParam}
               isSharedOwnership={isSharedOwnershipParam}
               regions={regionsParam}
+              dynamicFilters={dynamicFiltersParam}
               onUpdate={updateQuery}
             />
           </aside>

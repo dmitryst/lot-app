@@ -1,8 +1,8 @@
 // components/Filters/Filters.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import { BIDDING_TYPES, CATEGORIES_TREE, REGIONS_TREE } from '@/app/data/constants';
+import { useState, useEffect, useMemo } from 'react';
+import { BIDDING_TYPES, CATEGORIES_TREE, REGIONS_TREE, getDynamicFiltersForCategories } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
 import RegionSelect from '@/components/RegionSelect';
 import styles from './Filters.module.css';
@@ -16,6 +16,7 @@ interface FiltersProps {
     searchQuery: string;
     isSharedOwnership: string | null;
     regions: string[];
+    dynamicFilters?: Record<string, string>;
     onUpdate: (updates: Record<string, any>) => void;
 }
 
@@ -35,6 +36,7 @@ export default function Filters({
     searchQuery,
     isSharedOwnership,
     regions,
+    dynamicFilters,
     onUpdate,
 }: FiltersProps) {
     // Локальное состояние для инпутов
@@ -45,6 +47,12 @@ export default function Filters({
     const [localBiddingType, setLocalBiddingType] = useState(biddingType);
     const [localIsSharedOwnership, setLocalIsSharedOwnership] = useState(isSharedOwnership);
     const [localRegions, setLocalRegions] = useState(regions);
+    const [localDynamicFilters, setLocalDynamicFilters] = useState<Record<string, string>>(dynamicFilters || {});
+
+    // Получаем список доступных динамических фильтров для выбранных категорий
+    const availableDynamicFilters = useMemo(() => {
+        return getDynamicFiltersForCategories(localCategories);
+    }, [localCategories]);
 
     // Синхронизация с URL (на случай навигации браузера Вперед/Назад)
     useEffect(() => {
@@ -55,11 +63,12 @@ export default function Filters({
         setLocalBiddingType(biddingType);
         setLocalIsSharedOwnership(isSharedOwnership);
         setLocalRegions(regions);
-    }, [searchQuery, priceFrom, priceTo, categories, biddingType, isSharedOwnership, regions]);
+        setLocalDynamicFilters(dynamicFilters || {});
+    }, [searchQuery, priceFrom, priceTo, categories, biddingType, isSharedOwnership, regions, dynamicFilters]);
 
     // --- Основная функция поиска ---
     const handleApplyFilters = () => {
-        onUpdate({
+        const updates: Record<string, any> = {
             searchQuery: localSearch,
             priceFrom: localPriceFrom.replace(/\D/g, ''),
             priceTo: localPriceTo.replace(/\D/g, ''),
@@ -68,7 +77,29 @@ export default function Filters({
             isSharedOwnership: localIsSharedOwnership,
             regions: localRegions,
             page: 1, // Всегда сбрасываем на первую страницу при поиске
+        };
+
+        // Добавляем динамические фильтры
+        // Сначала очищаем старые (передавая пустые строки для тех, что были, но теперь их нет)
+        if (dynamicFilters) {
+            Object.keys(dynamicFilters).forEach(key => {
+                updates[`attr_${key}`] = '';
+            });
+        }
+        
+        // Затем добавляем новые (только те, которые доступны для текущих выбранных категорий)
+        const availableFilterIds = new Set(availableDynamicFilters.map(f => f.id));
+
+        Object.entries(localDynamicFilters).forEach(([key, value]) => {
+            // Извлекаем базовый ID фильтра (убираем _from и _to для range фильтров)
+            const baseKey = key.replace(/_from$/, '').replace(/_to$/, '');
+
+            if (value && availableFilterIds.has(baseKey)) {
+                updates[`attr_${key}`] = value;
+            }
         });
+
+        onUpdate(updates);
     };
 
     // --- Handlers ---
@@ -116,6 +147,13 @@ export default function Filters({
     // Хендлер для переключения долевой собственности
     const handleSharedOwnershipClick = (value: string | null) => {
         setLocalIsSharedOwnership(value);
+    };
+
+    const handleDynamicFilterChange = (key: string, value: string) => {
+        setLocalDynamicFilters(prev => ({
+            ...prev,
+            [key]: value
+        }));
     };
 
     // --- HANDLERS ДЛЯ ОЧИСТКИ ---
@@ -248,6 +286,43 @@ export default function Filters({
                     />
                 </div>
             </div>
+
+            {/* Динамические фильтры */}
+            {availableDynamicFilters.map(filter => (
+                <div key={filter.id} className={styles.filterGroup}>
+                    <label className={styles.filterLabel}>{filter.label}</label>
+                    {filter.type === 'text' || filter.type === 'number' ? (
+                        <ClearableInput
+                            type="text"
+                            placeholder={filter.placeholder || ''}
+                            value={localDynamicFilters[filter.id] || ''}
+                            onChange={(e) => handleDynamicFilterChange(filter.id, e.target.value)}
+                            onClear={() => handleDynamicFilterChange(filter.id, '')}
+                            onKeyDown={handleKeyDown}
+                        />
+                    ) : filter.type === 'range' ? (
+                        <div className={styles.priceFilterInputs}>
+                            <ClearableInput
+                                type="text"
+                                placeholder={filter.placeholderFrom || 'От'}
+                                value={localDynamicFilters[`${filter.id}_from`] || ''}
+                                onChange={(e) => handleDynamicFilterChange(`${filter.id}_from`, e.target.value.replace(/\D/g, ''))}
+                                onClear={() => handleDynamicFilterChange(`${filter.id}_from`, '')}
+                                onKeyDown={handleKeyDown}
+                            />
+                            <span className={styles.priceSeparator}>—</span>
+                            <ClearableInput
+                                type="text"
+                                placeholder={filter.placeholderTo || 'До'}
+                                value={localDynamicFilters[`${filter.id}_to`] || ''}
+                                onChange={(e) => handleDynamicFilterChange(`${filter.id}_to`, e.target.value.replace(/\D/g, ''))}
+                                onClear={() => handleDynamicFilterChange(`${filter.id}_to`, '')}
+                                onKeyDown={handleKeyDown}
+                            />
+                        </div>
+                    ) : null}
+                </div>
+            ))}
 
             {/* Кнопка НАЙТИ */}
             <div className={styles.actionArea}>

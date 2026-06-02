@@ -12,8 +12,9 @@ import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery
 import AiEvaluationBlock from '@/components/AiEvaluationBlock/AiEvaluationBlock';
 import ContractModal from '@/components/ContractModal/ContractModal';
 import { generateSlug } from '../../../utils/slugify';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { getDynamicFiltersForCategories } from '@/app/data/constants';
 
 // Иконки для кнопки
 const HeartOutline = () => (
@@ -356,6 +357,24 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     displayPrice = lot.marketValue;
   }
 
+  // Получаем конфигурацию динамических фильтров для категорий лота
+  const dynamicFiltersConfig = useMemo(() => {
+    if (!lot.categories) return [];
+    return getDynamicFiltersForCategories(lot.categories.map(c => c.name));
+  }, [lot.categories]);
+
+  // Фильтруем только те атрибуты, которые есть у лота и имеют значение
+  const displayAttributes = useMemo(() => {
+    if (!lot.attributes || Object.keys(lot.attributes).length === 0) return [];
+    
+    return dynamicFiltersConfig
+      .filter(config => lot.attributes![config.id])
+      .map(config => ({
+        label: config.label,
+        value: lot.attributes![config.id]
+      }));
+  }, [lot.attributes, dynamicFiltersConfig]);
+
   return (
 
     <main className={styles.container}>
@@ -437,6 +456,18 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           {lot.bidding?.tradePeriod && (
             <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
+          )}
+
+          {/* Динамические атрибуты */}
+          {displayAttributes.length > 0 && (
+            <div className={styles.attributesBlock} style={{ marginTop: '1rem', marginBottom: '1rem', padding: '1rem', backgroundColor: '#f7fafc', borderRadius: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 600 }}>Характеристики</h3>
+              {displayAttributes.map((attr, idx) => (
+                <p key={idx} className={styles.lotInfo}>
+                  <b>{attr.label}:</b> {attr.value}
+                </p>
+              ))}
+            </div>
           )}
 
           {lot.bidding?.bankruptMessageId && (

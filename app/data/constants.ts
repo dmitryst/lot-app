@@ -245,3 +245,63 @@ export const FINAL_TRADE_STATUSES = [
   "Торги завершены (нет данных)",
   "Аннулированные"
 ];
+
+// Типы для динамических фильтров
+export type FilterType = 'text' | 'number' | 'range' | 'select';
+
+export interface DynamicFilterConfig {
+  id: string; // Идентификатор атрибута (например, attr_brand)
+  label: string; // Название фильтра (например, "Марка")
+  type: FilterType; // Тип фильтра
+  options?: string[]; // Опции для типа select
+  placeholder?: string;
+  placeholderFrom?: string;
+  placeholderTo?: string;
+}
+
+// Конфигурация динамических фильтров по категориям
+export const DYNAMIC_FILTERS_BY_CATEGORY: Record<string, DynamicFilterConfig[]> = {
+  'Транспортные средства': [
+    { id: 'brand', label: 'Марка', type: 'text', placeholder: 'Например: Toyota' },
+    { id: 'model', label: 'Модель', type: 'text', placeholder: 'Например: Camry' },
+    { id: 'year', label: 'Год выпуска', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
+    { id: 'mileage', label: 'Пробег, км', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
+  ],
+  // 'Недвижимость': [
+  //   { id: 'area', label: 'Площадь, м²', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
+  //   { id: 'rooms', label: 'Количество комнат', type: 'number', placeholder: 'Например: 2' },
+  //   { id: 'floor', label: 'Этаж', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
+  // ]
+};
+
+// Функция для получения фильтров для выбранных категорий
+export const getDynamicFiltersForCategories = (selectedCategories: string[]): DynamicFilterConfig[] => {
+  if (!selectedCategories || selectedCategories.length === 0) return [];
+  
+  let commonFilters: DynamicFilterConfig[] | null = null;
+  
+  selectedCategories.forEach(category => {
+    let categoryFilters: DynamicFilterConfig[] = [];
+
+    // Проверяем точное совпадение
+    if (DYNAMIC_FILTERS_BY_CATEGORY[category]) {
+      categoryFilters = [...DYNAMIC_FILTERS_BY_CATEGORY[category]];
+    } else {
+      // Проверяем родительскую категорию, если выбрана дочерняя
+      const parentCategory = CATEGORIES_TREE.find(p => p.children?.some(c => c.name === category));
+      if (parentCategory && DYNAMIC_FILTERS_BY_CATEGORY[parentCategory.name]) {
+        categoryFilters = [...DYNAMIC_FILTERS_BY_CATEGORY[parentCategory.name]];
+      }
+    }
+
+    if (commonFilters === null) {
+      // Инициализируем фильтрами первой категории
+      commonFilters = [...categoryFilters];
+    } else {
+      // Оставляем только те фильтры (пересечение), которые есть и в текущей категории
+      commonFilters = commonFilters.filter(cf => categoryFilters.some(f => f.id === cf.id));
+    }
+  });
+  
+  return commonFilters || [];
+};
