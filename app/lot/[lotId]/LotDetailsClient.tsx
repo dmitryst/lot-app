@@ -127,6 +127,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [descriptionText, setDescriptionText] = useState(lot?.description || '');
   const [isSavingDescription, setIsSavingDescription] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isReclassifying, setIsReclassifying] = useState(false);
 
   // Проверка статуса избранного и прав на договор при загрузке
   useEffect(() => {
@@ -265,6 +266,29 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       alert('Ошибка при загрузке фото');
     } finally {
       setIsUploadingImage(false);
+    }
+  };
+
+  const handleReclassify = async () => {
+    if (!lot) return;
+    if (!confirm('Вы уверены, что хотите переклассифицировать этот лот?')) return;
+    
+    setIsReclassifying(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/reclassify`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        alert('Лот отправлен на переклассификацию и в IndexNow.');
+      } else {
+        alert('Ошибка при переклассификации');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при переклассификации');
+    } finally {
+      setIsReclassifying(false);
     }
   };
 
@@ -618,13 +642,23 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className={styles.sectionTitle}>Описание лота</h2>
             {user?.isAdmin && !isEditingDescription && (
-              <button 
-                onClick={() => setIsEditingDescription(true)}
-                className={styles.ctaButton}
-                style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', background: '#e2e8f0', color: '#2d3748' }}
-              >
-                Редактировать
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button 
+                  onClick={handleReclassify}
+                  disabled={isReclassifying}
+                  className={styles.ctaButton}
+                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', background: '#ed8936', color: '#fff' }}
+                >
+                  {isReclassifying ? 'Отправка...' : 'Переклассифицировать'}
+                </button>
+                <button 
+                  onClick={() => setIsEditingDescription(true)}
+                  className={styles.ctaButton}
+                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', background: '#e2e8f0', color: '#2d3748' }}
+                >
+                  Редактировать
+                </button>
+              </div>
             )}
           </div>
           <div className={styles.descriptionText}>
