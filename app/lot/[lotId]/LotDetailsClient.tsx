@@ -384,7 +384,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   // Получаем конфигурацию динамических фильтров для категорий лота
   const dynamicFiltersConfig = useMemo(() => {
     if (!lot.categories) return [];
-    return getDynamicFiltersForCategories(lot.categories.map(c => c.name));
+    return getDynamicFiltersForCategories(lot.categories.map(c => c.name), 'union');
   }, [lot.categories]);
 
   // Фильтруем только те атрибуты, которые есть у лота и имеют значение
@@ -480,18 +480,6 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           {lot.bidding?.tradePeriod && (
             <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
-          )}
-
-          {/* Динамические атрибуты */}
-          {displayAttributes.length > 0 && (
-            <div className={styles.attributesBlock} style={{ marginTop: '1rem', marginBottom: '1rem', padding: '1rem', backgroundColor: '#f7fafc', borderRadius: '0.5rem' }}>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 600 }}>Характеристики</h3>
-              {displayAttributes.map((attr, idx) => (
-                <p key={idx} className={styles.lotInfo}>
-                  <b>{attr.label}:</b> {attr.value}
-                </p>
-              ))}
-            </div>
           )}
 
           {lot.bidding?.bankruptMessageId && (
@@ -696,6 +684,21 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             )}
           </div>
         </div>
+
+        {/* Динамические атрибуты */}
+        {displayAttributes.length > 0 && (
+          <div className={styles.descriptionSection}>
+            <h2 className={styles.sectionTitle}>Характеристики</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+              {displayAttributes.map((attr, idx) => (
+                <div key={idx} style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.85rem', color: '#718096', marginBottom: '0.25rem' }}>{attr.label}</div>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 500, color: '#2d3748' }}>{attr.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Информация по кадастровым номерам */}
         {lot.cadastralInfos && lot.cadastralInfos.length > 0 && (

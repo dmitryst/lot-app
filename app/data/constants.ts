@@ -275,7 +275,7 @@ export const DYNAMIC_FILTERS_BY_CATEGORY: Record<string, DynamicFilterConfig[]> 
 };
 
 // Функция для получения фильтров для выбранных категорий
-export const getDynamicFiltersForCategories = (selectedCategories: string[]): DynamicFilterConfig[] => {
+export const getDynamicFiltersForCategories = (selectedCategories: string[], mode: 'intersection' | 'union' = 'intersection'): DynamicFilterConfig[] => {
   if (!selectedCategories || selectedCategories.length === 0) return [];
   
   let commonFilters: DynamicFilterConfig[] | null = null;
@@ -298,8 +298,17 @@ export const getDynamicFiltersForCategories = (selectedCategories: string[]): Dy
       // Инициализируем фильтрами первой категории
       commonFilters = [...categoryFilters];
     } else {
-      // Оставляем только те фильтры (пересечение), которые есть и в текущей категории
-      commonFilters = commonFilters.filter(cf => categoryFilters.some(f => f.id === cf.id));
+      if (mode === 'intersection') {
+        // Оставляем только те фильтры (пересечение), которые есть и в текущей категории
+        commonFilters = commonFilters.filter(cf => categoryFilters.some(f => f.id === cf.id));
+      } else {
+        // Объединяем фильтры (union), чтобы показывать все возможные атрибуты для выбранных категорий
+        categoryFilters.forEach(f => {
+          if (!commonFilters!.some(cf => cf.id === f.id)) {
+            commonFilters!.push(f);
+          }
+        });
+      }
     }
   });
   
