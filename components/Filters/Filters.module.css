@@ -99,6 +99,13 @@
   white-space: nowrap;
 }
 
+.dynamicFiltersArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
 /* Кнопка Найти */
 
 .searchButton {
@@ -145,10 +152,18 @@
       "regions regions"
       "categories categories"
       "types ownership"
-      "price action";
+      "price ."
+      "dynamic dynamic"
+      "action action";
     /* Цена и Кнопка теперь в одной строке! */
     align-items: end;
-    /* Выравнивание по низу, чтобы кнопка и инпуты стояли ровно */
+  }
+
+  .dynamicFiltersArea {
+    grid-area: dynamic;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
   }
 
   .searchArea {
@@ -223,10 +238,19 @@
       /* Третий ряд: Категории на всю ширину */
       "types ownership ."
       /* Средний ряд: Типы, Собственность, Пусто */
-      "price action .";
+      "price . ."
+      "dynamic dynamic dynamic"
+      "action . .";
     /* Нижний ряд: Цена, Кнопка, Пусто */
     align-items: start;
     /* Выравнивание по верху, чтобы лейблы были на одной линии */
+  }
+
+  .dynamicFiltersArea {
+    grid-area: dynamic;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
   }
 
   /* Назначаем области сетки */
@@ -306,9 +330,17 @@
       /* Ряд 2: Категории и Вид торгов */
       "ownership price"
       /* Ряд 3: Собственность и Цена */
+      "dynamic dynamic"
       "action action";
     /* Кнопка на всю ширину внизу */
     align-items: end;
+  }
+
+  .dynamicFiltersArea {
+    grid-area: dynamic;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
   }
 
   /* Поиск */

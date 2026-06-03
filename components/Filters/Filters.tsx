@@ -288,41 +288,45 @@ export default function Filters({
             </div>
 
             {/* Динамические фильтры */}
-            {availableDynamicFilters.map(filter => (
-                <div key={filter.id} className={styles.filterGroup}>
-                    <label className={styles.filterLabel}>{filter.label}</label>
-                    {filter.type === 'text' || filter.type === 'number' ? (
-                        <ClearableInput
-                            type="text"
-                            placeholder={filter.placeholder || ''}
-                            value={localDynamicFilters[filter.id] || ''}
-                            onChange={(e) => handleDynamicFilterChange(filter.id, e.target.value)}
-                            onClear={() => handleDynamicFilterChange(filter.id, '')}
-                            onKeyDown={handleKeyDown}
-                        />
-                    ) : filter.type === 'range' ? (
-                        <div className={styles.priceFilterInputs}>
-                            <ClearableInput
-                                type="text"
-                                placeholder={filter.placeholderFrom || 'От'}
-                                value={localDynamicFilters[`${filter.id}_from`] || ''}
-                                onChange={(e) => handleDynamicFilterChange(`${filter.id}_from`, e.target.value.replace(/\D/g, ''))}
-                                onClear={() => handleDynamicFilterChange(`${filter.id}_from`, '')}
-                                onKeyDown={handleKeyDown}
-                            />
-                            <span className={styles.priceSeparator}>—</span>
-                            <ClearableInput
-                                type="text"
-                                placeholder={filter.placeholderTo || 'До'}
-                                value={localDynamicFilters[`${filter.id}_to`] || ''}
-                                onChange={(e) => handleDynamicFilterChange(`${filter.id}_to`, e.target.value.replace(/\D/g, ''))}
-                                onClear={() => handleDynamicFilterChange(`${filter.id}_to`, '')}
-                                onKeyDown={handleKeyDown}
-                            />
+            {availableDynamicFilters.length > 0 && (
+                <div className={styles.dynamicFiltersArea}>
+                    {availableDynamicFilters.map(filter => (
+                        <div key={filter.id} className={styles.filterGroup}>
+                            <label className={styles.filterLabel}>{filter.label}</label>
+                            {filter.type === 'text' || filter.type === 'number' ? (
+                                <ClearableInput
+                                    type="text"
+                                    placeholder={filter.placeholder || ''}
+                                    value={localDynamicFilters[filter.id] || ''}
+                                    onChange={(e) => handleDynamicFilterChange(filter.id, e.target.value)}
+                                    onClear={() => handleDynamicFilterChange(filter.id, '')}
+                                    onKeyDown={handleKeyDown}
+                                />
+                            ) : filter.type === 'range' ? (
+                                <div className={styles.priceFilterInputs}>
+                                    <ClearableInput
+                                        type="text"
+                                        placeholder={filter.placeholderFrom || 'От'}
+                                        value={localDynamicFilters[`${filter.id}_from`] || ''}
+                                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_from`, e.target.value.replace(/\D/g, ''))}
+                                        onClear={() => handleDynamicFilterChange(`${filter.id}_from`, '')}
+                                        onKeyDown={handleKeyDown}
+                                    />
+                                    <span className={styles.priceSeparator}>—</span>
+                                    <ClearableInput
+                                        type="text"
+                                        placeholder={filter.placeholderTo || 'До'}
+                                        value={localDynamicFilters[`${filter.id}_to`] || ''}
+                                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_to`, e.target.value.replace(/\D/g, ''))}
+                                        onClear={() => handleDynamicFilterChange(`${filter.id}_to`, '')}
+                                        onKeyDown={handleKeyDown}
+                                    />
+                                </div>
+                            ) : null}
                         </div>
-                    ) : null}
+                    ))}
                 </div>
-            ))}
+            )}
 
             {/* Кнопка НАЙТИ */}
             <div className={styles.actionArea}>
