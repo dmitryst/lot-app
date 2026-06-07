@@ -33,6 +33,9 @@ RUN npm run build
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 
+ARG GIT_COMMIT=unknown
+LABEL org.opencontainers.image.revision=$GIT_COMMIT
+
 # Создаем пользователя с ограниченными правами
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -46,6 +49,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 # Копируем собранное приложение со стадии сборки
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+RUN echo "$GIT_COMMIT" > /app/BUILD_INFO && chown nextjs:nodejs /app/BUILD_INFO
 
 # Устанавливаем пользователя
 USER nextjs

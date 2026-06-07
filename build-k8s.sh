@@ -28,16 +28,24 @@ VERSION="${VERSION#\"}"
 FULL_TAG="${VERSION}${TAG_SUFFIX}"
 IMAGE_NAME="dmitryst/lot-app"
 
+# Хэш коммита, из которого собирается образ
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+if [ "$GIT_COMMIT" != "unknown" ] && ! git diff-index --quiet HEAD -- 2>/dev/null; then
+  GIT_COMMIT="${GIT_COMMIT}-dirty"
+fi
+
 echo "🎯 Target Version: $FULL_TAG"
+echo "🔖 Git Commit: $GIT_COMMIT"
 
 # Билд образа
-# Важно: NEXT_PUBLIC_APP_VERSION передается здесь и "запекается" в статику Next.js
+# Важно: NEXT_PUBLIC_* передаются здесь и "запекаются" в статику Next.js
 docker build \
   --no-cache \
   --build-arg NEXT_PUBLIC_CSHARP_BACKEND_URL=$(grep NEXT_PUBLIC_CSHARP_BACKEND_URL "$ENV_FILE" | cut -d '=' -f2) \
   --build-arg NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED=$(grep NEXT_PUBLIC_FEATURE_PUBLISH_BUTTON_ENABLED "$ENV_FILE" | cut -d '=' -f2) \
   --build-arg NEXT_PUBLIC_YANDEX_MAPS_API_KEY=$(grep NEXT_PUBLIC_YANDEX_MAPS_API_KEY "$ENV_FILE" | cut -d '=' -f2) \
   --build-arg NEXT_PUBLIC_APP_VERSION="$FULL_TAG" \
+  --build-arg GIT_COMMIT="$GIT_COMMIT" \
   -t $IMAGE_NAME:"$FULL_TAG" .
 
 # Создаем тег latest, который ссылается на ТОТ ЖЕ самый образ
@@ -78,7 +86,7 @@ docker push $IMAGE_NAME:latest
 # kubectl patch deployment $DEPLOYMENT_NAME -p \
 #   "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
 
-echo "✅ Done! v$FULL_TAG deployed."
+echo "✅ Done! v$FULL_TAG ($GIT_COMMIT) deployed."
 
 # Опционально: вернуться назад
 # cd /b/Projects/lot-app

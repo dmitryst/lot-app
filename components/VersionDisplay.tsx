@@ -28,7 +28,7 @@ export default function VersionDisplay() {
     fetchVersion();
   }, []);
 
-  // Версия самого фронтенда (будет установлена при сборке)
+  // Версия фронтенда (запекается при сборке Docker-образа)
   const frontendVersion = process.env.NEXT_PUBLIC_APP_VERSION || 'local';
 
   return (
