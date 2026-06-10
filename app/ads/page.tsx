@@ -2,12 +2,13 @@
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 import Pagination from '@/components/Pagination';
 import styles from './ads.module.css';
 import AdCard from '@/components/AdCard/AdCard';
+import { useQueryNavigation } from '@/hooks/useQueryNavigation';
 
 const PAGE_SIZE = 20;
 
@@ -41,9 +42,9 @@ export default function AdsPageWrapper() {
 }
 
 function AdsPage() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { updateQuery } = useQueryNavigation();
 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
@@ -65,17 +66,8 @@ function AdsPage() {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
 
-  const updateQuery = useCallback((updates: Record<string, string | number>) => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      currentParams.set(key, String(value));
-    });
-    router.push(`${pathname}?${currentParams.toString()}`);
-  }, [pathname, router, searchParams]);
-
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const fetchAds = useCallback(async () => {

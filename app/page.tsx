@@ -1,9 +1,9 @@
 // app/page.tsx
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { PAGE_SIZE } from './data/constants';
 
@@ -16,6 +16,7 @@ import { Lot } from '../types';
 import PromoGrid from '@/components/PromoGrid/PromoGrid';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import { useAuth } from '@/context/AuthContext';
+import { useQueryNavigation } from '@/hooks/useQueryNavigation';
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -28,10 +29,9 @@ export default function PageWrapper() {
 
 // --- Основной компонент страницы ---
 function Page() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { updateQuery } = useQueryNavigation();
 
   // ЕДИНСТВЕННЫЙ источник данных для API — URL
   const page = Number(searchParams.get('page')) || 1;
@@ -59,26 +59,8 @@ function Page() {
     sessionStorage.setItem('lotListQuery', query ? `?${query}` : '');
   }, [searchParams]);
 
-  // Утилита: атомарно обновить URL-параметры
-  const updateQuery = useCallback((updates: Record<string, string | number | null | string[]>) => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-
-    Object.entries(updates).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        currentParams.delete(key);
-        value.forEach(item => currentParams.append(key, item));
-      } else if (value === null || value === undefined || value === '' || value === 'Все') {
-        currentParams.delete(key);
-      } else {
-        currentParams.set(key, String(value));
-      }
-    });
-
-    router.push(`${pathname}?${currentParams.toString()}`);
-  }, [pathname, router, searchParams]);
-
   const onPageChange = (nextPage: number) => {
-    updateQuery({ page: nextPage });
+    updateQuery({ page: nextPage }, { scroll: false });
   };
 
   // Данные

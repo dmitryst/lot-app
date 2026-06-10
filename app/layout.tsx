@@ -12,6 +12,7 @@ import Footer from '@/components/Footer';
 import YandexMetrika from "@/components/YandexMetrika";
 import { Suspense } from 'react';
 import AnnouncementBar from "@/components/AnnouncementBar/AnnouncementBar";
+import RouterRecovery from "@/components/RouterRecovery";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
+        <RouterRecovery />
         <AuthProvider>
           <ChatProvider>
             <FavoritesProvider>

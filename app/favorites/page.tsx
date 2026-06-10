@@ -2,12 +2,13 @@
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Lot } from '@/types';
 import { LotItem } from '@/components/LotItem';
 import Pagination from '@/components/Pagination';
+import { useQueryNavigation } from '@/hooks/useQueryNavigation';
 
 // Импортируем стили ГЛАВНОЙ страницы, чтобы сетка была идентичной
 import pageStyles from '../page.module.css';
@@ -26,8 +27,8 @@ export default function FavoritesPageWrapper() {
 function FavoritesPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { updateQuery } = useQueryNavigation();
 
     const page = Number(searchParams.get('page')) || 1;
 
@@ -43,16 +44,8 @@ function FavoritesPage() {
         sessionStorage.setItem('favoritesQuery', query ? `?${query}` : '');
     }, [searchParams]);
 
-    const updateQuery = useCallback((updates: Record<string, string | number>) => {
-        const currentParams = new URLSearchParams(searchParams.toString());
-        Object.entries(updates).forEach(([key, value]) => {
-            currentParams.set(key, String(value));
-        });
-        router.push(`${pathname}?${currentParams.toString()}`);
-    }, [pathname, router, searchParams]);
-
     const onPageChange = (nextPage: number) => {
-        updateQuery({ page: nextPage });
+        updateQuery({ page: nextPage }, { scroll: false });
     };
 
     const fetchFavoriteLots = useCallback(async () => {
