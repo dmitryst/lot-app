@@ -1,169 +1,192 @@
 # Навигация по query-параметрам и восстановление роутера
 
-Документ описывает, как работает связка **`lib/queryNavigation.ts` → `hooks/useQueryNavigation.ts` → `components/RouterRecovery.tsx`** и как через неё обновляется пагинация после долгого простоя вкладки.
+Документ описывает, как работает связка **`lib/queryNavigation.ts` → `hooks/useQueryNavigation.ts` → `components/RouterRecovery.tsx`** и как через неё обновляются пагинация и фильтры на страницах со списками.
 
 ## Проблема
 
 На главной странице, в избранном и в объявлениях состояние списка хранится в URL (`page`, `categories`, `regions` и т.д.).
 
-После того как вкладка долго неактивна (свернута, ноутбук уснул, браузер «заморозил» вкладку), **клиентский роутер Next.js App Router может устареть**. Тогда при клике на пагинацию:
+Иногда (дефект **плавающий**, не воспроизводится на каждом клике) при переходе по страницам или нажатии «Найти лоты»:
 
-- `router.push()` молча не срабатывает;
-- параметр `page` в адресной строке не меняется;
-- список лотов не перезагружается.
+- клик **ничего не делает** — запрос к `/api/lots/list` не уходит;
+- помогает только **обновление страницы** (F5).
 
-Это клиентская проблема Next.js, а не бэкенда или Istio.
+При этом подряд можно пролистать хоть 20 страниц без ошибок — сбой проявляется в определённых условиях, а не «на N-й странице».
 
-## Общая схема
+### Типичные триггеры
 
-Два слоя решают задачу по-разному:
+| Условие | Что может случиться |
+|---|---|
+| Вкладка долго неактивна (5–10+ мин) | App Router Next.js «засыпает» |
+| Быстрое листание без пауз | Обычно работает нормально |
+| Рассинхрон URL и React-состояния | Клик попадает в «ту же» страницу → ранний выход без действия |
+| Несколько `router.refresh()` подряд | Редкий deadlock роутера в Next.js 16 |
 
-| Компонент | Когда работает | Задача |
+Это **клиентская** проблема Next.js App Router, не бэкенда и не Istio.
+
+### Почему первый фикс был недостаточен
+
+Первоначально использовалась схема `pushState` + `router.refresh()`:
+
+- `pushState` менял URL в адресной строке;
+- `useSearchParams()` **часто не обновлялся** — Next.js не знает о ручном `pushState`;
+- `fetchLots` зависел от `searchParams` → запрос к API **не уходил**, хотя URL уже мог измениться;
+- UI показывал старую страницу пагинации, URL — новую → повторный клик давал early return (`currentUrl === url`);
+- `router.refresh()` на **каждый** клик мог усугублять нестабильность роутера.
+
+---
+
+## Общая схема (текущая)
+
+Два независимых слоя:
+
+| Комponent | Когда работает | Задача |
 |---|---|---|
-| **`RouterRecovery`** | Пользователь **вернулся** на вкладку | Профилактика: «оживить» роутер до клика |
-| **`useQueryNavigation`** + **`queryNavigation`** | Пользователь **кликнул** на страницу / фильтр | Надёжно обновить URL и перезагрузить данные |
+| **`RouterRecovery`** | Пользователь **вернулся** на вкладку после простоя | Профилактика для остального App Router |
+| **`useQueryNavigation`** + **`queryNavigation`** | Пользователь **кликнул** пагинацию / «Найти лоты» | URL, React-state и запрос к API **без участия** `router.push` / `refresh` |
 
 ```
   Долгий простой вкладки
            │
            ▼
   ┌─────────────────────┐
-  │   RouterRecovery    │  visibilitychange / pageshow / popstate
-  │   router.refresh()  │  → роутер снова синхронизирован с URL
+  │   RouterRecovery    │  visibilitychange (≥5 мин) / pageshow (bfcache)
+  │   router.refresh()  │  → подтягивает App Router для прочих маршрутов
   └─────────────────────┘
 
-  Клик на «28» в пагинации
+  Клик на «20» в пагинации
            │
            ▼
   ┌─────────────────────┐
-  │ useQueryNavigation  │  onPageChange({ page: 28 })
+  │ useQueryNavigation  │  updateQuery({ page: 20 })
   └──────────┬──────────┘
              ▼
   ┌─────────────────────┐
-  │ queryNavigation.ts  │  pushState + router.refresh()
+  │ queryNavigation.ts  │  pushState → возвращает новый query string
   └──────────┬──────────┘
              ▼
-  URL: ?page=28&…  →  useSearchParams()  →  fetchLots()
+  ┌─────────────────────┐
+  │ setQueryString()    │  React-state обновляется сразу
+  └──────────┬──────────┘
+             ▼
+  params  →  fetchLots()  →  /api/lots/list?page=20&…
 ```
+
+**Источник правды для списков:** `params` из `useQueryNavigation`, а не `useSearchParams()`.
 
 ---
 
 ## 1. `lib/queryNavigation.ts` — ядро навигации
 
-Файл содержит три функции.
-
 ### `applyQueryUpdates(baseParams, updates)`
 
-Берёт текущие query-параметры и применяет изменения:
+Применяет изменения к query-параметрам:
 
-- `{ page: 28 }` — установить параметр;
+- `{ page: 20 }` — установить;
 - `{ page: null }` или `{ biddingType: 'Все' }` — удалить;
-- `{ categories: ['Квартира', 'Жилой дом'] }` — заменить массив (сначала удаляет старые значения ключа, потом добавляет новые).
+- `{ categories: ['Квартира', …] }` — заменить массив.
 
 ### `buildQueryUrl(pathname, params)`
 
-Собирает итоговый URL: `/` + `?categories=…&page=28`.
+Собирает URL: `/?categories=…&page=20`.
 
-### `navigateWithQueryParams(pathname, updates, router, options?)`
+### `readQueryStringFromWindow()`
 
-**Главная функция.** Вызывается при каждом изменении фильтров или страницы пагинации.
+Читает актуальную query-строку из `window.location.search` (без `?`).
+
+### `navigateWithQueryParams(pathname, updates, options?)`
+
+**Главная функция.** Вызывается при каждом изменении фильтров или страницы.
 
 ```typescript
-// Упрощённый алгоритм
 const params = applyQueryUpdates(
-  new URLSearchParams(window.location.search),  // актуальный URL из браузера
-  { page: 28 },
+  new URLSearchParams(window.location.search),
+  { page: 20 },
 );
 const url = buildQueryUrl(pathname, params);
 
-window.history.pushState(null, '', url);  // 1. адресная строка обновляется всегда
-router.refresh();                          // 2. Next.js подхватывает новый URL
+if (currentUrl === url) return params.toString();  // уже на этой странице
+
+window.history.pushState(null, '', url);
+return params.toString();  // новая query-строка для React-state
 ```
 
-**Почему `window.location.search`, а не `useSearchParams()`?**  
-На момент клика адресная строка — единственный надёжный источник правды. React-хук `searchParams` после «заморозки» вкладки может отставать от реального URL.
+**Почему `window.location.search`?**  
+На момент клика адресная строка — надёжный источник. `useSearchParams()` может отставать.
 
 **Почему `pushState`, а не `router.push`?**  
-`pushState` выполняется браузером напрямую и всегда меняет URL. `router.push` зависит от внутреннего состояния Next.js, которое как раз и «ломается» после простоя.
+`pushState` выполняется браузером всегда. `router.push` зависит от внутреннего состояния Next.js, которое иногда «ломается».
 
-**Почему сразу после `pushState` вызывается `router.refresh()`?**  
-Next.js не узнаёт об изменении URL, сделанном вручную через History API. `refresh()` заставляет приложение перечитать текущий URL: обновляется `useSearchParams()`, срабатывают `useEffect` с зависимостью от `searchParams`, уходит новый запрос к API.
+**Почему нет `router.refresh()`?**  
+`refresh()` не гарантирует обновление `useSearchParams` после `pushState` и при частых вызовах может дестабилизировать роутер. Вместо этого состояние обновляется **напрямую в React** (см. хук ниже).
 
 ---
 
 ## 2. `hooks/useQueryNavigation.ts` — хук для страниц
 
-Тонкая обёртка над `navigateWithQueryParams` для использования в React-компонентах.
+Хранит query-строку в React-state и синхронизирует её с браузером.
 
 ```typescript
 export function useQueryNavigation() {
-  const router = useRouter();
-  const pathname = usePathname();
+  const [queryString, setQueryString] = useState(readQueryStringFromWindow);
+  const params = useMemo(() => new URLSearchParams(queryString), [queryString]);
 
-  const updateQuery = useCallback(
-    (updates, options?) => {
-      navigateWithQueryParams(pathname, updates, router, options);
-    },
-    [pathname, router],
-  );
+  const updateQuery = (updates, options?) => {
+    const next = navigateWithQueryParams(pathname, updates, options);
+    setQueryString(next);  // ← сразу триггерит fetchLots через params
+  };
 
-  return { updateQuery };
+  return { updateQuery, queryString, params };
 }
 ```
 
-Хук скрывает детали: странице не нужно знать про `pushState` и `refresh` — она просто вызывает `updateQuery`.
+### Синхронизация с App Router
+
+| Ситуация | Поведение |
+|---|---|
+| Прямая ссылка / F5 | `searchParams` совпадает с `window.location` → `queryString` обновляется из роутера |
+| Клик по пагинации (`pushState`) | `window.location` ≠ `searchParams` → **не перезаписываем** `queryString` из роутера |
+| Back / Forward | `popstate` → `queryString` читается из `window.location` |
 
 ### Связка с пагинацией
 
 На главной странице (`app/page.tsx`):
 
 ```typescript
-const { updateQuery } = useQueryNavigation();
+const { updateQuery, params } = useQueryNavigation();
+
+const page = Number(params.get('page')) || 1;
 
 const onPageChange = (nextPage: number) => {
   updateQuery({ page: nextPage }, { scroll: false });
 };
 
-<Pagination
-  currentPage={page}
-  totalPages={totalPages}
-  onPageChange={onPageChange}   // ← клик по «28» попадает сюда
-/>
+// fetchLots зависит от params, не от useSearchParams()
+useEffect(() => { fetchLots(); }, [fetchLots]);
 ```
 
-Цепочка при клике на страницу **28**:
+Цепочка при клике на страницу **20**:
 
-1. `Pagination` вызывает `onPageChange(28)`.
-2. `onPageChange` → `updateQuery({ page: 28 })`.
-3. `useQueryNavigation` → `navigateWithQueryParams('/', { page: 28 }, router)`.
-4. `queryNavigation.ts` читает текущие фильтры из URL, подставляет `page=28`, делает `pushState` + `refresh`.
-5. `useSearchParams()` возвращает новый `page=28`.
-6. `useEffect` → `fetchLots()` → запрос `/api/lots/list?page=28&…`.
+1. `Pagination` → `onPageChange(20)`.
+2. `updateQuery({ page: 20 })`.
+3. `navigateWithQueryParams` → `pushState`, возвращает новую query-строку.
+4. `setQueryString(...)` → `params` меняется **сразу**.
+5. `fetchLots()` → запрос `/api/lots/list?page=20&…`.
 
-Тот же хук используется для **фильтров** (`<Filters onUpdate={updateQuery} />`) — логика одна, меняются только передаваемые `updates`.
-
-Аналогично подключено в `app/favorites/page.tsx` и `app/ads/page.tsx`.
+Тот же хук используется для **фильтров** (`<Filters onUpdate={updateQuery} />`) и в `app/favorites/page.tsx`, `app/ads/page.tsx`.
 
 ---
 
 ## 3. `components/RouterRecovery.tsx` — восстановление после простоя
 
-Компонент монтируется один раз в `app/layout.tsx` и ничего не рендерит (`return null`). Его задача — **профилактика**: обновить роутер, когда пользователь возвращается на «устаревшую» вкладку, *до* того как он нажмёт на пагинацию.
+Монтируется в `app/layout.tsx`, ничего не рендерит. **Не участвует** в пагинации напрямую — только профилактика для App Router в целом.
 
 | Событие | Условие | Действие |
 |---|---|---|
 | `visibilitychange` | Вкладка снова видима, простой **≥ 5 минут** | `router.refresh()` |
-| `pageshow` | Страница восстановлена из **bfcache** (`event.persisted`) | `router.refresh()` |
-| `popstate` | Пользователь нажал **Назад / Вперёд** в браузере | `router.refresh()` |
+| `pageshow` | Восстановление из **bfcache** (`event.persisted`) | `router.refresh()` |
 
-Порог 5 минут (`INACTIVITY_THRESHOLD_MS`) выбран как типичное время, после которого браузер может «заморозить» вкладку и оборвать внутренние соединения Next.js.
-
-### Как `RouterRecovery` дополняет `queryNavigation`
-
-- **`RouterRecovery`** — страховка *до* действия пользователя: «подтянуть» роутер, когда вкладка проснулась.
-- **`queryNavigation`** — страховка *во время* действия: даже если роутер всё ещё сломан, `pushState` гарантированно меняет URL, а `refresh()` подтягивает данные.
-
-Вместе они закрывают оба сценария: профилактику и принудительную навигацию.
+`popstate` (Back/Forward) обрабатывает **`useQueryNavigation`**, а не `RouterRecovery` — чтобы не дублировать `refresh()` и не конфликтовать с `pushState`.
 
 ---
 
@@ -171,10 +194,10 @@ const onPageChange = (nextPage: number) => {
 
 | Файл | Роль |
 |---|---|
-| `lib/queryNavigation.ts` | Логика: собрать URL, `pushState`, `router.refresh()` |
-| `hooks/useQueryNavigation.ts` | React-хук `updateQuery` для страниц |
-| `components/RouterRecovery.tsx` | Глобальное восстановление роутера |
-| `app/layout.tsx` | `<RouterRecovery />` — работает на всём сайте |
+| `lib/queryNavigation.ts` | `pushState`, сбор URL, возврат query-строки |
+| `hooks/useQueryNavigation.ts` | React-state `queryString`, `params`, `updateQuery` |
+| `components/RouterRecovery.tsx` | `router.refresh()` после долгого простоя вкладки |
+| `app/layout.tsx` | `<RouterRecovery />` глобально |
 | `app/page.tsx` | Пагинация и фильтры лотов |
 | `app/favorites/page.tsx` | Пагинация избранного |
 | `app/ads/page.tsx` | Пагинация объявлений |
@@ -190,14 +213,32 @@ npm run build
 npm start
 ```
 
+### Сценарий 1 — быстрое листание
+
+1. Открыть главную с фильтрами.
+2. Пролистать 1 → 20 без пауз.
+3. В DevTools → Network: на каждый переход должен уходить `/api/lots/list`.
+
+### Сценарий 2 — простой вкладки (основной для плавающего бага)
+
 1. Открыть главную с фильтрами, перейти на страницу 2–3.
-2. Оставить вкладку неактивной 5–10 минут.
-3. Вернуться и нажать другую страницу в пагинации.
-4. Убедиться: `page=` в адресной строке изменился, список перезагрузился.
+2. Оставить вкладку неактивной **5–10 минут**.
+3. Вернуться, нажать другую страницу или «Найти лоты».
+4. Убедиться: `page=` изменился, запрос ушёл, список обновился.
+
+### Если сбой повторился на prod
+
+За 30 секунд в DevTools зафиксировать:
+
+| Наблюдение | Вероятная причина |
+|---|---|
+| URL не меняется, запроса нет | Зависший App Router / обработчики |
+| URL меняется, запроса нет | Старый баг (до фикса с `params`) |
+| Запрос есть, 503 | Istio / web-api |
 
 ---
 
 ## Связанные, но отдельные проблемы
 
-- **Istio / 503 от API** после простоя — отдельный фикс в `k8s/web-api/web-api-dr.yaml`. Запросы не доходят до бэкенда, но URL при этом может меняться.
-- **Устаревший роутер Next.js** — URL **не меняется** при клике. Решается описанной здесь связкой.
+- **Istio / 503 от API** после простоя — фикс в `k8s/web-api/web-api-dr.yaml` и `virtual-service.yaml`. Запросы не доходят до бэкенда; URL при этом может меняться.
+- **Плавающий сбой пагинации** — клиентский App Router и рассинхрон состояния; решается связкой `queryNavigation` + `useQueryNavigation`.

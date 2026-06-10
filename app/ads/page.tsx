@@ -44,7 +44,7 @@ export default function AdsPageWrapper() {
 function AdsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { updateQuery } = useQueryNavigation();
+  const { updateQuery, params } = useQueryNavigation();
 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
@@ -60,7 +60,7 @@ function AdsPage() {
     }
   }, [searchParams, pathname]);
 
-  const page = Number(searchParams.get('page')) || 1;
+  const page = Number(params.get('page')) || 1;
 
   const [ads, setAds] = useState<UserAd[]>([]);
   const [loading, setLoading] = useState(true);

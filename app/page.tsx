@@ -3,7 +3,6 @@
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 import { PAGE_SIZE } from './data/constants';
 
@@ -29,23 +28,22 @@ export default function PageWrapper() {
 
 // --- Основной компонент страницы ---
 function Page() {
-  const searchParams = useSearchParams();
+  const { updateQuery, params } = useQueryNavigation();
   const { user } = useAuth();
-  const { updateQuery } = useQueryNavigation();
 
-  // ЕДИНСТВЕННЫЙ источник данных для API — URL
-  const page = Number(searchParams.get('page')) || 1;
-  const biddingType = searchParams.get('biddingType') || 'Все';
-  const priceFromParam = searchParams.get('priceFrom') || '';
-  const priceToParam = searchParams.get('priceTo') || '';
-  const searchQueryParam = searchParams.get('searchQuery') || '';
-  const categoriesParam = searchParams.getAll('categories');
-  const isSharedOwnershipParam = searchParams.get('isSharedOwnership');
-  const regionsParam = searchParams.getAll('regions');
+  // Источник правды для UI и API — params из useQueryNavigation (синхронизирован с window.location)
+  const page = Number(params.get('page')) || 1;
+  const biddingType = params.get('biddingType') || 'Все';
+  const priceFromParam = params.get('priceFrom') || '';
+  const priceToParam = params.get('priceTo') || '';
+  const searchQueryParam = params.get('searchQuery') || '';
+  const categoriesParam = params.getAll('categories');
+  const isSharedOwnershipParam = params.get('isSharedOwnership');
+  const regionsParam = params.getAll('regions');
 
   // Извлекаем динамические фильтры из URL
   const dynamicFiltersParam: Record<string, string> = {};
-  searchParams.forEach((value, key) => {
+  params.forEach((value, key) => {
     if (key.startsWith('attr_')) {
       dynamicFiltersParam[key.substring(5)] = value;
     }
@@ -55,9 +53,9 @@ function Page() {
     // Сбрасываем флаг Избранного, так как мы на главной странице
     sessionStorage.setItem('isFromFavorites', 'false');
     // Сохраняем текущие параметры главной страницы
-    const query = searchParams.toString();
+    const query = params.toString();
     sessionStorage.setItem('lotListQuery', query ? `?${query}` : '');
-  }, [searchParams]);
+  }, [params]);
 
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage }, { scroll: false });
@@ -79,13 +77,11 @@ function Page() {
       return;
     }
 
-    // searchParams - единственный источник правды.
-    // Просто берем все параметры из текущего URL.
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('pageSize', String(PAGE_SIZE));
+    const apiParams = new URLSearchParams(params.toString());
+    apiParams.set('pageSize', String(PAGE_SIZE));
 
     try {
-      const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
+      const res = await fetch(`${apiUrl}/api/lots/list?${apiParams.toString()}`);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -103,7 +99,7 @@ function Page() {
     } finally {
       setLoading(false);
     }
-  }, [searchParams]);
+  }, [params]);
 
   useEffect(() => {
     let isCancelled = false;

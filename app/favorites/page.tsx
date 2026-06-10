@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Lot } from '@/types';
@@ -27,10 +27,9 @@ export default function FavoritesPageWrapper() {
 function FavoritesPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const { updateQuery } = useQueryNavigation();
+    const { updateQuery, params } = useQueryNavigation();
 
-    const page = Number(searchParams.get('page')) || 1;
+    const page = Number(params.get('page')) || 1;
 
     const [lots, setLots] = useState<Lot[]>([]);
     const [loading, setLoading] = useState(true);
@@ -40,9 +39,9 @@ function FavoritesPage() {
         // Помечаем, что мы находимся в разделе Избранное
         sessionStorage.setItem('isFromFavorites', 'true');
         // Сохраняем текущую страницу избранного, чтобы вернуться на неё
-        const query = searchParams.toString();
+        const query = params.toString();
         sessionStorage.setItem('favoritesQuery', query ? `?${query}` : '');
-    }, [searchParams]);
+    }, [params]);
 
     const onPageChange = (nextPage: number) => {
         updateQuery({ page: nextPage }, { scroll: false });

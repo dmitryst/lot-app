@@ -1,5 +1,3 @@
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-
 export type QueryUpdates = Record<string, string | number | null | string[] | undefined>;
 
 export function applyQueryUpdates(baseParams: URLSearchParams, updates: QueryUpdates): URLSearchParams {
@@ -24,29 +22,35 @@ export function buildQueryUrl(pathname: string, params: URLSearchParams): string
   return query ? `${pathname}?${query}` : pathname;
 }
 
+export function readQueryStringFromWindow(): string {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+  return new URLSearchParams(window.location.search).toString();
+}
+
 /**
- * Updates query params reliably even when Next.js App Router is stale
- * after a tab was inactive (router.push may silently no-op).
+ * Updates query params via History API and returns the new query string.
+ * Does not rely on Next.js router — useSearchParams() may stay stale after pushState.
  */
 export function navigateWithQueryParams(
   pathname: string,
   updates: QueryUpdates,
-  router: AppRouterInstance,
   options?: { scroll?: boolean },
-): void {
+): string {
   const params = applyQueryUpdates(new URLSearchParams(window.location.search), updates);
   const url = buildQueryUrl(pathname, params);
   const currentUrl = window.location.pathname + window.location.search;
 
   if (currentUrl === url) {
-    return;
+    return params.toString();
   }
 
-  // pushState always updates the address bar; refresh re-syncs useSearchParams / RSC.
   window.history.pushState(null, '', url);
-  router.refresh();
 
   if (options?.scroll !== false) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  return params.toString();
 }

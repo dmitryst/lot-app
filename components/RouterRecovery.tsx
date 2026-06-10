@@ -39,18 +39,12 @@ export default function RouterRecovery() {
       markActive();
     };
 
-    const handlePopState = () => {
-      router.refresh();
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pageshow', handlePageShow);
-    window.addEventListener('popstate', handlePopState);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pageshow', handlePageShow);
-      window.removeEventListener('popstate', handlePopState);
     };
   }, [router]);
 
