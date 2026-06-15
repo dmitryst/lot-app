@@ -1,0 +1,177 @@
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.heading {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.subheading {
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 1fr 120px 150px 150px auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    font-size: 0.85rem;
+    color: #555;
+    font-weight: 600;
+}
+
+.field input {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.submitBtn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    height: 42px;
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.error {
+    color: #dc2626;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border-radius: 6px;
+}
+
+.success {
+    color: #15803d;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #f0fdf4;
+    border-radius: 6px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table th,
+.table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.table th {
+    background: #f8f9fa;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.lotLink {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.lotLink:hover {
+    text-decoration: underline;
+}
+
+.rewardInput {
+    width: 120px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.saveBtn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.deleteBtn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.pageBtn {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pageBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+    .form {
+        grid-template-columns: 1fr;
+    }
+}
