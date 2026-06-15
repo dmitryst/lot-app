@@ -1,10 +1,11 @@
 // app/lot/[lotId]/page.tsx
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
 import { CATEGORIES_TREE, FINAL_TRADE_STATUSES } from '../../data/constants';
 import { generateLotSchemas, generateLotUrl } from './schemas';
+import { generateSlug } from '../../../utils/slugify';
 
 // --- SEO ОПТИМИЗАЦИЯ: Компонент для структурированных данных JSON-LD ---
 // Этот скрипт помогает Яндексу и Google точно понять, что продается на странице.
@@ -220,6 +221,12 @@ export default async function Page({ params }: Props) {
 
   if (!lot) {
     notFound();
+  }
+
+  const canonicalSlug = lot.slug ?? generateSlug(lot.title || lot.description || 'lot');
+  const requestedSlug = lotId.replace(/-\d+$/, '');
+  if (requestedSlug && requestedSlug !== canonicalSlug && lot.publicId) {
+    redirect(`/lot/${canonicalSlug}-${lot.publicId}`);
   }
 
   return (

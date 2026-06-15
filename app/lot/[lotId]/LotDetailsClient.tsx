@@ -229,6 +229,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       if (res.ok) {
         setIsEditingDescription(false);
         lot.description = descriptionText;
+        alert('Описание сохранено. Лот поставлен в общую очередь классификации (обычно 10–15 мин).');
       } else {
         alert('Ошибка при сохранении описания');
       }
@@ -280,7 +281,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         credentials: 'include'
       });
       if (res.ok) {
-        alert('Лот отправлен на переклассификацию и в IndexNow.');
+        const data = await res.json();
+        alert(data.message ?? 'Лот поставлен в очередь на переклассификацию.');
       } else {
         alert('Ошибка при переклассификации');
       }
@@ -629,6 +631,18 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         <div className={styles.descriptionSection}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className={styles.sectionTitle}>Описание лота</h2>
+            {user?.isAdmin && lot.needsDescriptionReview && !isEditingDescription && (
+              <span style={{
+                background: '#fef3c7',
+                color: '#92400e',
+                padding: '0.25rem 0.75rem',
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+              }}>
+                Нет описания имущества
+              </span>
+            )}
             {user?.isAdmin && !isEditingDescription && (
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button 

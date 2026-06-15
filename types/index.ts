@@ -60,6 +60,7 @@ export type Lot = {
   similarLots?: SimilarLot[];
   sameCadastralLots?: SimilarLot[];
   attributes?: Record<string, string>;
+  needsDescriptionReview?: boolean;
 };
 
 export type SimilarLot = {

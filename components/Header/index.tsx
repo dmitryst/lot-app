@@ -16,6 +16,7 @@ export const Header = () => {
     const { favoritesCount } = useFavorites();
     const { unreadCount } = useChat();
     const [moderationCount, setModerationCount] = useState(0);
+    const [needsDescriptionCount, setNeedsDescriptionCount] = useState(0);
 
     useEffect(() => {
         if (user?.isAdmin) {
@@ -29,6 +30,17 @@ export const Header = () => {
                 }
             })
             .catch(err => console.error('Ошибка загрузки счетчика модерации', err));
+
+            fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/lots/needs-description/count?activeOnly=true`, {
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.count === 'number') {
+                    setNeedsDescriptionCount(data.count);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки счетчика лотов без описания', err));
         }
     }, [user]);
 
@@ -99,15 +111,33 @@ export const Header = () => {
 
                             {/* Админка */}
                             {user.isAdmin && (
-                                <Link href="/admin/ads" className={styles.accountLink} title="Модерация">
-                                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                                        <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                        </svg>
-                                        {moderationCount > 0 && <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>{moderationCount}</span>}
-                                    </div>
-                                    <span className={styles.accountText}>Модерация</span>
-                                </Link>
+                                <>
+                                    <Link href="/admin/lots-needing-description" className={styles.accountLink} title="Лоты без описания">
+                                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                            <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                                <line x1="12" y1="9" x2="12.01" y2="9"></line>
+                                            </svg>
+                                            {needsDescriptionCount > 0 && (
+                                                <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>
+                                                    {needsDescriptionCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className={styles.accountText}>Описания</span>
+                                    </Link>
+                                    <Link href="/admin/ads" className={styles.accountLink} title="Модерация">
+                                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                            <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                            </svg>
+                                            {moderationCount > 0 && <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>{moderationCount}</span>}
+                                        </div>
+                                        <span className={styles.accountText}>Модерация</span>
+                                    </Link>
+                                </>
                             )}
 
                             {/* Аккаунт / Профиль */}
