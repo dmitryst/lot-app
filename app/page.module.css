@@ -246,7 +246,8 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 140px;
+  min-height: 140px;
+  height: 100%;
   /* Примерная высота, равная ~2 высотам кнопки */
   margin-top: 0;
   margin-bottom: 0;

@@ -134,6 +134,12 @@ function Page() {
       <div className={styles.heroWrapper}>
         <HeroSection />
 
+        <div className={styles.mapBanner}>
+          <Link href="/map" className={styles.mapLinkButton}>
+            Смотреть недвижимость на карте
+          </Link>
+        </div>
+
         {/* --- ПРОМО БАННЕР (Магнит Саратов) --- */}
         {/* <div className={styles.promoBanner} style={{ position: 'relative', overflow: 'hidden', padding: '20px' }}>
 
@@ -207,14 +213,8 @@ function Page() {
       </div>
 
 
-      <div className={styles.actionBannersGrid}>
-        <div className={styles.mapBanner}>
-          <Link href="/map" className={styles.mapLinkButton}>
-            Смотреть недвижимость на карте
-          </Link>
-        </div>
-
-        {user?.isAdmin && (
+      {user?.isAdmin && (
+        <div className={styles.actionBannersGrid}>
           <div className={styles.addAdBanner}>
             <div className={styles.addAdContent}>
               <h3>Частные объявления</h3>
@@ -230,8 +230,8 @@ function Page() {
               </Link>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <section className={styles.contentArea}>
         <div className={styles.filtersContainer}>
