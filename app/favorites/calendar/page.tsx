@@ -244,8 +244,8 @@ function FavoritesCalendarPage() {
 
                                         return (
                                             <Link href={`/lot/${lot.id}`} key={lot.id} className={styles.lotBadge}>
-                                                {lot.imageUrl && (
-                                                    <img src={lot.imageUrl} alt="" className={styles.lotThumb} />
+                                                {(lot.images?.[0] || lot.imageUrl) && (
+                                                    <img src={lot.images?.[0] || lot.imageUrl || ''} alt="" className={styles.lotThumb} />
                                                 )}
 
                                                 <div className={styles.lotText}>
