@@ -253,7 +253,8 @@ export interface DynamicFilterConfig {
   id: string; // Идентификатор атрибута (например, attr_brand)
   label: string; // Название фильтра (например, "Марка")
   type: FilterType; // Тип фильтра
-  options?: string[]; // Опции для типа select
+  options?: string[]; // Опции для типа select (если заданы статически)
+  dependsOn?: string; // ID другого фильтра (например, model зависит от brand)
   placeholder?: string;
   placeholderFrom?: string;
   placeholderTo?: string;
@@ -262,8 +263,8 @@ export interface DynamicFilterConfig {
 // Конфигурация динамических фильтров по категориям
 export const DYNAMIC_FILTERS_BY_CATEGORY: Record<string, DynamicFilterConfig[]> = {
   'Транспортные средства': [
-    { id: 'brand', label: 'Марка', type: 'text', placeholder: 'Например: Toyota' },
-    { id: 'model', label: 'Модель', type: 'text', placeholder: 'Например: Camry' },
+    { id: 'brand', label: 'Марка', type: 'select', placeholder: 'Выберите марку' },
+    { id: 'model', label: 'Модель', type: 'select', placeholder: 'Выберите модель', dependsOn: 'brand' },
     { id: 'year', label: 'Год выпуска', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
     { id: 'mileage', label: 'Пробег, км', type: 'range', placeholderFrom: 'От', placeholderTo: 'До' },
   ],

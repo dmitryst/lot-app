@@ -5,6 +5,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { BIDDING_TYPES, CATEGORIES_TREE, REGIONS_TREE, getDynamicFiltersForCategories } from '@/app/data/constants';
 import CategorySelect from '@/components/CategorySelect';
 import RegionSelect from '@/components/RegionSelect';
+import FilterSingleSelect from '@/components/FilterSingleSelect';
+import { useVehicleFilterOptions } from '@/app/hooks/useVehicleFilterOptions';
 import styles from './Filters.module.css';
 import ClearableInput from '@/components/ui/ClearableInput';
 
@@ -53,6 +55,23 @@ export default function Filters({
     const availableDynamicFilters = useMemo(() => {
         return getDynamicFiltersForCategories(localCategories);
     }, [localCategories]);
+
+    const showVehicleSelectFilters = useMemo(
+        () => availableDynamicFilters.some(f => f.id === 'brand' || f.id === 'model'),
+        [availableDynamicFilters]
+    );
+
+    const { options: vehicleOptions, loading: vehicleOptionsLoading } = useVehicleFilterOptions(showVehicleSelectFilters);
+
+    const selectedBrand = localDynamicFilters.brand || '';
+    const modelOptions = useMemo(() => {
+        if (!selectedBrand) {
+            return [];
+        }
+        return vehicleOptions.modelsByBrand[selectedBrand]
+            ?? Object.entries(vehicleOptions.modelsByBrand).find(([brand]) => brand.toLowerCase() === selectedBrand.toLowerCase())?.[1]
+            ?? [];
+    }, [selectedBrand, vehicleOptions.modelsByBrand]);
 
     // Синхронизация с URL (на случай навигации браузера Вперед/Назад)
     useEffect(() => {
@@ -150,10 +169,85 @@ export default function Filters({
     };
 
     const handleDynamicFilterChange = (key: string, value: string) => {
-        setLocalDynamicFilters(prev => ({
-            ...prev,
-            [key]: value
-        }));
+        setLocalDynamicFilters(prev => {
+            const next = { ...prev, [key]: value };
+
+            // При смене марки сбрасываем модель
+            if (key === 'brand' && prev.brand !== value) {
+                next.model = '';
+            }
+
+            return next;
+        });
+    };
+
+    const renderDynamicFilter = (filter: ReturnType<typeof getDynamicFiltersForCategories>[number]) => {
+        if (filter.type === 'select' && filter.id === 'brand') {
+            return (
+                <FilterSingleSelect
+                    options={vehicleOptions.brands}
+                    value={localDynamicFilters.brand || ''}
+                    onChange={(value) => handleDynamicFilterChange('brand', value)}
+                    placeholder={filter.placeholder || 'Выберите марку'}
+                    loading={vehicleOptionsLoading}
+                    emptyMessage="Марки пока не найдены"
+                />
+            );
+        }
+
+        if (filter.type === 'select' && filter.id === 'model') {
+            const brandSelected = !!selectedBrand;
+            return (
+                <FilterSingleSelect
+                    options={modelOptions}
+                    value={localDynamicFilters.model || ''}
+                    onChange={(value) => handleDynamicFilterChange('model', value)}
+                    placeholder={brandSelected ? (filter.placeholder || 'Выберите модель') : 'Сначала выберите марку'}
+                    disabled={!brandSelected}
+                    loading={vehicleOptionsLoading}
+                    emptyMessage={brandSelected ? 'Модели для этой марки не найдены' : 'Сначала выберите марку'}
+                />
+            );
+        }
+
+        if (filter.type === 'text' || filter.type === 'number') {
+            return (
+                <ClearableInput
+                    type="text"
+                    placeholder={filter.placeholder || ''}
+                    value={localDynamicFilters[filter.id] || ''}
+                    onChange={(e) => handleDynamicFilterChange(filter.id, e.target.value)}
+                    onClear={() => handleDynamicFilterChange(filter.id, '')}
+                    onKeyDown={handleKeyDown}
+                />
+            );
+        }
+
+        if (filter.type === 'range') {
+            return (
+                <div className={styles.priceFilterInputs}>
+                    <ClearableInput
+                        type="text"
+                        placeholder={filter.placeholderFrom || 'От'}
+                        value={localDynamicFilters[`${filter.id}_from`] || ''}
+                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_from`, e.target.value.replace(/\D/g, ''))}
+                        onClear={() => handleDynamicFilterChange(`${filter.id}_from`, '')}
+                        onKeyDown={handleKeyDown}
+                    />
+                    <span className={styles.priceSeparator}>—</span>
+                    <ClearableInput
+                        type="text"
+                        placeholder={filter.placeholderTo || 'До'}
+                        value={localDynamicFilters[`${filter.id}_to`] || ''}
+                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_to`, e.target.value.replace(/\D/g, ''))}
+                        onClear={() => handleDynamicFilterChange(`${filter.id}_to`, '')}
+                        onKeyDown={handleKeyDown}
+                    />
+                </div>
+            );
+        }
+
+        return null;
     };
 
     // --- HANDLERS ДЛЯ ОЧИСТКИ ---
@@ -293,36 +387,7 @@ export default function Filters({
                     {availableDynamicFilters.map(filter => (
                         <div key={filter.id} className={styles.filterGroup}>
                             <label className={styles.filterLabel}>{filter.label}</label>
-                            {filter.type === 'text' || filter.type === 'number' ? (
-                                <ClearableInput
-                                    type="text"
-                                    placeholder={filter.placeholder || ''}
-                                    value={localDynamicFilters[filter.id] || ''}
-                                    onChange={(e) => handleDynamicFilterChange(filter.id, e.target.value)}
-                                    onClear={() => handleDynamicFilterChange(filter.id, '')}
-                                    onKeyDown={handleKeyDown}
-                                />
-                            ) : filter.type === 'range' ? (
-                                <div className={styles.priceFilterInputs}>
-                                    <ClearableInput
-                                        type="text"
-                                        placeholder={filter.placeholderFrom || 'От'}
-                                        value={localDynamicFilters[`${filter.id}_from`] || ''}
-                                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_from`, e.target.value.replace(/\D/g, ''))}
-                                        onClear={() => handleDynamicFilterChange(`${filter.id}_from`, '')}
-                                        onKeyDown={handleKeyDown}
-                                    />
-                                    <span className={styles.priceSeparator}>—</span>
-                                    <ClearableInput
-                                        type="text"
-                                        placeholder={filter.placeholderTo || 'До'}
-                                        value={localDynamicFilters[`${filter.id}_to`] || ''}
-                                        onChange={(e) => handleDynamicFilterChange(`${filter.id}_to`, e.target.value.replace(/\D/g, ''))}
-                                        onClear={() => handleDynamicFilterChange(`${filter.id}_to`, '')}
-                                        onKeyDown={handleKeyDown}
-                                    />
-                                </div>
-                            ) : null}
+                            {renderDynamicFilter(filter)}
                         </div>
                     ))}
                 </div>

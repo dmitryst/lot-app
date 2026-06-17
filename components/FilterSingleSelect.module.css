@@ -1,0 +1,58 @@
+.searchInput {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.option:hover {
+  background-color: #f0f4f8;
+}
+
+.optionSelected {
+  background-color: #e8f1ff;
+  color: #0070f3;
+  font-weight: 500;
+}
+
+.emptyMessage {
+  padding: 12px 8px;
+  color: #888;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.disabledTrigger {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

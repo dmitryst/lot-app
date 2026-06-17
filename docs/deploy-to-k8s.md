@@ -1,8 +1,22 @@
 ## Выкатка фронта с помощью скрипта (в cloud k8s)
 
-1. Изменить версию **NEXT_PUBLIC_APP_VERSION** в файле .env.production
-2. запустить Git Bash и перейти в папку командой cd /b/Projects/lot-app
-3. запустить скрипт ./build-k8s.sh prod
+1. изменить версию **NEXT_PUBLIC_APP_VERSION** в файле .env.production
+2. в Git Bash перейти в директорию lot-app
+```bash
+cd /b/Projects/lot-app
+```
+3. запустить скрипт сборки образа:
+```bash
+./build-k8s.sh prod
+```
+4. перейти в директорию k8s
+```bash
+cd /b/Projects/k8s
+```
+5. изменить версию в deployment и применить его:
+```bash
+kubectl apply -f web-api/deployment.yaml
+```
 
 ## Узнать хэш последнего комита образа/контейнера
 

@@ -17,6 +17,7 @@ export const Header = () => {
     const { unreadCount } = useChat();
     const [moderationCount, setModerationCount] = useState(0);
     const [needsDescriptionCount, setNeedsDescriptionCount] = useState(0);
+    const [unmatchedVehicleCount, setUnmatchedVehicleCount] = useState(0);
 
     useEffect(() => {
         if (user?.isAdmin) {
@@ -41,6 +42,17 @@ export const Header = () => {
                 }
             })
             .catch(err => console.error('Ошибка загрузки счетчика лотов без описания', err));
+
+            fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/lots/unmatched-vehicle-attributes/count?activeOnly=true`, {
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.count === 'number') {
+                    setUnmatchedVehicleCount(data.count);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки счетчика неразобранных марок/моделей', err));
         }
     }, [user]);
 
@@ -127,6 +139,24 @@ export const Header = () => {
                                             )}
                                         </div>
                                         <span className={styles.accountText}>Описания</span>
+                                    </Link>
+                                    <Link href="/admin/unmatched-vehicle-attributes" className={styles.accountLink} title="Марки и модели">
+                                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                            <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M7 17h10"></path>
+                                                <path d="M7 11h10"></path>
+                                                <path d="M7 5h10"></path>
+                                                <circle cx="5" cy="5" r="1"></circle>
+                                                <circle cx="5" cy="11" r="1"></circle>
+                                                <circle cx="5" cy="17" r="1"></circle>
+                                            </svg>
+                                            {unmatchedVehicleCount > 0 && (
+                                                <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>
+                                                    {unmatchedVehicleCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className={styles.accountText}>Авто</span>
                                     </Link>
                                     <Link href="/admin/ads" className={styles.accountLink} title="Модерация">
                                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
