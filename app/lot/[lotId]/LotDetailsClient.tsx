@@ -126,6 +126,9 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [descriptionText, setDescriptionText] = useState(lot?.description || '');
   const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [isEditingViewingProcedure, setIsEditingViewingProcedure] = useState(false);
+  const [viewingProcedureText, setViewingProcedureText] = useState(lot?.bidding?.viewingProcedure || '');
+  const [isSavingViewingProcedure, setIsSavingViewingProcedure] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isReclassifying, setIsReclassifying] = useState(false);
 
@@ -238,6 +241,34 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       alert('Ошибка при сохранении описания');
     } finally {
       setIsSavingDescription(false);
+    }
+  };
+
+  const handleSaveViewingProcedure = async () => {
+    if (!lot) return;
+    setIsSavingViewingProcedure(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/viewing-procedure`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ viewingProcedure: viewingProcedureText }),
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setIsEditingViewingProcedure(false);
+        if (lot.bidding) {
+          lot.bidding.viewingProcedure = viewingProcedureText.trim() || undefined;
+        }
+      } else {
+        alert('Ошибка при сохранении порядка ознакомления');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка при сохранении порядка ознакомления');
+    } finally {
+      setIsSavingViewingProcedure(false);
     }
   };
 
@@ -892,11 +923,59 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       )}
 
       {/* Порядок ознакомления с имуществом */}
-      {lot.bidding?.viewingProcedure && (
+      {(lot.bidding?.viewingProcedure || user?.isAdmin) && (
         <div className={styles.descriptionSection}>
-          <h2 className={styles.sectionTitle}>Порядок ознакомления с имуществом</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 className={styles.sectionTitle}>Порядок ознакомления с имуществом</h2>
+            {user?.isAdmin && !isEditingViewingProcedure && (
+              <button
+                onClick={() => setIsEditingViewingProcedure(true)}
+                className={styles.ctaButton}
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem', background: '#e2e8f0', color: '#2d3748' }}
+              >
+                Редактировать
+              </button>
+            )}
+          </div>
           <div className={styles.descriptionText}>
-            {lot.bidding.viewingProcedure}
+            {isEditingViewingProcedure ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <textarea
+                  value={viewingProcedureText}
+                  onChange={(e) => setViewingProcedureText(e.target.value)}
+                  placeholder="Телефон, график работы, адрес для ознакомления..."
+                  style={{ width: '100%', minHeight: '120px', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                />
+                <p style={{ margin: 0, fontSize: '0.875rem', color: '#666' }}>
+                  Относится ко всем лотам этих торгов.
+                </p>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={handleSaveViewingProcedure}
+                    disabled={isSavingViewingProcedure}
+                    className={styles.ctaButton}
+                    style={{ padding: '0.5rem 1rem', background: '#3182ce', color: '#fff' }}
+                  >
+                    {isSavingViewingProcedure ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingViewingProcedure(false);
+                      setViewingProcedureText(lot.bidding?.viewingProcedure || '');
+                    }}
+                    disabled={isSavingViewingProcedure}
+                    className={styles.ctaButton}
+                    style={{ padding: '0.5rem 1rem', background: '#e2e8f0', color: '#2d3748' }}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            ) : (
+              lot.bidding?.viewingProcedure || (
+                user?.isAdmin ? <span style={{ color: '#666' }}>Не указан</span> : null
+              )
+            )}
           </div>
         </div>
       )}
