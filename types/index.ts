@@ -18,6 +18,7 @@ type BiddingInfo = {
   tradePeriod: string;
   viewingProcedure?: string;
   platform: string;
+  tradeNumber?: string | null;
   bankruptMessageId?: string | null;
   arbitrationManager?: ArbitrationManager | null;
   debtor?: Debtor | null;

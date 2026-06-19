@@ -652,6 +652,29 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           <p className={styles.lotInfo}><b>Площадка:</b> {lot.bidding?.platform}</p>
 
+          {lot.bidding?.tradeNumber && (
+            user?.isSubscriptionActive ? (
+              <p className={styles.lotInfo}><b>Номер торгов:</b> {lot.bidding.tradeNumber}</p>
+            ) : (
+              <div className={`${styles.lotInfo} ${styles.lotInfoColumn}`}>
+                <b>Номер торгов:</b>
+                <div
+                  className={styles.proBadgeWrapper}
+                  onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
+                  title={user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
+                >
+                  <div className={styles.proBadgeContent}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', flexShrink: 0 }}>
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Доступно пользователям с PRO доступом
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+
           {/* Можно добавить кнопку "купить" прямо сюда */}
           {/* <button className={styles.ctaButton} style={{ marginTop: '2rem' }}>Оставить заявку</button> */}
         </div>
