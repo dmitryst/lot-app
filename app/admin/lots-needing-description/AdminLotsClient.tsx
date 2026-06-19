@@ -12,12 +12,30 @@ interface LotNeedingDescription {
     lotNumber?: string | null;
     title?: string | null;
     description?: string | null;
+    viewingProcedure?: string | null;
     startPrice?: number | null;
     tradeStatus?: string | null;
     createdAt: string;
     tradeNumber?: string | null;
     platform?: string | null;
+    bankruptMessageId?: string | null;
     url: string;
+}
+
+interface AlignmentPreview {
+    publicId: number;
+    lotId: string;
+    lotNumber?: string | null;
+    startPrice?: number | null;
+    fedresursUrl?: string | null;
+    error?: string | null;
+    currentDescription?: string | null;
+    currentViewingProcedure?: string | null;
+    proposedDescription?: string | null;
+    proposedViewingProcedure?: string | null;
+    canApply: boolean;
+    editedDescription?: string;
+    editedViewingProcedure?: string;
 }
 
 interface PaginatedResponse {
@@ -36,6 +54,10 @@ export default function AdminLotsClient() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [previews, setPreviews] = useState<AlignmentPreview[]>([]);
+    const [isAligning, setIsAligning] = useState(false);
+    const [applyingId, setApplyingId] = useState<number | null>(null);
 
     const fetchLots = useCallback(async (currentPage: number) => {
         setIsLoading(true);
@@ -50,6 +72,8 @@ export default function AdminLotsClient() {
                 setTotalPages(data.totalPages);
                 setTotalCount(data.totalCount);
                 setPage(data.page);
+                setSelectedIds(new Set());
+                setPreviews([]);
             }
         } catch (e) {
             console.error('Ошибка загрузки лотов', e);
@@ -79,6 +103,120 @@ export default function AdminLotsClient() {
         return text.length > max ? `${text.slice(0, max)}…` : text;
     };
 
+    const toggleSelect = (publicId: number) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(publicId)) next.delete(publicId);
+            else next.add(publicId);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === lots.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(lots.map(l => l.publicId)));
+        }
+    };
+
+    const runAlignmentPreview = async () => {
+        if (selectedIds.size === 0) {
+            alert('Выберите хотя бы один лот.');
+            return;
+        }
+
+        setIsAligning(true);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/lots/needs-description/align-preview`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ publicIds: Array.from(selectedIds) }),
+                }
+            );
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert(err.message ?? 'Ошибка при загрузке данных с Федресурса');
+                return;
+            }
+
+            const data = await res.json();
+            const items: AlignmentPreview[] = (data.items ?? []).map((item: AlignmentPreview) => ({
+                ...item,
+                editedDescription: item.proposedDescription ?? '',
+                editedViewingProcedure: item.proposedViewingProcedure ?? '',
+            }));
+            setPreviews(items);
+        } catch (e) {
+            console.error(e);
+            alert('Ошибка при выравнивании');
+        } finally {
+            setIsAligning(false);
+        }
+    };
+
+    const applyAlignment = async (preview: AlignmentPreview) => {
+        if (!preview.editedDescription?.trim()) {
+            alert('Описание не может быть пустым.');
+            return;
+        }
+
+        setApplyingId(preview.publicId);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/lots/needs-description/align-apply`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        publicId: preview.publicId,
+                        description: preview.editedDescription,
+                        viewingProcedure: preview.editedViewingProcedure,
+                    }),
+                }
+            );
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert(err.message ?? 'Ошибка при сохранении');
+                return;
+            }
+
+            setPreviews(prev => prev.filter(p => p.publicId !== preview.publicId));
+            setLots(prev => prev.filter(l => l.publicId !== preview.publicId));
+            setSelectedIds(prev => {
+                const next = new Set(prev);
+                next.delete(preview.publicId);
+                return next;
+            });
+            setTotalCount(c => Math.max(0, c - 1));
+        } catch (e) {
+            console.error(e);
+            alert('Ошибка при сохранении');
+        } finally {
+            setApplyingId(null);
+        }
+    };
+
+    const dismissPreview = (publicId: number) => {
+        setPreviews(prev => prev.filter(p => p.publicId !== publicId));
+    };
+
+    const updatePreviewField = (
+        publicId: number,
+        field: 'editedDescription' | 'editedViewingProcedure',
+        value: string
+    ) => {
+        setPreviews(prev =>
+            prev.map(p => (p.publicId === publicId ? { ...p, [field]: value } : p))
+        );
+    };
+
     if (loading || isLoading) {
         return <div className={styles.container}>Загрузка...</div>;
     }
@@ -92,9 +230,110 @@ export default function AdminLotsClient() {
                     : 'Все активные лоты имеют описание имущества'}
             </p>
             <p className={styles.workflowHint}>
-                Допишите описание на странице лота и нажмите «Сохранить» — лот встанет в общую очередь
-                классификации (батчи по 10, обычно каждые 10–15 мин). Кнопка «Переклассифицировать» не обязательна.
+                Выберите лоты и нажмите «Выравнить с Федресурсом» — система загрузит описание со страницы
+                объявления торгов, перенесёт текущий текст в блок ознакомления и покажет результат для
+                подтверждения. После применения лот встанет в очередь классификации.
             </p>
+
+            {lots.length > 0 && (
+                <div className={styles.toolbar}>
+                    <button
+                        type="button"
+                        className={styles.alignBtn}
+                        onClick={runAlignmentPreview}
+                        disabled={isAligning || selectedIds.size === 0}
+                    >
+                        {isAligning ? 'Загрузка с Федресурса…' : `Выравнить с Федресурсом (${selectedIds.size})`}
+                    </button>
+                </div>
+            )}
+
+            {previews.length > 0 && (
+                <section className={styles.previewSection}>
+                    <h2 className={styles.previewHeading}>Результаты выравнивания — проверьте и подтвердите</h2>
+                    {previews.map(preview => (
+                        <div key={preview.publicId} className={styles.previewCard}>
+                            <div className={styles.previewHeader}>
+                                <strong>Лот #{preview.publicId}</strong>
+                                {preview.lotNumber && <span> · №{preview.lotNumber}</span>}
+                                {preview.startPrice != null && (
+                                    <span> · {formatPrice(preview.startPrice)}</span>
+                                )}
+                                {preview.fedresursUrl && (
+                                    <a
+                                        href={preview.fedresursUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.fedresursLink}
+                                    >
+                                        Федресурс ↗
+                                    </a>
+                                )}
+                            </div>
+
+                            {preview.error ? (
+                                <p className={styles.previewError}>{preview.error}</p>
+                            ) : (
+                                <div className={styles.previewGrid}>
+                                    <div className={styles.previewColumn}>
+                                        <h3>Было: описание</h3>
+                                        <pre className={styles.previewText}>{preview.currentDescription || '—'}</pre>
+                                        <h3>Было: ознакомление</h3>
+                                        <pre className={styles.previewText}>{preview.currentViewingProcedure || '—'}</pre>
+                                    </div>
+                                    <div className={styles.previewColumn}>
+                                        <h3>Станет: описание</h3>
+                                        <textarea
+                                            className={styles.previewTextarea}
+                                            value={preview.editedDescription ?? ''}
+                                            onChange={e =>
+                                                updatePreviewField(preview.publicId, 'editedDescription', e.target.value)
+                                            }
+                                            rows={6}
+                                        />
+                                        <h3>Станет: ознакомление</h3>
+                                        <textarea
+                                            className={styles.previewTextarea}
+                                            value={preview.editedViewingProcedure ?? ''}
+                                            onChange={e =>
+                                                updatePreviewField(
+                                                    preview.publicId,
+                                                    'editedViewingProcedure',
+                                                    e.target.value
+                                                )
+                                            }
+                                            rows={4}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={styles.previewActions}>
+                                {!preview.error && preview.canApply && (
+                                    <button
+                                        type="button"
+                                        className={styles.applyBtn}
+                                        disabled={applyingId === preview.publicId}
+                                        onClick={() => applyAlignment(preview)}
+                                    >
+                                        {applyingId === preview.publicId ? 'Сохранение…' : 'Применить'}
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    className={styles.skipBtn}
+                                    onClick={() => dismissPreview(preview.publicId)}
+                                >
+                                    Пропустить
+                                </button>
+                                <Link href={`/lot/${preview.publicId}`} className={styles.openLink}>
+                                    Открыть лот →
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                </section>
+            )}
 
             {lots.length === 0 ? (
                 <div className={styles.emptyState}>Нет лотов, ожидающих доработки описания.</div>
@@ -103,6 +342,14 @@ export default function AdminLotsClient() {
                     <table className={styles.table}>
                         <thead>
                             <tr>
+                                <th className={styles.checkboxCol}>
+                                    <input
+                                        type="checkbox"
+                                        checked={lots.length > 0 && selectedIds.size === lots.length}
+                                        onChange={toggleSelectAll}
+                                        aria-label="Выбрать все"
+                                    />
+                                </th>
                                 <th>ID</th>
                                 <th>Торги</th>
                                 <th>Описание</th>
@@ -111,8 +358,16 @@ export default function AdminLotsClient() {
                             </tr>
                         </thead>
                         <tbody>
-                            {lots.map((lot) => (
+                            {lots.map(lot => (
                                 <tr key={lot.id}>
+                                    <td className={styles.checkboxCol}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.has(lot.publicId)}
+                                            onChange={() => toggleSelect(lot.publicId)}
+                                            aria-label={`Выбрать лот ${lot.publicId}`}
+                                        />
+                                    </td>
                                     <td>
                                         #{lot.publicId}
                                         {lot.lotNumber && <div>Лот {lot.lotNumber}</div>}
@@ -138,7 +393,7 @@ export default function AdminLotsClient() {
                             <button
                                 className={styles.pageBtn}
                                 disabled={page <= 1}
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
                             >
                                 ← Назад
                             </button>
@@ -148,7 +403,7 @@ export default function AdminLotsClient() {
                             <button
                                 className={styles.pageBtn}
                                 disabled={page >= totalPages}
-                                onClick={() => setPage((p) => p + 1)}
+                                onClick={() => setPage(p => p + 1)}
                             >
                                 Вперёд →
                             </button>

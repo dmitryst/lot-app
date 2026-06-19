@@ -101,6 +101,150 @@
     font-size: 0.95rem;
 }
 
+.toolbar {
+    margin-bottom: 20px;
+}
+
+.alignBtn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.alignBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.checkboxCol {
+    width: 40px;
+    text-align: center;
+}
+
+.previewSection {
+    margin-bottom: 32px;
+}
+
+.previewHeading {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+}
+
+.previewCard {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.previewHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.fedresursLink {
+    margin-left: auto;
+    color: #2563eb;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.fedresursLink:hover {
+    text-decoration: underline;
+}
+
+.previewError {
+    color: #b91c1c;
+    background: #fef2f2;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 0 0 12px;
+}
+
+.previewGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .previewGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.previewColumn h3 {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.previewText {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    margin: 0 0 12px;
+    max-height: 160px;
+    overflow: auto;
+}
+
+.previewTextarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    margin-bottom: 12px;
+    resize: vertical;
+}
+
+.previewActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.applyBtn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.applyBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.skipBtn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .price {
     white-space: nowrap;
     font-weight: 600;
