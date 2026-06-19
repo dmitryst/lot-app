@@ -16,11 +16,12 @@ interface LotItemProps {
 
 export const LotItem = ({ lot, className }: LotItemProps) => {
   const handleMouseDown = () => {
-    // Сохраняем позицию скролла и query — логика общая для главной и избранного
+    // Сохраняем позицию скролла и URL списка — логика общая для главной и каталога авто
     if (typeof window === 'undefined') return;
 
     sessionStorage.setItem('scrollPosition', String(window.scrollY));
-    sessionStorage.setItem('lotListQuery', window.location.search);
+    const query = window.location.search;
+    sessionStorage.setItem('lotListUrl', query ? `${window.location.pathname}${query}` : window.location.pathname);
   };
 
   // Если есть PublicId: берём slug из БД или генерируем на фронте для старых лотов

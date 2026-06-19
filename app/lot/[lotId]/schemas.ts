@@ -3,7 +3,8 @@
 
 import { Lot } from '../../../types';
 import { generateSlug } from '../../../utils/slugify';
-import { buildLotBreadcrumbs } from '../../../utils/lotBreadcrumbs';
+import { buildLotBreadcrumbs, PASSENGER_CAR_CATEGORY } from '../../../utils/lotBreadcrumbs';
+import { generateBreadcrumbListSchema } from '../../../utils/listingSchemas';
 import { FINAL_TRADE_STATUSES } from '../../data/constants';
 
 const BASE_URL = 'https://s-lot.ru';
@@ -41,6 +42,26 @@ function isLotActive(tradeStatus?: string): boolean {
   return !FINAL_TRADE_STATUSES.includes(tradeStatus);
 }
 
+function isPassengerCarLot(lot: Lot): boolean {
+  return lot.categories?.some((category) => category.name === PASSENGER_CAR_CATEGORY) ?? false;
+}
+
+function getProductBrand(lot: Lot): Record<string, string> {
+  const vehicleBrand = lot.attributes?.brand;
+  if (isPassengerCarLot(lot) && vehicleBrand) {
+    return {
+      '@type': 'Brand',
+      name: vehicleBrand,
+    };
+  }
+
+  return {
+    '@type': 'Organization',
+    name: 's-lot.ru',
+    url: BASE_URL,
+  };
+}
+
 /**
  * Генерирует Product schema для лота
  */
@@ -60,11 +81,7 @@ function generateProductSchema(lot: Lot): any {
     "description": lot.description,
     "image": images,
     "category": lot.categories?.[0]?.name || "Имущество банкротов",
-    "brand": {
-      "@type": "Organization",
-      "name": "s-lot.ru",
-      "url": BASE_URL
-    },
+    "brand": getProductBrand(lot),
     "offers": {
       "@type": "Offer",
       "price": price,
@@ -91,18 +108,7 @@ function generateProductSchema(lot: Lot): any {
  * Генерирует BreadcrumbList schema
  */
 function generateBreadcrumbSchema(lot: Lot): any {
-  const crumbs = buildLotBreadcrumbs(lot, BASE_URL);
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": crumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": crumb.label,
-      "item": crumb.href,
-    })),
-  };
+  return generateBreadcrumbListSchema(buildLotBreadcrumbs(lot, BASE_URL));
 }
 
 /**

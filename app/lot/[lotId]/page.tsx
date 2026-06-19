@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
 import { CATEGORIES_TREE, FINAL_TRADE_STATUSES } from '../../data/constants';
+import { PASSENGER_CAR_CATEGORY } from '../../../utils/lotBreadcrumbs';
 import { generateLotSchemas, generateLotUrl } from './schemas';
 import { generateSlug } from '../../../utils/slugify';
 
@@ -65,6 +66,34 @@ const generateKeywords = (lot: Lot): string => {
 
   // Ключевые слова из данных самого лота
   const lotSpecificKeywords = lot.title ? lot.title.split(' ').filter(word => word.length > 2) : [];
+
+  const isPassengerCar = lot.categories?.some((category) => category.name === PASSENGER_CAR_CATEGORY);
+  const vehicleBrand = lot.attributes?.brand;
+  const vehicleModel = lot.attributes?.model;
+
+  if (isPassengerCar) {
+    categoryKeywords.push(
+      'легковые автомобили с торгов',
+      'авто с торгов по банкротству',
+    );
+
+    if (vehicleBrand) {
+      lotSpecificKeywords.push(
+        vehicleBrand,
+        `${vehicleBrand} с торгов`,
+        `купить ${vehicleBrand} на торгах`,
+      );
+    }
+
+    if (vehicleBrand && vehicleModel) {
+      lotSpecificKeywords.push(
+        vehicleModel,
+        `${vehicleBrand} ${vehicleModel}`,
+        `${vehicleBrand} ${vehicleModel} с торгов`,
+        `купить ${vehicleBrand} ${vehicleModel} на торгах`,
+      );
+    }
+  }
   // TODO: добавить КН
   // if (lot.cadastralNumber) {
   //   lotSpecificKeywords.push(lot.cadastralNumber);

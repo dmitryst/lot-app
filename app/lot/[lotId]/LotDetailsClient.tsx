@@ -206,16 +206,22 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const handleBackToList = () => {
     // Проверяем, откуда мы пришли
     const isFromFavorites = sessionStorage.getItem('isFromFavorites') === 'true';
+    const savedListUrl = sessionStorage.getItem('lotListUrl');
     const savedQuery = sessionStorage.getItem('lotListQuery');
 
     if (isFromFavorites) {
       // Если пришли из избранного, возвращаемся в избранное (с учетом пагинации, если она была сохранена)
       const favQuery = sessionStorage.getItem('favoritesQuery') || '';
       router.push(`/favorites${favQuery}`);
-    } else {
-      // Иначе возвращаемся в основной список
-      router.push(`/${savedQuery || ''}`);
+      return;
     }
+
+    if (savedListUrl) {
+      router.push(savedListUrl);
+      return;
+    }
+
+    router.push(savedQuery ? `/${savedQuery}` : '/');
   };
 
   const handleSaveDescription = async () => {

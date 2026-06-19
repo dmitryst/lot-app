@@ -1,7 +1,46 @@
 import { MetadataRoute } from 'next';
 import { generateSlug } from '../utils/slugify';
+import {
+  PASSENGER_CARS_BASE_PATH,
+  buildPassengerCarPath,
+  fetchVehicleFilterOptions,
+  getModelsForBrand,
+} from '../utils/vehiclePaths';
 
 const BASE_URL = 'https://s-lot.ru';
+
+async function getPassengerCarListingRoutes(): Promise<MetadataRoute.Sitemap> {
+  const catalog = await fetchVehicleFilterOptions();
+  const routes: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}${PASSENGER_CARS_BASE_PATH}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+  ];
+
+  for (const brand of catalog.brands) {
+    routes.push({
+      url: `${BASE_URL}${buildPassengerCarPath(brand)}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    });
+
+    const models = getModelsForBrand(brand, catalog.modelsByBrand);
+    for (const model of models) {
+      routes.push({
+        url: `${BASE_URL}${buildPassengerCarPath(brand, model)}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      });
+    }
+  }
+
+  return routes;
+}
 
 // Генерируем список sitemap-файлов (id: 0, id: 1 ...)
 export async function generateSitemaps() {
@@ -35,6 +74,9 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       changeFrequency: 'monthly',
       priority: 0.8,
     });
+
+    const passengerCarRoutes = await getPassengerCarListingRoutes();
+    staticRoutes.push(...passengerCarRoutes);
   }
 
   // Запрашиваем чанк данных из API

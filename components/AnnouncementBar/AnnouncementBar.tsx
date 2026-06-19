@@ -18,7 +18,7 @@ export const ANNOUNCEMENTS: Announcement[] = [
         id: 'hideVehicleFiltersPromo_v1',
         badge: 'Новое',
         text: 'Мы добавили умные фильтры! Теперь легковые автомобили можно искать по марке, модели, году выпуска и пробегу.',
-        linkHref: '/?categories=Легковой+автомобиль',
+        linkHref: '/legkovye-avtomobili',
         linkText: 'Попробовать →'
     },
     {

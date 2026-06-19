@@ -1,7 +1,7 @@
 // app/page.tsx
 'use client';
 
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, useCallback, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 
 import { PAGE_SIZE } from './data/constants';
@@ -9,6 +9,7 @@ import { PAGE_SIZE } from './data/constants';
 import { LotItem } from '@/components/LotItem';
 import Pagination from '../components/Pagination';
 import Filters from '../components/Filters/Filters';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import styles from './page.module.css';
 import { Lot } from '../types';
 
@@ -16,6 +17,8 @@ import PromoGrid from '@/components/PromoGrid/PromoGrid';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import { useAuth } from '@/context/AuthContext';
 import { useQueryNavigation } from '@/hooks/useQueryNavigation';
+import { buildPassengerCarListingBreadcrumbs } from '@/utils/lotBreadcrumbs';
+import { PASSENGER_CAR_CATEGORY } from '@/utils/vehiclePaths';
 
 // Обертка для основного компонента, чтобы использовать Suspense
 export default function PageWrapper() {
@@ -52,10 +55,24 @@ function Page() {
   useEffect(() => {
     // Сбрасываем флаг Избранного, так как мы на главной странице
     sessionStorage.setItem('isFromFavorites', 'false');
-    // Сохраняем текущие параметры главной страницы
+    // Сохраняем текущий URL списка для кнопки «Назад» на странице лота
     const query = params.toString();
-    sessionStorage.setItem('lotListQuery', query ? `?${query}` : '');
+    sessionStorage.setItem('lotListUrl', query ? `/?${query}` : '/');
   }, [params]);
+
+  const passengerCarCrumbs = useMemo(() => {
+    const isSinglePassengerCategory =
+      categoriesParam.length === 1 && categoriesParam[0] === PASSENGER_CAR_CATEGORY;
+
+    if (!isSinglePassengerCategory) {
+      return null;
+    }
+
+    return buildPassengerCarListingBreadcrumbs({
+      brand: dynamicFiltersParam.brand,
+      model: dynamicFiltersParam.model,
+    });
+  }, [categoriesParam, dynamicFiltersParam]);
 
   const onPageChange = (nextPage: number) => {
     updateQuery({ page: nextPage }, { scroll: false });
@@ -234,6 +251,8 @@ function Page() {
       )}
 
       <section className={styles.contentArea}>
+        {passengerCarCrumbs && <Breadcrumbs crumbs={passengerCarCrumbs} />}
+
         <div className={styles.filtersContainer}>
           <button
             className={styles.toggleFiltersButton}

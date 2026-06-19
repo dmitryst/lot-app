@@ -1,27 +1,19 @@
 import { Lot } from '@/types';
 import { generateSlug } from '@/utils/slugify';
+import {
+  PASSENGER_CAR_CATEGORY,
+  PASSENGER_CAR_CATEGORY_LABEL,
+  buildPassengerCarPath,
+} from '@/utils/vehiclePaths';
 
 export type BreadcrumbCrumb = {
   label: string;
   href: string;
 };
 
-export const PASSENGER_CAR_CATEGORY = 'Легковой автомобиль';
-
 function joinUrl(baseUrl: string, path: string): string {
   if (!baseUrl) return path;
   return `${baseUrl.replace(/\/$/, '')}${path}`;
-}
-
-export function buildLotListPath(categories: string[], attrs: Record<string, string> = {}): string {
-  const params = new URLSearchParams();
-  categories.forEach((category) => params.append('categories', category));
-  Object.entries(attrs).forEach(([key, value]) => {
-    if (value) params.set(`attr_${key}`, value);
-  });
-
-  const query = params.toString();
-  return query ? `/?${query}` : '/';
 }
 
 function isPassengerCarLot(lot: Lot): boolean {
@@ -41,6 +33,37 @@ function getLotPageLabel(lot: Lot): string {
   return `${lot.description.substring(0, maxLength)}...`;
 }
 
+export function buildPassengerCarListingBreadcrumbs(
+  options: { brand?: string; model?: string },
+  baseUrl = '',
+): BreadcrumbCrumb[] {
+  const { brand, model } = options;
+
+  const crumbs: BreadcrumbCrumb[] = [
+    { label: 'Главная', href: joinUrl(baseUrl, '/') },
+    {
+      label: PASSENGER_CAR_CATEGORY_LABEL,
+      href: joinUrl(baseUrl, buildPassengerCarPath()),
+    },
+  ];
+
+  if (brand) {
+    crumbs.push({
+      label: brand,
+      href: joinUrl(baseUrl, buildPassengerCarPath(brand)),
+    });
+  }
+
+  if (brand && model) {
+    crumbs.push({
+      label: model,
+      href: joinUrl(baseUrl, buildPassengerCarPath(brand, model)),
+    });
+  }
+
+  return crumbs;
+}
+
 export function buildLotBreadcrumbs(lot: Lot, baseUrl = ''): BreadcrumbCrumb[] {
   const lotPagePath = getLotPagePath(lot);
   const lotPageLabel = getLotPageLabel(lot);
@@ -54,21 +77,21 @@ export function buildLotBreadcrumbs(lot: Lot, baseUrl = ''): BreadcrumbCrumb[] {
     const model = lot.attributes?.model;
 
     crumbs.push({
-      label: PASSENGER_CAR_CATEGORY,
-      href: joinUrl(baseUrl, buildLotListPath([PASSENGER_CAR_CATEGORY])),
+      label: PASSENGER_CAR_CATEGORY_LABEL,
+      href: joinUrl(baseUrl, buildPassengerCarPath()),
     });
 
     if (brand) {
       crumbs.push({
         label: brand,
-        href: joinUrl(baseUrl, buildLotListPath([PASSENGER_CAR_CATEGORY], { brand })),
+        href: joinUrl(baseUrl, buildPassengerCarPath(brand)),
       });
     }
 
     if (brand && model) {
       crumbs.push({
         label: model,
-        href: joinUrl(baseUrl, buildLotListPath([PASSENGER_CAR_CATEGORY], { brand, model })),
+        href: joinUrl(baseUrl, buildPassengerCarPath(brand, model)),
       });
     }
 
@@ -79,3 +102,9 @@ export function buildLotBreadcrumbs(lot: Lot, baseUrl = ''): BreadcrumbCrumb[] {
   crumbs.push({ label: lotPageLabel, href: joinUrl(baseUrl, lotPagePath) });
   return crumbs;
 }
+
+export function isPassengerCarCategoryLot(lot: Lot): boolean {
+  return isPassengerCarLot(lot);
+}
+
+export { PASSENGER_CAR_CATEGORY, PASSENGER_CAR_CATEGORY_LABEL };
