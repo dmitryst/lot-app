@@ -12,6 +12,7 @@ import LotImageGallery from '../../../components/LotImageGallery/LotImageGallery
 import AiEvaluationBlock from '@/components/AiEvaluationBlock/AiEvaluationBlock';
 import ContractModal from '@/components/ContractModal/ContractModal';
 import { generateSlug } from '../../../utils/slugify';
+import { buildLotBreadcrumbs, getLotPagePath } from '@/utils/lotBreadcrumbs';
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getDynamicFiltersForCategories } from '@/app/data/constants';
@@ -338,15 +339,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
     );
   }
 
-  // Формируем "хлебные крошки" для навигации и SEO (slug из БД или с фронта для старых лотов)
-  const slug = lot.slug ?? generateSlug(lot.title || lot.description);
-  const lotUrl = lot.publicId
-    ? `/lot/${slug}-${lot.publicId}`
-    : `/lot/${lot.id}`;
-  const crumbs = [
-    { label: 'Главная', href: '/' },
-    { label: lot.description.substring(0, 50) + '...', href: lotUrl }
-  ];
+  const crumbs = buildLotBreadcrumbs(lot);
+  const lotUrl = getLotPagePath(lot);
 
   const getRankColorClass = (rank: number | null | undefined) => {
     if (!rank) return styles.rankLow; // Если null или 0 — серый цвет

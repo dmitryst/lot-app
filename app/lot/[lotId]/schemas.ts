@@ -3,6 +3,7 @@
 
 import { Lot } from '../../../types';
 import { generateSlug } from '../../../utils/slugify';
+import { buildLotBreadcrumbs } from '../../../utils/lotBreadcrumbs';
 import { FINAL_TRADE_STATUSES } from '../../data/constants';
 
 const BASE_URL = 'https://s-lot.ru';
@@ -90,31 +91,17 @@ function generateProductSchema(lot: Lot): any {
  * Генерирует BreadcrumbList schema
  */
 function generateBreadcrumbSchema(lot: Lot): any {
-  const lotUrl = generateLotUrl(lot);
+  const crumbs = buildLotBreadcrumbs(lot, BASE_URL);
 
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Главная",
-        "item": BASE_URL
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": lot.categories?.[0]?.name || "Лоты",
-        "item": `${BASE_URL}/?category=${lot.categories?.[0]?.id || ''}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": lot.title || lot.description.substring(0, 50),
-        "item": lotUrl
-      }
-    ]
+    "itemListElement": crumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": crumb.label,
+      "item": crumb.href,
+    })),
   };
 }
 
