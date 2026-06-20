@@ -508,24 +508,35 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             <p className={styles.lotInfo}><b>Период торгов:</b> {lot.bidding?.tradePeriod}</p>
           )}
 
-          {lot.bidding?.bankruptMessageId && (
+          {(lot.bidding?.bankruptMessageId || lot.bidding?.id) && (
             <div className={`${styles.lotInfo} ${styles.lotInfoColumn}`}>
-              {user?.isSubscriptionActive ? (
-                <>
-                  <b>Объявление о проведении торгов:</b>
-                  <a
-                    href={`https://fedresurs.ru/bankruptmessages/${lot.bidding.bankruptMessageId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.documentLink}
-                  >
-                    Открыть на Федресурсе
-                  </a>
-                </>
-              ) : (
-                <>
-                  <b>Объявление о проведении торгов:</b>
-                  <div 
+              <b>Информация о торгах с Федресурса:</b>
+              <div className={styles.documentLinks}>
+                {user?.isSubscriptionActive ? (
+                  <>
+                    {lot.bidding?.bankruptMessageId && (
+                      <a
+                        href={`https://fedresurs.ru/bankruptmessages/${lot.bidding.bankruptMessageId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.documentLink}
+                      >
+                        Сообщение об объявлении торгов
+                      </a>
+                    )}
+                    {lot.bidding?.id && (
+                      <a
+                        href={`https://fedresurs.ru/biddings/${lot.bidding.id}/messages`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.documentLink}
+                      >
+                        Все сообщения по торгам
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <div
                     className={styles.proBadgeWrapper}
                     onClick={() => router.push(user ? '/subscribe' : `/login?returnUrl=${encodeURIComponent(lotUrl)}`)}
                     title={user ? 'Перейти на PRO тариф' : 'Войти для просмотра'}
@@ -538,8 +549,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                       Доступно пользователям с PRO доступом
                     </div>
                   </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
           )}
 

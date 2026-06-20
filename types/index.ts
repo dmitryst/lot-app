@@ -13,6 +13,7 @@ type Debtor = {
 };
 
 type BiddingInfo = {
+  id?: string | null;
   type: string;
   bidAcceptancePeriod: string;
   tradePeriod: string;
