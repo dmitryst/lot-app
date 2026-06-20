@@ -32,7 +32,7 @@ export default function PageWrapper() {
 // --- Основной компонент страницы ---
 function Page() {
   const { updateQuery, params } = useQueryNavigation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Источник правды для UI и API — params из useQueryNavigation (синхронизирован с window.location)
   const page = Number(params.get('page')) || 1;
@@ -98,7 +98,9 @@ function Page() {
     apiParams.set('pageSize', String(PAGE_SIZE));
 
     try {
-      const res = await fetch(`${apiUrl}/api/lots/list?${apiParams.toString()}`);
+      const res = await fetch(`${apiUrl}/api/lots/list?${apiParams.toString()}`, {
+        credentials: 'include',
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -119,18 +121,17 @@ function Page() {
   }, [params]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     let isCancelled = false;
 
     const fetchDataAndScroll = async () => {
       await fetchLots();
 
-      // Если компонент размонтировался, пока грузились данные, ничего не делаем
       if (isCancelled) return;
 
-      // Проверяем наличие сохраненной позиции скролла
       const scrollPosition = sessionStorage.getItem('scrollPosition');
       if (scrollPosition) {
-        // Ждем следующего "кадра" отрисовки, чтобы DOM гарантированно обновился
         requestAnimationFrame(() => {
           window.scrollTo(0, parseInt(scrollPosition, 10));
           sessionStorage.removeItem('scrollPosition');
@@ -140,11 +141,10 @@ function Page() {
 
     fetchDataAndScroll();
 
-    // Функция очистки, которая сработает, если компонент размонтируется
     return () => {
       isCancelled = true;
     };
-  }, [fetchLots]);
+  }, [fetchLots, authLoading, user?.isAdmin]);
 
   return (
     <main className={styles.main}>

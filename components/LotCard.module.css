@@ -278,6 +278,10 @@
   background-color: #ef4444;
 }
 
+.confidenceNotEvaluable {
+  background-color: #94a3b8;
+}
+
 /* Бейджи апсайда */
 .upsideBadge {
   display: inline-flex;

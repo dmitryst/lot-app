@@ -12,6 +12,7 @@ import {
   buildPassengerCarPath,
 } from '@/utils/vehiclePaths';
 import { Lot } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 import styles from './listing.module.css';
 
 type PassengerCarListingClientProps = {
@@ -75,6 +76,7 @@ export default function PassengerCarListingClient({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
   const page = Math.max(1, Number(searchParams.get('page')) || initialPage);
   const searchParamsKey = searchParams.toString();
 
@@ -115,9 +117,12 @@ export default function PassengerCarListingClient({
   }, [pathname, searchParamsKey]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     const isInitialView = page === initialPage && searchParamsKey === '';
 
-    if (isInitialView) {
+    // SSR-данные без cookie админа; для админа всегда подгружаем с API
+    if (isInitialView && !user?.isAdmin) {
       setLots(initialLots);
       setTotalPages(initialTotalPages);
       setTotalCount(initialTotalCount);
@@ -138,7 +143,9 @@ export default function PassengerCarListingClient({
       const params = buildListingApiParams({ page, brand, model, searchParams });
 
       try {
-        const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`);
+        const res = await fetch(`${apiUrl}/api/lots/list?${params.toString()}`, {
+          credentials: 'include',
+        });
         if (!res.ok) {
           throw new Error('Failed to load lots');
         }
@@ -167,7 +174,19 @@ export default function PassengerCarListingClient({
     return () => {
       cancelled = true;
     };
-  }, [page, brand, model, initialPage, initialLots, initialTotalPages, initialTotalCount, searchParamsKey, searchParams]);
+  }, [
+    page,
+    brand,
+    model,
+    initialPage,
+    initialLots,
+    initialTotalPages,
+    initialTotalCount,
+    searchParamsKey,
+    searchParams,
+    authLoading,
+    user?.isAdmin,
+  ]);
 
   const onPageChange = useCallback((nextPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -228,11 +247,11 @@ export default function PassengerCarListingClient({
       </aside>
 
       <div className={styles.results}>
-        {!loading && totalCount > 0 && (
+        {!loading && !authLoading && totalCount > 0 && (
           <p className={styles.count}>Найдено лотов: {totalCount}</p>
         )}
 
-        {loading ? (
+        {(loading || authLoading) ? (
           <p className={styles.loadingMessage}>Загрузка лотов...</p>
         ) : lots.length > 0 ? (
           <>

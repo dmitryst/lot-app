@@ -236,6 +236,16 @@
   box-shadow: 0 0 0 2px rgba(245, 101, 101, 0.2);
 }
 
+.confidenceNotEvaluable {
+  background-color: #94a3b8;
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2);
+}
+
+.notEvaluableLabel {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
 .confidenceText {
   font-size: 0.75rem;
   font-weight: 500;

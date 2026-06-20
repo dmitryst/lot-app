@@ -1,5 +1,6 @@
 // app/lot/[lotId]/page.tsx
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { Lot } from '../../../types';
 import LotDetailsClient from './LotDetailsClient';
@@ -112,7 +113,16 @@ async function getLotData(slugOrId: string): Promise<Lot | null> {
   const url = `${apiUrl}/api/lots/${publicId}`;
 
   try {
-    const res = await fetch(url, { cache: 'no-store' });
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join('; ');
+
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
+    });
 
     if (!res.ok)
       return null;

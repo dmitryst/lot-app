@@ -5,7 +5,9 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './LotCard.module.css';
 import { Lot } from '../types';
+import { useAuth } from '@/context/AuthContext';
 import { formatMoney } from '../utils/format';
+import { getWeightedMarketPrice, getConfidenceLabel } from '@/utils/priceEvaluation';
 
 // Импортируем картинку как статический ресурс.
 // Путь указывается относительно текущего файла.
@@ -89,6 +91,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     const [isInvestmentExpanded, setIsInvestmentExpanded] = useState(false);
 
     const isDesktop = useIsDesktop();
+    const { user } = useAuth();
 
     // Обработчик нажатия на кнопку "Опубликовать"
     const handlePublishToProd = async (e: React.MouseEvent) => {
@@ -169,13 +172,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         objectFitMode = 'contain';
     }
 
-    // Считаем взвешенную цену: 70% веса на Min (пессимизм), 30% на Max
-    let displayPrice: number | null = null;
-    if (lot.marketValueMin && lot.marketValueMax) {
-        displayPrice = (lot.marketValueMin * 0.7) + (lot.marketValueMax * 0.3);
-    } else if (lot.marketValueMin) {
-        displayPrice = lot.marketValueMin;
-    }
+    const displayPrice = getWeightedMarketPrice(lot);
 
     // Считаем апсайд от displayPrice
     let upsidePercent: number | null = null;
@@ -190,22 +187,13 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
         return styles.upsideNeutral;
     }
 
-    // Цвет уверенности
     const getConfidenceClass = (conf?: string | null) => {
         switch (conf?.toLowerCase()) {
             case 'high': return styles.confidenceHigh;
             case 'medium': return styles.confidenceMedium;
             case 'low': return styles.confidenceLow;
-            default: return styles.confidenceMedium; // Fallback
-        }
-    };
-
-    const getConfidenceLabel = (conf?: string | null) => {
-        switch (conf?.toLowerCase()) {
-            case 'high': return 'Высокая точность оценки';
-            case 'medium': return 'Средняя точность';
-            case 'low': return 'Низкая точность (мало данных)';
-            default: return 'Точность оценки';
+            case 'not_evaluable': return styles.confidenceNotEvaluable;
+            default: return styles.confidenceMedium;
         }
     };
 
@@ -305,7 +293,7 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                     )} */}
 
                     {/* Блок рыночной оценки AI */}
-                    {(displayPrice || lot.investmentSummary) && (
+                    {user?.isAdmin && (displayPrice || lot.investmentSummary) && (
                         <div className={styles.priceRow}>
                             <span className={styles.priceLabel}>Оценка AI:</span>
 
@@ -330,7 +318,19 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                                     )}
                                 </>
                             ) : (
-                                <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Нет оценки</span>
+                                <>
+                                    {lot.priceConfidence && (
+                                        <div
+                                            className={`${styles.confidenceDot} ${getConfidenceClass(lot.priceConfidence)}`}
+                                            title={getConfidenceLabel(lot.priceConfidence)}
+                                        />
+                                    )}
+                                    <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+                                        {lot.priceConfidence?.toLowerCase() === 'not_evaluable'
+                                            ? 'Автооценка недоступна'
+                                            : 'Нет оценки'}
+                                    </span>
+                                </>
                             )}
 
                             {/* Кнопка раскрытия */}

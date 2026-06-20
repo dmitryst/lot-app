@@ -5,36 +5,39 @@ import { useAuth } from '@/context/AuthContext';
 import styles from './aiEvaluationBlock.module.css';
 
 interface EvaluationData {
-    estimatedPrice: number;
+    estimatedPrice?: number;
     liquidityScore?: number;
     investmentSummary: string | null | undefined;
     reasoningText?: string;
-    upsidePercent?: number; // Передаем готовый процент
+    upsidePercent?: number;
 }
 
 interface AiEvaluationBlockProps {
-    type: 'quick' | 'deep'; // Тип блока
-    lotPublicId?: number | string; // Для deep-режима
-    currentPrice?: number | null; // Для расчета апсайда
-
-    // Для quick-режима данные передаются напрямую
+    type: 'quick' | 'deep';
+    lotPublicId?: number | string;
+    currentPrice?: number | null;
     quickData?: EvaluationData;
-    priceConfidence?: number | null;
+    priceConfidence?: string | null;
 }
 
-// Вспомогательные функции для уверенности (можно вынести в утилиты)
-const getConfidenceClass = (score: number | null | undefined, styles: any) => {
-    if (!score && score !== 0) return styles.confidenceLow;
-    if (score >= 0.8) return styles.confidenceHigh;
-    if (score >= 0.5) return styles.confidenceMedium;
-    return styles.confidenceLow;
+const getQuickConfidenceClass = (conf: string | null | undefined, styles: Record<string, string>) => {
+    switch (conf?.toLowerCase()) {
+        case 'high': return styles.confidenceHigh;
+        case 'medium': return styles.confidenceMedium;
+        case 'low': return styles.confidenceLow;
+        case 'not_evaluable': return styles.confidenceNotEvaluable;
+        default: return styles.confidenceMedium;
+    }
 };
 
-const getConfidenceLabel = (score: number | null | undefined) => {
-    if (!score && score !== 0) return 'Низкая точность (мало данных)';
-    if (score >= 0.8) return 'Высокая точность';
-    if (score >= 0.5) return 'Средняя точность';
-    return 'Низкая точность (мало данных)';
+const getQuickConfidenceLabel = (conf: string | null | undefined) => {
+    switch (conf?.toLowerCase()) {
+        case 'high': return 'Высокая точность';
+        case 'medium': return 'Средняя точность';
+        case 'low': return 'Низкая точность (мало данных)';
+        case 'not_evaluable': return 'Автооценка недоступна для этого типа лота';
+        default: return 'Точность оценки';
+    }
 };
 
 export default function AiEvaluationBlock({
@@ -208,7 +211,7 @@ export default function AiEvaluationBlock({
         return { diff, percent };
     };
 
-    const upside = (evaluationResult && currentPrice)
+    const upside = (evaluationResult?.estimatedPrice && currentPrice)
         ? calculateUpside(evaluationResult.estimatedPrice, currentPrice)
         : null;
 
@@ -270,36 +273,40 @@ export default function AiEvaluationBlock({
             {evaluationResult && (
                 <div className={styles.resultContainer}>
                     <div className={styles.priceRow}>
-                        {/* Лейбл */}
                         <span className={styles.priceLabelBadge}>
                             {type === 'quick' ? 'Оценка AI:' : 'Новая оценка AI:'}
                         </span>
 
-                        {/* Цена и Апсайд */}
-                        <div className={styles.priceDataWrapper}>
-                            <span className={styles.estimatedPrice}>
-                                ~{evaluationResult.estimatedPrice?.toLocaleString('ru-RU')} ₽
-                            </span>
+                        {evaluationResult.estimatedPrice ? (
+                            <div className={styles.priceDataWrapper}>
+                                <span className={styles.estimatedPrice}>
+                                    ~{evaluationResult.estimatedPrice.toLocaleString('ru-RU')} ₽
+                                </span>
 
-                            {upside && (
-                                <div className={styles.upsideContainer}>
-                                    <span className={`${styles.upsideBadge} ${upside.percent >= 0 ? styles.upsidePositive : styles.upsideNegative}`}>
-                                        {upside.percent > 0 ? '+' : ''}{upside.percent.toFixed(0)}%
-                                    </span>
-                                    <span className={styles.upsideLabel}>от начальной цены</span>
-                                </div>
-                            )}
-                        </div>
+                                {upside && (
+                                    <div className={styles.upsideContainer}>
+                                        <span className={`${styles.upsideBadge} ${upside.percent >= 0 ? styles.upsidePositive : styles.upsideNegative}`}>
+                                            {upside.percent > 0 ? '+' : ''}{upside.percent.toFixed(0)}%
+                                        </span>
+                                        <span className={styles.upsideLabel}>от начальной цены</span>
+                                    </div>
+                                )}
+                            </div>
+                        ) : type === 'quick' ? (
+                            <span className={styles.notEvaluableLabel}>
+                                {priceConfidence?.toLowerCase() === 'not_evaluable'
+                                    ? 'Автооценка недоступна'
+                                    : 'Числовая оценка не рассчитана'}
+                            </span>
+                        ) : null}
                     </div>
 
-                    {/* ТОЧКА УВЕРЕННОСТИ (только для quick) */}
-                    {/* todo: перенести точку уверенности в детальную оценку */}
-                    {type === 'quick' && priceConfidence !== undefined && priceConfidence !== null && (
+                    {type === 'quick' && priceConfidence && (
                         <div className={styles.confidenceRow}>
                             <div className={styles.confidenceBadge}>
-                                <div className={`${styles.confidenceDot} ${getConfidenceClass(priceConfidence, styles)}`} />
+                                <div className={`${styles.confidenceDot} ${getQuickConfidenceClass(priceConfidence, styles)}`} />
                                 <span className={styles.confidenceText}>
-                                    {getConfidenceLabel(priceConfidence)}
+                                    {getQuickConfidenceLabel(priceConfidence)}
                                 </span>
                             </div>
                         </div>

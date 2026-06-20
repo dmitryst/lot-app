@@ -16,6 +16,7 @@ import { buildLotBreadcrumbs, getLotPagePath } from '@/utils/lotBreadcrumbs';
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getDynamicFiltersForCategories } from '@/app/data/constants';
+import { getWeightedMarketPrice, shouldShowPriceEstimate } from '@/utils/priceEvaluation';
 
 // Иконки для кнопки
 const HeartOutline = () => (
@@ -404,15 +405,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   // Проверяем, есть ли хоть одна запись с задатком > 0
   const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
 
-  // Считаем взвешенную цену: 70% веса на Min (пессимизм), 30% на Max
-  let displayPrice: number | null = null;
-  if (lot.marketValueMin && lot.marketValueMax) {
-    displayPrice = (lot.marketValueMin * 0.7) + (lot.marketValueMax * 0.3);
-  } else if (lot.marketValueMin) {
-    displayPrice = lot.marketValueMin;
-  } else if (lot.marketValue) {
-    displayPrice = lot.marketValue;
-  }
+  const displayPrice = getWeightedMarketPrice(lot);
 
   // Получаем конфигурацию динамических фильтров для категорий лота
   const dynamicFiltersConfig = useMemo(() => {
@@ -888,13 +881,14 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         */}
 
         {/* Экспресс-оценка (Quick) */}
-        {!isFinalStatus(lot.tradeStatus) && displayPrice && (
+        {!isFinalStatus(lot.tradeStatus) && user?.isAdmin && (displayPrice || lot.investmentSummary) && (
           <div className={styles.descriptionSection}>
             <AiEvaluationBlock
               type="quick"
               currentPrice={lot.startPrice}
+              priceConfidence={lot.priceConfidence}
               quickData={{
-                estimatedPrice: displayPrice,
+                estimatedPrice: displayPrice ?? undefined,
                 investmentSummary: lot.investmentSummary,
               }}
             />
@@ -902,7 +896,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         )}
 
         {/* Глубокая аналитика (DeepSeek Reasoning Evaluation) */}
-        {!isFinalStatus(lot.tradeStatus) && lot.startPrice != null && lot.startPrice > 1000000 && (
+        {!isFinalStatus(lot.tradeStatus) && user?.isAdmin && lot.startPrice != null && lot.startPrice > 1000000 && shouldShowPriceEstimate(lot) && (
           <div className={styles.descriptionSection}>
             <AiEvaluationBlock
               type="deep"
