@@ -126,6 +126,13 @@ function generateEventSchema(lot: Lot): any | null {
     "description": `Аукцион по реализации имущества банкротов. ${lot.bidding?.type || 'Торги'}`,
     "startDate": lot.bidding?.bidAcceptancePeriod || undefined,
     "endDate": lot.bidding?.tradePeriod || undefined,
+    ...(lot.bidding?.tradeNumber && {
+      identifier: {
+        "@type": "PropertyValue",
+        propertyID: "tradeNumber",
+        value: lot.bidding.tradeNumber,
+      },
+    }),
     "location": {
       "@type": "Place",
       "name": lot.bidding?.platform || "Электронная торговая площадка"

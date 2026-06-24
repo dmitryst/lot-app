@@ -95,6 +95,14 @@ const generateKeywords = (lot: Lot): string => {
       );
     }
   }
+  if (lot.bidding?.tradeNumber) {
+    lotSpecificKeywords.push(
+      lot.bidding.tradeNumber,
+      `торги ${lot.bidding.tradeNumber}`,
+      `аукцион ${lot.bidding.tradeNumber}`,
+    );
+  }
+
   // TODO: добавить КН
   // if (lot.cadastralNumber) {
   //   lotSpecificKeywords.push(lot.cadastralNumber);
@@ -186,6 +194,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? [
         lot.description.substring(0, 120),
         `Начальная цена: ${formattedPrice} ₽`,
+        lot.bidding?.tradeNumber ? `Номер торгов: ${lot.bidding.tradeNumber}` : null,
         lot.bidding?.tradePeriod ? `Торги: ${lot.bidding.tradePeriod}` : null,
         lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
         'Открытый аукцион по реализации имущества банкротов. Участвуйте в торгах на s-lot.ru!'
@@ -194,6 +203,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         `ВНИМАНИЕ: Торги по данному лоту завершены. Статус: ${lot.tradeStatus || 'Архив'}.`,
         lot.description.substring(0, 100),
         `Начальная цена составляла: ${formattedPrice} ₽`,
+        lot.bidding?.tradeNumber ? `Номер торгов: ${lot.bidding.tradeNumber}` : null,
         lot.propertyRegionName ? `Регион: ${lot.propertyRegionName}` : null,
         'Исторические данные об аукционе по банкротству на s-lot.ru.'
       ].filter(Boolean);
