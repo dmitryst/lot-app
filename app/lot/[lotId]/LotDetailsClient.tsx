@@ -472,6 +472,12 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             {lot.tradeStatus ? lot.tradeStatus : 'Торги идут (прием заявок)'}
           </div>
 
+          {lot.tradeStatusReason && (
+            <div className={`${styles.statusReason} ${styles[getStatusTheme(lot.tradeStatus)]}`}>
+              <b>Причина:</b> {lot.tradeStatusReason}
+            </div>
+          )}
+
           {/* Активные лоты с этим кадастровым номером (под статусом) */}
           {lot.sameCadastralLots && lot.sameCadastralLots.length > 0 && (
             <div className={styles.sameCadastralTopBlock}>

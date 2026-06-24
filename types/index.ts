@@ -56,6 +56,7 @@ export type Lot = {
   images: string[];
   documents?: LotDocument[];
   tradeStatus?: string;
+  tradeStatusReason?: string | null;
   finalPrice?: number;
   winnerName?: string;
   winnerInn?: string;

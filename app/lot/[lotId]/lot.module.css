@@ -733,6 +733,37 @@
   color: #c05621;
 }
 
+.statusReason {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #4a5568;
+  margin: -0.5rem 0 1rem;
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 3px solid #cbd5e0;
+}
+
+.statusReason b {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.statusReason.warning {
+  background: #fffaf0;
+  border-left-color: #ed8936;
+}
+
+.statusReason.cancelled {
+  background: #fff5f5;
+  border-left-color: #fc8181;
+}
+
+.statusReason.completed {
+  background: #f0fff4;
+  border-left-color: #68d391;
+}
+
 /* =========================================
    КНОПКА "В ИЗБРАННОЕ" НА СТРАНИЦЕ ЛОТА
    ========================================= */
