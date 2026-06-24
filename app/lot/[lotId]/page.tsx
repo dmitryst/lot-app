@@ -103,10 +103,16 @@ const generateKeywords = (lot: Lot): string => {
     );
   }
 
-  // TODO: добавить КН
-  // if (lot.cadastralNumber) {
-  //   lotSpecificKeywords.push(lot.cadastralNumber);
-  // }
+  for (const info of lot.cadastralInfos ?? []) {
+    const cadastralNumber = info.cadastralNumber?.trim();
+    if (!cadastralNumber) continue;
+
+    lotSpecificKeywords.push(
+      cadastralNumber,
+      `торги ${cadastralNumber}`,
+      `кадастровый номер ${cadastralNumber}`,
+    );
+  }
 
   // Объединяем все, удаляем дубликаты и возвращаем строку
   const allKeywords = [...baseKeywords, ...categoryKeywords, ...lotSpecificKeywords];
