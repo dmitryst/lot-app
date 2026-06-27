@@ -30,6 +30,37 @@ const SearchIcon = () => (
     </svg>
 );
 
+// Иконки для кнопок типа торгов
+const IconArrowUp = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+        <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+    </svg>
+);
+
+const IconArrowDown = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+        <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+    </svg>
+);
+
+const getBiddingTypeDisplay = (type: string) => {
+    if (type === 'Открытый аукцион') {
+        return (
+            <span style={{ display: 'flex', alignItems: 'center', color: '#28a745' }}>
+                Аукционы <IconArrowUp />
+            </span>
+        );
+    }
+    if (type === 'Публичное предложение') {
+        return (
+            <span style={{ display: 'flex', alignItems: 'center', color: '#dc3545' }}>
+                Публичные предложения <IconArrowDown />
+            </span>
+        );
+    }
+    return type;
+};
+
 export default function Filters({
     categories,
     biddingType,
@@ -321,7 +352,7 @@ export default function Filters({
                             onClick={() => handleBiddingTypeClick(type)}
                             className={localBiddingType  === type ? styles.activeFilter : styles.filterButton}
                         >
-                            {type}
+                            {getBiddingTypeDisplay(type)}
                         </button>
                     ))}
                 </div>

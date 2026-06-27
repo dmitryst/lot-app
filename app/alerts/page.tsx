@@ -57,6 +57,37 @@ const formatNumber = (value: string | number | null) => {
     return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
 
+// Иконки для кнопок типа торгов
+const IconArrowUp = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+        <path d="M12 19V5" /><path d="m5 12 7-7 7 7" />
+    </svg>
+);
+
+const IconArrowDown = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+        <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+    </svg>
+);
+
+const getBiddingTypeDisplay = (type: string) => {
+    if (type === 'Открытый аукцион') {
+        return (
+            <span style={{ display: 'flex', alignItems: 'center', color: '#28a745' }}>
+                Аукционы <IconArrowUp />
+            </span>
+        );
+    }
+    if (type === 'Публичное предложение') {
+        return (
+            <span style={{ display: 'flex', alignItems: 'center', color: '#dc3545' }}>
+                Публичные предложения <IconArrowDown />
+            </span>
+        );
+    }
+    return type;
+};
+
 export default function AlertsPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
@@ -313,7 +344,7 @@ export default function AlertsPage() {
                                             onClick={() => setBiddingType(type)}
                                             className={biddingType === type ? styles.activeFilter : styles.filterButton}
                                         >
-                                            {type}
+                                            {getBiddingTypeDisplay(type)}
                                         </button>
                                     ))}
                                 </div>
@@ -422,7 +453,7 @@ export default function AlertsPage() {
                                 <span>Регионы:</span> {alert.regionCodes?.length ? mapCodesToRegionNames(alert.regionCodes).join(', ') : 'Все РФ'}
                             </p>
                             <p className={styles.alertDetail}>
-                                <span>Вид торгов:</span> {alert.biddingType || 'Все'}
+                                <span>Вид торгов:</span> {alert.biddingType ? getBiddingTypeDisplay(alert.biddingType) : 'Все'}
                             </p>
                             <p className={styles.alertDetail}>
                                 <span>Собственность:</span> {alert.isSharedOwnership === true ? 'Только доли' : alert.isSharedOwnership === false ? 'Целиком' : 'Все'}
