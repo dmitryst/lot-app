@@ -47,6 +47,25 @@ export default function MapClient() {
 
     const [isInfoPanelClosed, setIsInfoPanelClosed] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+    const [viewedLots, setViewedLots] = useState<string[]>([]);
+
+    // Загрузка списка просмотренных лотов
+    useEffect(() => {
+        const loadViewedLots = () => {
+            try {
+                const viewed = JSON.parse(localStorage.getItem('viewedLots') || '[]');
+                setViewedLots(viewed);
+            } catch (e) {
+                console.error('Ошибка при чтении просмотренных лотов', e);
+            }
+        };
+
+        loadViewedLots();
+
+        // Обновляем список при возвращении на вкладку
+        window.addEventListener('focus', loadViewedLots);
+        return () => window.removeEventListener('focus', loadViewedLots);
+    }, []);
 
     // --- СОСТОЯНИЯ ДЛЯ BOUNDING BOX ---
     // bounds: [[minLat, minLon], [maxLat, maxLon]] (левый нижний и правый верхний углы)
@@ -297,6 +316,8 @@ export default function MapClient() {
                         const formattedPrice = new Intl.NumberFormat('ru-RU').format(lot.startPrice) + ' ₽';
                         // HTML для стрелки направления цены
                         const arrowHtml = getDirectionIconHtml(lot.type);
+                        
+                        const isViewed = viewedLots.includes(lot.id);
 
                         return (
                             <Placemark
@@ -322,7 +343,7 @@ export default function MapClient() {
                                     hintContent: lot.title,
                                 }}
                                 options={{
-                                    preset: 'islands#blueDotIcon',
+                                    preset: isViewed ? 'islands#grayDotIcon' : 'islands#blueDotIcon',
                                     // Ограничиваем ширину одиночного балуна
                                     balloonMaxWidth: 300
                                 }}

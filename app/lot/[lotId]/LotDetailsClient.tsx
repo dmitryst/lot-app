@@ -135,6 +135,25 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [isUploadingDocument, setIsUploadingDocument] = useState(false);
   const [isReclassifying, setIsReclassifying] = useState(false);
 
+  // Сохранение лота в историю просмотренных
+  useEffect(() => {
+    if (lot?.id) {
+      try {
+        const viewed = JSON.parse(localStorage.getItem('viewedLots') || '[]');
+        if (!viewed.includes(lot.id)) {
+          viewed.push(lot.id);
+          // Ограничим историю, например, 1000 последними лотами, чтобы не переполнять localStorage
+          if (viewed.length > 1000) {
+            viewed.shift();
+          }
+          localStorage.setItem('viewedLots', JSON.stringify(viewed));
+        }
+      } catch (e) {
+        console.error('Ошибка при сохранении просмотренного лота', e);
+      }
+    }
+  }, [lot?.id]);
+
   // Проверка статуса избранного и прав на договор при загрузке
   useEffect(() => {
     if (!user || !lot) {
