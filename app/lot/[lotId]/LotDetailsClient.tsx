@@ -1001,7 +1001,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                     className={styles.documentLink}
                   >
                     {doc.title}
-                    {doc.extension && (
+                    {doc.extension && !doc.title.toLowerCase().endsWith(doc.extension.toLowerCase()) && (
                       <span className={styles.documentExt}> {doc.extension}</span>
                     )}
                   </a>
