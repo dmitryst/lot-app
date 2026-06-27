@@ -132,6 +132,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [viewingProcedureText, setViewingProcedureText] = useState(lot?.bidding?.viewingProcedure || '');
   const [isSavingViewingProcedure, setIsSavingViewingProcedure] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingDocument, setIsUploadingDocument] = useState(false);
   const [isReclassifying, setIsReclassifying] = useState(false);
 
   // Проверка статуса избранного и прав на договор при загрузке
@@ -306,6 +307,47 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       alert('Ошибка при загрузке фото');
     } finally {
       setIsUploadingImage(false);
+    }
+  };
+
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!lot || !e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
+
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    setIsUploadingDocument(true);
+    try {
+      const extractToDescription = lot.needsDescriptionReview ? 'true' : 'false';
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/documents?extractToDescription=${extractToDescription}`,
+        {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.extractedDescription) {
+          alert('Документ загружен. Описание обновлено из файла, лот поставлен в очередь классификации.');
+        } else {
+          alert('Документ загружен.');
+        }
+        window.location.reload();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(err.message ?? 'Ошибка при загрузке документа');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при загрузке документа');
+    } finally {
+      setIsUploadingDocument(false);
+      e.target.value = '';
     }
   };
 
@@ -761,6 +803,24 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
               lot.description
             )}
           </div>
+          {user?.isAdmin && lot.needsDescriptionReview && (
+            <div style={{ marginTop: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.9rem', color: '#4a5568' }}>
+                Если перечень имущества в отдельном файле (docx, pdf), загрузите его — текст будет извлечён в описание.
+              </p>
+              <label className={styles.ctaButton} style={{ display: 'inline-block', padding: '0.5rem 1rem', background: '#3182ce', color: '#fff', cursor: 'pointer' }}>
+                {isUploadingDocument ? 'Загрузка…' : 'Загрузить документ'}
+                <input
+                  type="file"
+                  accept=".docx,.doc,.pdf,.xlsx,.xls,.rtf"
+                  multiple
+                  onChange={handleDocumentUpload}
+                  disabled={isUploadingDocument}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Динамические атрибуты */}
@@ -928,10 +988,14 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <div className={styles.descriptionSection}>
             <h2 className={styles.sectionTitle}>Документы</h2>
             <ul className={styles.documentList}>
-              {lot.documents.map((doc) => (
+              {lot.documents.map((doc) => {
+                const downloadHref = doc.downloadUrl.startsWith('http')
+                  ? doc.downloadUrl
+                  : `${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}${doc.downloadUrl}`;
+                return (
                 <li key={doc.id}>
                   <a
-                    href={doc.url}
+                    href={downloadHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={styles.documentLink}
@@ -942,7 +1006,8 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                     )}
                   </a>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         )}

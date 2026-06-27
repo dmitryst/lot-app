@@ -22,6 +22,19 @@ interface LotNeedingDescription {
     url: string;
 }
 
+interface AlignmentAttachment {
+    title: string;
+    url: string;
+    extension: string;
+    extractedText?: string | null;
+    descriptionText?: string | null;
+    isSummarized?: boolean;
+    summarizationError?: string | null;
+    extractionError?: string | null;
+    selectedForDownload: boolean;
+    useForDescription: boolean;
+}
+
 interface AlignmentPreview {
     publicId: number;
     lotId: string;
@@ -31,11 +44,60 @@ interface AlignmentPreview {
     error?: string | null;
     currentDescription?: string | null;
     currentViewingProcedure?: string | null;
+    tableDescription?: string | null;
+    isReferralDescription?: boolean;
     proposedDescription?: string | null;
     proposedViewingProcedure?: string | null;
+    attachments?: AlignmentAttachment[];
     canApply: boolean;
     editedDescription?: string;
     editedViewingProcedure?: string;
+}
+
+function isReferralDescription(text?: string | null): boolean {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return lower.includes('полный перечень имущества')
+        || lower.includes('перечень имущества опубликован')
+        || lower.includes('опубликован на сайте ефрсб')
+        || lower.includes('опубликован на сайте электронной')
+        || lower.includes('на сайте электронной площадки');
+}
+
+function buildDescriptionFromAttachments(
+    tableDescription: string | null | undefined,
+    attachments: AlignmentAttachment[]
+): string {
+    const docParts = attachments
+        .filter(a => a.useForDescription && (a.descriptionText || a.extractedText))
+        .map(a => (a.descriptionText ?? a.extractedText)!.trim())
+        .filter(Boolean);
+
+    const docText = docParts.length > 0 ? docParts.join('\n\n') : '';
+    const table = tableDescription?.trim() ?? '';
+
+    if (!docText) {
+        if (isReferralDescription(table)) return '';
+        return table;
+    }
+
+    if (isReferralDescription(table) || !table || table.toLowerCase() === 'не найдено') {
+        return docText;
+    }
+
+    if (docText.length > table.length * 1.5) {
+        return docText;
+    }
+
+    return table;
+}
+
+function recalculatePreviewDescription(preview: AlignmentPreview): AlignmentPreview {
+    const editedDescription = buildDescriptionFromAttachments(
+        preview.tableDescription,
+        preview.attachments ?? []
+    );
+    return { ...preview, editedDescription };
 }
 
 interface PaginatedResponse {
@@ -145,11 +207,20 @@ export default function AdminLotsClient() {
             }
 
             const data = await res.json();
-            const items: AlignmentPreview[] = (data.items ?? []).map((item: AlignmentPreview) => ({
-                ...item,
-                editedDescription: item.proposedDescription ?? '',
-                editedViewingProcedure: item.proposedViewingProcedure ?? '',
-            }));
+            const items: AlignmentPreview[] = (data.items ?? []).map((item: AlignmentPreview) => {
+                const attachments = (item.attachments ?? []).map(a => ({
+                    ...a,
+                    selectedForDownload: a.selectedForDownload ?? true,
+                    useForDescription: a.useForDescription ?? false,
+                }));
+                const base: AlignmentPreview = {
+                    ...item,
+                    attachments,
+                    editedDescription: item.proposedDescription ?? '',
+                    editedViewingProcedure: item.proposedViewingProcedure ?? '',
+                };
+                return recalculatePreviewDescription(base);
+            });
             setPreviews(items);
         } catch (e) {
             console.error(e);
@@ -177,6 +248,13 @@ export default function AdminLotsClient() {
                         publicId: preview.publicId,
                         description: preview.editedDescription,
                         viewingProcedure: preview.editedViewingProcedure,
+                        attachments: (preview.attachments ?? [])
+                            .filter(a => a.selectedForDownload)
+                            .map(a => ({
+                                title: a.title,
+                                extension: a.extension,
+                                sourceUrl: a.url,
+                            })),
                     }),
                 }
             );
@@ -207,6 +285,37 @@ export default function AdminLotsClient() {
         setPreviews(prev => prev.filter(p => p.publicId !== publicId));
     };
 
+    const toggleAttachmentDownload = (publicId: number, url: string) => {
+        setPreviews(prev =>
+            prev.map(p => {
+                if (p.publicId !== publicId) return p;
+                return {
+                    ...p,
+                    attachments: (p.attachments ?? []).map(a =>
+                        a.url === url ? { ...a, selectedForDownload: !a.selectedForDownload } : a
+                    ),
+                };
+            })
+        );
+    };
+
+    const toggleAttachmentForDescription = (publicId: number, url: string) => {
+        setPreviews(prev =>
+            prev.map(p => {
+                if (p.publicId !== publicId) return p;
+                const attachments = (p.attachments ?? []).map(a =>
+                    a.url === url ? { ...a, useForDescription: !a.useForDescription } : a
+                );
+                return recalculatePreviewDescription({ ...p, attachments });
+            })
+        );
+    };
+
+    const canApplyPreview = (preview: AlignmentPreview) =>
+        !!preview.editedDescription?.trim() &&
+        (preview.editedDescription.trim() !== (preview.currentDescription?.trim() ?? '') ||
+            (preview.attachments ?? []).some(a => a.selectedForDownload));
+
     const updatePreviewField = (
         publicId: number,
         field: 'editedDescription' | 'editedViewingProcedure',
@@ -231,8 +340,9 @@ export default function AdminLotsClient() {
             </p>
             <p className={styles.workflowHint}>
                 Выберите лоты и нажмите «Выравнить с Федресурсом» — система загрузит описание со страницы
-                объявления торгов, перенесёт текущий текст в блок ознакомления и покажет результат для
-                подтверждения. После применения лот встанет в очередь классификации.
+                объявления торгов, при необходимости извлечёт и обобщит через ИИ текст из вложений (docx и др.), перенесёт
+                текущий текст в блок ознакомления и покажет результат для подтверждения. Если файла нет на
+                Федресурсе, загрузите документ вручную на странице лота.
             </p>
 
             {lots.length > 0 && (
@@ -271,9 +381,79 @@ export default function AdminLotsClient() {
                                 )}
                             </div>
 
-                            {preview.error ? (
+                            {preview.error && (
                                 <p className={styles.previewError}>{preview.error}</p>
-                            ) : (
+                            )}
+
+                            {preview.isReferralDescription && !preview.error && (
+                                <p className={styles.referralHint}>
+                                    Описание в таблице — отсылка к внешнему перечню имущества.
+                                    {preview.attachments && preview.attachments.length > 0
+                                        ? ' Отметьте файлы «В описание».'
+                                        : ' Загрузите документ вручную на странице лота.'}
+                                </p>
+                            )}
+
+                            {(preview.attachments?.length ?? 0) > 0 && (
+                                <div className={styles.attachmentsBlock}>
+                                    <h3>Файлы на Федресурсе</h3>
+                                    <p className={styles.attachmentsHint}>
+                                        Отметьте, какие файлы прикрепить к лоту и из каких взять текст описания.
+                                    </p>
+                                    {preview.attachments!.map(att => (
+                                        <div key={att.url} className={styles.attachmentRow}>
+                                            <div className={styles.attachmentHeader}>
+                                                <a href={att.url} target="_blank" rel="noopener noreferrer">
+                                                    {att.title}
+                                                </a>
+                                                <span className={styles.attachmentExt}>{att.extension}</span>
+                                            </div>
+                                            <div className={styles.attachmentToggles}>
+                                                <label className={styles.attachmentToggle}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={att.selectedForDownload}
+                                                        onChange={() => toggleAttachmentDownload(preview.publicId, att.url)}
+                                                    />
+                                                    Скачать
+                                                </label>
+                                                    <label className={styles.attachmentToggle}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={att.useForDescription}
+                                                            disabled={!att.descriptionText && !att.extractedText}
+                                                            onChange={() => toggleAttachmentForDescription(preview.publicId, att.url)}
+                                                        />
+                                                        В описание
+                                                    </label>
+                                                </div>
+                                                {att.isSummarized && (
+                                                    <p className={styles.summarizedBadge}>Текст обобщён ИИ</p>
+                                                )}
+                                                {att.summarizationError && (
+                                                    <p className={styles.attachmentError}>{att.summarizationError}</p>
+                                                )}
+                                                {att.extractionError && (
+                                                    <p className={styles.attachmentError}>{att.extractionError}</p>
+                                                )}
+                                                {att.descriptionText && (
+                                                    <pre className={styles.previewText}>{truncate(att.descriptionText, 600)}</pre>
+                                                )}
+                                                {att.isSummarized && att.extractedText && (
+                                                    <details className={styles.rawExtractDetails}>
+                                                        <summary>Фрагмент исходного текста</summary>
+                                                        <pre className={styles.previewText}>{att.extractedText}</pre>
+                                                    </details>
+                                                )}
+                                                {!att.descriptionText && att.extractedText && (
+                                                    <pre className={styles.previewText}>{truncate(att.extractedText, 400)}</pre>
+                                                )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {(!preview.error || (preview.attachments?.length ?? 0) > 0) && (
                                 <div className={styles.previewGrid}>
                                     <div className={styles.previewColumn}>
                                         <h3>Было: описание</h3>
@@ -309,7 +489,7 @@ export default function AdminLotsClient() {
                             )}
 
                             <div className={styles.previewActions}>
-                                {!preview.error && preview.canApply && (
+                                {canApplyPreview(preview) && (
                                     <button
                                         type="button"
                                         className={styles.applyBtn}

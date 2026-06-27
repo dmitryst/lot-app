@@ -245,6 +245,120 @@
     cursor: pointer;
 }
 
+.referralHint {
+    background: #eff6ff;
+    color: #1e40af;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+}
+
+.attachmentsBlock {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.attachmentsBlock h3 {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.attachmentRow {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.attachmentRow:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.attachmentHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.attachmentHeader a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.attachmentHeader a:hover {
+    text-decoration: underline;
+}
+
+.attachmentsHint {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 12px;
+}
+
+.attachmentToggles {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.attachmentToggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.attachmentToggle input:disabled + span,
+.attachmentToggle:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.attachmentExt {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.attachmentError {
+    color: #b91c1c;
+    font-size: 0.85rem;
+    margin: 4px 0 0;
+}
+
+.summarizedBadge {
+    display: inline-block;
+    margin: 4px 0 8px;
+    padding: 2px 8px;
+    background: #ecfdf5;
+    color: #047857;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.rawExtractDetails {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.rawExtractDetails summary {
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
 .price {
     white-space: nowrap;
     font-weight: 600;

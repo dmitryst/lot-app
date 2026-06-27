@@ -77,9 +77,10 @@ export type SimilarLot = {
 
 export type LotDocument = {
   id: string;
-  url: string;
+  downloadUrl: string;
   title: string;
   extension?: string | null;
+  isExternal?: boolean;
 };
 
 export type PriceSchedule = {
