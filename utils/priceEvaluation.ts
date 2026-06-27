@@ -37,7 +37,7 @@ export function getWeightedMarketPrice(lot: LotPriceFields & { categories?: { na
   }
 
   if (lot.marketValueMin != null && lot.marketValueMax != null) {
-    return lot.marketValueMin * 0.7 + lot.marketValueMax * 0.3;
+    return (lot.marketValueMin + lot.marketValueMax) / 2;
   }
 
   if (lot.marketValueMin != null) {
