@@ -135,6 +135,9 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [isUploadingDocument, setIsUploadingDocument] = useState(false);
   const [isReclassifying, setIsReclassifying] = useState(false);
 
+  // Состояние для причины статуса
+  const [isReasonExpanded, setIsReasonExpanded] = useState(false);
+
   // Сохранение лота в историю просмотренных
   useEffect(() => {
     if (lot?.id) {
@@ -535,7 +538,18 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           {lot.tradeStatusReason && (
             <div className={`${styles.statusReason} ${styles[getStatusTheme(lot.tradeStatus)]}`}>
-              <b>Причина:</b> {lot.tradeStatusReason}
+              <b>Причина:</b>{' '}
+              {lot.tradeStatusReason.length > 200 && !isReasonExpanded
+                ? `${lot.tradeStatusReason.substring(0, 200)}... `
+                : lot.tradeStatusReason}
+              {lot.tradeStatusReason.length > 200 && (
+                <button
+                  onClick={() => setIsReasonExpanded(!isReasonExpanded)}
+                  className={styles.expandReasonBtn}
+                >
+                  {isReasonExpanded ? 'Скрыть' : 'Читать далее'}
+                </button>
+              )}
             </div>
           )}
 
