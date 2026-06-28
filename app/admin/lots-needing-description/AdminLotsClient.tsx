@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './admin-lots.module.css';
+import MapPicker from '@/app/add-ad/MapPicker';
 
 interface LotNeedingDescription {
     id: string;
@@ -52,6 +53,9 @@ interface AlignmentPreview {
     canApply: boolean;
     editedDescription?: string;
     editedViewingProcedure?: string;
+    editedLatitude?: number;
+    editedLongitude?: number;
+    editedAddress?: string;
 }
 
 function isReferralDescription(text?: string | null): boolean {
@@ -248,6 +252,8 @@ export default function AdminLotsClient() {
                         publicId: preview.publicId,
                         description: preview.editedDescription,
                         viewingProcedure: preview.editedViewingProcedure,
+                        latitude: preview.editedLatitude,
+                        longitude: preview.editedLongitude,
                         attachments: (preview.attachments ?? [])
                             .filter(a => a.selectedForDownload)
                             .map(a => ({
@@ -318,8 +324,8 @@ export default function AdminLotsClient() {
 
     const updatePreviewField = (
         publicId: number,
-        field: 'editedDescription' | 'editedViewingProcedure',
-        value: string
+        field: 'editedDescription' | 'editedViewingProcedure' | 'editedLatitude' | 'editedLongitude' | 'editedAddress',
+        value: string | number | undefined
     ) => {
         setPreviews(prev =>
             prev.map(p => (p.publicId === publicId ? { ...p, [field]: value } : p))
@@ -484,6 +490,23 @@ export default function AdminLotsClient() {
                                             }
                                             rows={4}
                                         />
+
+                                        <h3 style={{ marginTop: '15px', marginBottom: '8px' }}>Координаты на карте (если кадастровый номер не извлечён)</h3>
+                                        <div style={{ marginBottom: '15px' }}>
+                                            <MapPicker
+                                                address={preview.editedAddress || ''}
+                                                setAddress={(val) => updatePreviewField(preview.publicId, 'editedAddress', val)}
+                                                coordinates={
+                                                    preview.editedLatitude && preview.editedLongitude
+                                                        ? [preview.editedLatitude, preview.editedLongitude]
+                                                        : null
+                                                }
+                                                setCoordinates={(coords) => {
+                                                    updatePreviewField(preview.publicId, 'editedLatitude', coords?.[0]);
+                                                    updatePreviewField(preview.publicId, 'editedLongitude', coords?.[1]);
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             )}
