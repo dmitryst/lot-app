@@ -856,6 +856,47 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           )}
         </div>
 
+        {/* Категории и Регион */}
+        {((lot.categories && lot.categories.length > 0) || lot.propertyRegionName) && (
+          <div className={styles.descriptionSection}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {lot.propertyRegionName && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#4a5568' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>{lot.propertyRegionName}</span>
+                </div>
+              )}
+              
+              {lot.categories && lot.categories.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {lot.categories.map((c, idx) => (
+                    <div key={idx} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.375rem', 
+                      padding: '0.375rem 0.75rem', 
+                      backgroundColor: '#edf2f7', 
+                      color: '#2d3748', 
+                      borderRadius: '9999px', 
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#48bb78" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {c.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Динамические атрибуты */}
         {displayAttributes.length > 0 && (
           <div className={styles.descriptionSection}>
