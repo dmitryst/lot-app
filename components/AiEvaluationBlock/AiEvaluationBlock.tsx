@@ -18,6 +18,9 @@ interface AiEvaluationBlockProps {
     currentPrice?: number | null;
     quickData?: EvaluationData;
     priceConfidence?: string | null;
+    initialReasoningText?: string | null;
+    isTeaser?: boolean;
+    initialLiquidityScore?: number | null;
 }
 
 const getQuickConfidenceClass = (conf: string | null | undefined, styles: Record<string, string>) => {
@@ -45,11 +48,23 @@ export default function AiEvaluationBlock({
     lotPublicId,
     currentPrice,
     quickData,
-    priceConfidence
+    priceConfidence,
+    initialReasoningText,
+    isTeaser,
+    initialLiquidityScore
 }: AiEvaluationBlockProps) {
-    const [evaluationResult, setEvaluationResult] = useState<EvaluationData | null>(
-        type === 'quick' ? quickData || null : null
-    );
+    const [evaluationResult, setEvaluationResult] = useState<EvaluationData | null>(() => {
+        if (type === 'quick') return quickData || null;
+        if (type === 'deep' && initialReasoningText) {
+            return {
+                investmentSummary: null, // we don't need it here usually, it's in quick
+                reasoningText: initialReasoningText,
+                liquidityScore: initialLiquidityScore ?? undefined
+            };
+        }
+        return null;
+    });
+    const [isTeaserMode, setIsTeaserMode] = useState<boolean>(!!isTeaser);
     const [isEvaluating, setIsEvaluating] = useState(false);
     const [error, setError] = useState<string | React.ReactNode>(null);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
@@ -75,6 +90,7 @@ export default function AiEvaluationBlock({
                 if (response.ok) {
                     const data = await response.json();
                     setEvaluationResult(data);
+                    setIsTeaserMode(false);
                 } else {
                     // 404 или 401 — значит еще не запускали или не авторизованы
                     // Просто ничего не делаем, останется кнопка "Запустить анализ"
@@ -146,6 +162,7 @@ export default function AiEvaluationBlock({
                 const [data] = await Promise.all([dataPromise, sleep(minWaitMs)]);
                 
                 setEvaluationResult(data);
+                setIsTeaserMode(false);
                 setIsEvaluating(false);
                 
                 return;
@@ -184,6 +201,7 @@ export default function AiEvaluationBlock({
                     // УРА! Данные готовы
                     const data = await res.json();
                     setEvaluationResult(data);
+                    setIsTeaserMode(false);
                     setIsEvaluating(false);
                     return;
                 }
@@ -243,19 +261,6 @@ export default function AiEvaluationBlock({
                 <div className={styles.errorBox}>❌ {error}</div>
             )}
 
-            {/* Кнопка запуска:
-                Показываем, если:
-                1. Это deep режим
-                2. Результата НЕТ (значит GET вернул 404)
-                3. Процесс не идет (isEvaluating == false)
-                4. Первичная проверка завершена (!isLoadingInitial)
-            */}
-            {type === 'deep' && !evaluationResult && !isEvaluating && !isLoadingInitial && (
-                <button onClick={handleEvaluate} className={styles.evaluateButton}>
-                    Запустить анализ
-                </button>
-            )}
-
             {/* Прогресс бар */}
             {isEvaluating && (
                 <div className={styles.progressContainer}>
@@ -272,34 +277,36 @@ export default function AiEvaluationBlock({
             {/* Результат */}
             {evaluationResult && (
                 <div className={styles.resultContainer}>
-                    <div className={styles.priceRow}>
-                        <span className={styles.priceLabelBadge}>
-                            {type === 'quick' ? 'Оценка AI:' : 'Новая оценка AI:'}
-                        </span>
-
-                        {evaluationResult.estimatedPrice ? (
-                            <div className={styles.priceDataWrapper}>
-                                <span className={styles.estimatedPrice}>
-                                    ~{evaluationResult.estimatedPrice.toLocaleString('ru-RU')} ₽
-                                </span>
-
-                                {upside && (
-                                    <div className={styles.upsideContainer}>
-                                        <span className={`${styles.upsideBadge} ${upside.percent >= 0 ? styles.upsidePositive : styles.upsideNegative}`}>
-                                            {upside.percent > 0 ? '+' : ''}{upside.percent.toFixed(0)}%
-                                        </span>
-                                        <span className={styles.upsideLabel}>от начальной цены</span>
-                                    </div>
-                                )}
-                            </div>
-                        ) : type === 'quick' ? (
-                            <span className={styles.notEvaluableLabel}>
-                                {priceConfidence?.toLowerCase() === 'not_evaluable'
-                                    ? 'Автооценка недоступна'
-                                    : 'Числовая оценка не рассчитана'}
+                    {(type === 'quick' || evaluationResult.estimatedPrice) && (
+                        <div className={styles.priceRow}>
+                            <span className={styles.priceLabelBadge}>
+                                {type === 'quick' ? 'Оценка AI:' : 'Новая оценка AI:'}
                             </span>
-                        ) : null}
-                    </div>
+
+                            {evaluationResult.estimatedPrice ? (
+                                <div className={styles.priceDataWrapper}>
+                                    <span className={styles.estimatedPrice}>
+                                        ~{evaluationResult.estimatedPrice.toLocaleString('ru-RU')} ₽
+                                    </span>
+
+                                    {upside && (
+                                        <div className={styles.upsideContainer}>
+                                            <span className={`${styles.upsideBadge} ${upside.percent >= 0 ? styles.upsidePositive : styles.upsideNegative}`}>
+                                                {upside.percent > 0 ? '+' : ''}{upside.percent.toFixed(0)}%
+                                            </span>
+                                            <span className={styles.upsideLabel}>от начальной цены</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : type === 'quick' ? (
+                                <span className={styles.notEvaluableLabel}>
+                                    {priceConfidence?.toLowerCase() === 'not_evaluable'
+                                        ? 'Автооценка недоступна'
+                                        : 'Числовая оценка не рассчитана'}
+                                </span>
+                            ) : null}
+                        </div>
+                    )}
 
                     {type === 'quick' && priceConfidence && (
                         <div className={styles.confidenceRow}>
@@ -327,19 +334,43 @@ export default function AiEvaluationBlock({
                     )}
 
                     {/* Резюме */}
-                    <div className={styles.summary}>
-                        <strong>Резюме:</strong> {renderMarkdown(evaluationResult.investmentSummary)}
-                    </div>
+                    {evaluationResult.investmentSummary && (
+                        <div className={styles.summary}>
+                            <strong>Резюме:</strong> {renderMarkdown(evaluationResult.investmentSummary)}
+                        </div>
+                    )}
 
                     {/* Детальный анализ (только для deep) */}
                     {type === 'deep' && evaluationResult.reasoningText && (
-                        <details className={styles.reasoningDetails}>
-                            <summary className={styles.reasoningSummary}>Показать детальный анализ</summary>
-                            <div className={styles.reasoningText}>
+                        <div className={styles.reasoningContainer}>
+                            <h3 className={styles.reasoningSummary}>Детальный анализ</h3>
+                            <div className={`${styles.reasoningText} ${isTeaserMode ? styles.teaserFade : ''}`}>
                                 {renderMarkdown(evaluationResult.reasoningText)}
                             </div>
-                        </details>
+                        </div>
                     )}
+                </div>
+            )}
+
+            {/* Кнопка запуска:
+                Показываем, если:
+                1. Это deep режим
+                2. Результата НЕТ (или это тизер)
+                3. Процесс не идет (isEvaluating == false)
+                4. Первичная проверка завершена (!isLoadingInitial)
+            */}
+            {type === 'deep' && (!evaluationResult || isTeaserMode) && !isEvaluating && !isLoadingInitial && (
+                <div style={{ marginTop: evaluationResult ? '1rem' : '0' }}>
+                    <button onClick={handleEvaluate} className={styles.evaluateButton}>
+                        {isTeaserMode ? 'Читать полный анализ' : 'Запустить анализ'}
+                    </button>
+                </div>
+            )}
+
+            {/* Дисклеймер (показываем только если есть какой-либо результат оценки) */}
+            {evaluationResult && (
+                <div className={styles.disclaimerBox}>
+                    <strong>Внимание!</strong> Данный анализ сгенерирован искусственным интеллектом на основе открытых данных на момент публикации. Он носит исключительно ознакомительный характер, может содержать неточности и не является инвестиционной, финансовой или юридической рекомендацией. Перед принятием решения о покупке проводите самостоятельную проверку.
                 </div>
             )}
         </div>

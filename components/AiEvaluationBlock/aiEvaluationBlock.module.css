@@ -259,4 +259,38 @@
     margin-left: 0;
     margin-top: 4px;
   }
+}.reasoningContainer {
+  margin-top: 1rem;
+}
+
+.teaserFade {
+  position: relative;
+  max-height: 250px;
+  overflow: hidden;
+}
+
+.teaserFade::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  pointer-events: none;
+}
+
+.disclaimerBox {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-left: 4px solid #94a3b8;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.disclaimerBox strong {
+  color: #475569;
 }

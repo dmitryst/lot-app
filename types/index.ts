@@ -47,6 +47,9 @@ export type Lot = {
   priceConfidence?: string | null;
   cadastralInfos?: CadastralInfo[];
   investmentSummary?: string | null;
+  reasoningText?: string | null;
+  isReasoningTextTeaser?: boolean;
+  liquidityScore?: number | null;
   createdAt?: string;
   categories: {
     id: number;
