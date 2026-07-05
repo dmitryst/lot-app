@@ -176,6 +176,13 @@ export const Header = () => {
                                         </svg>
                                         <span className={styles.accountText}>Договоры</span>
                                     </Link>
+                                    <Link href="/admin/popular-lots" className={styles.accountLink} title="Популярные лоты">
+                                        <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                            <polyline points="17 6 23 6 23 12"></polyline>
+                                        </svg>
+                                        <span className={styles.accountText}>Популярные</span>
+                                    </Link>
                                 </>
                             )}
 
