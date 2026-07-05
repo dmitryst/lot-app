@@ -69,6 +69,14 @@ export default function AiEvaluationBlock({
     const [error, setError] = useState<string | React.ReactNode>(null);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
 
+    // Состояния для ручного редактирования админом
+    const [isEditing, setIsEditing] = useState(false);
+    const [editReasoningText, setEditReasoningText] = useState('');
+    const [editInvestmentSummary, setEditInvestmentSummary] = useState('');
+    const [editEstimatedPrice, setEditEstimatedPrice] = useState<number | ''>('');
+    const [editLiquidityScore, setEditLiquidityScore] = useState<number | ''>('');
+    const [isSaving, setIsSaving] = useState(false);
+
     const apiUrl = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
     const { user } = useAuth();
     const router = useRouter();
@@ -221,6 +229,43 @@ export default function AiEvaluationBlock({
         setIsEvaluating(false);
     };
 
+    const handleSaveManual = async () => {
+        setIsSaving(true);
+        setError(null);
+        try {
+            const response = await fetch(`${apiUrl}/api/lots/${lotPublicId}/evaluation/manual`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    estimatedPrice: editEstimatedPrice === '' ? null : Number(editEstimatedPrice),
+                    liquidityScore: editLiquidityScore === '' ? null : Number(editLiquidityScore),
+                    investmentSummary: editInvestmentSummary || null,
+                    reasoningText: editReasoningText || null
+                }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Ошибка сохранения');
+            }
+
+            setEvaluationResult(prev => ({
+                ...prev,
+                estimatedPrice: editEstimatedPrice === '' ? undefined : Number(editEstimatedPrice),
+                liquidityScore: editLiquidityScore === '' ? undefined : Number(editLiquidityScore),
+                investmentSummary: editInvestmentSummary || null,
+                reasoningText: editReasoningText || undefined
+            }));
+            setIsTeaserMode(false);
+            setIsEditing(false);
+        } catch (err: any) {
+            setError(err.message || 'Произошла неизвестная ошибка');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     // Расчет апсайда
     const calculateUpside = (estimated: number, current: number) => {
         if (!estimated || !current) return null;
@@ -249,7 +294,23 @@ export default function AiEvaluationBlock({
 
     return (
         <div className={styles.aiBlock}>
-            <h2 className={styles.title}>{title}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '2px solid #edf2f7' }}>
+                <h2 className={styles.title} style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>{title}</h2>
+                {user?.isAdmin && type === 'deep' && !isEditing && (
+                    <button 
+                        onClick={() => {
+                            setEditReasoningText(evaluationResult?.reasoningText || '');
+                            setEditInvestmentSummary(evaluationResult?.investmentSummary || '');
+                            setEditEstimatedPrice(evaluationResult?.estimatedPrice || '');
+                            setEditLiquidityScore(evaluationResult?.liquidityScore || '');
+                            setIsEditing(true);
+                        }}
+                        style={{ padding: '0.3rem 0.75rem', fontSize: '0.875rem', background: '#e2e8f0', color: '#2d3748', borderRadius: '6px', cursor: 'pointer', border: 'none', fontWeight: 500, flexShrink: 0, marginLeft: '1rem' }}
+                    >
+                        Редактировать
+                    </button>
+                )}
+            </div>
 
             {/* Скелетон или спиннер, пока проверяем "покупал ли я?" */}
             {type === 'deep' && isLoadingInitial && (
@@ -261,7 +322,63 @@ export default function AiEvaluationBlock({
                 <div className={styles.errorBox}>❌ {error}</div>
             )}
 
-            {/* Прогресс бар */}
+            {isEditing ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>Оценочная стоимость (руб)</label>
+                        <input 
+                            type="number" 
+                            value={editEstimatedPrice} 
+                            onChange={e => setEditEstimatedPrice(e.target.value ? Number(e.target.value) : '')}
+                            style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>Ликвидность (1-10)</label>
+                        <input 
+                            type="number" 
+                            min="1" max="10"
+                            value={editLiquidityScore} 
+                            onChange={e => setEditLiquidityScore(e.target.value ? Number(e.target.value) : '')}
+                            style={{ width: '100%', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>Резюме (Investment Summary)</label>
+                        <textarea 
+                            value={editInvestmentSummary} 
+                            onChange={e => setEditInvestmentSummary(e.target.value)}
+                            style={{ width: '100%', minHeight: '80px', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>Детальный анализ (Reasoning Text, поддерживает Markdown **жирный**)</label>
+                        <textarea 
+                            value={editReasoningText} 
+                            onChange={e => setEditReasoningText(e.target.value)}
+                            style={{ width: '100%', minHeight: '300px', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                            onClick={handleSaveManual} 
+                            disabled={isSaving}
+                            style={{ padding: '0.5rem 1rem', background: '#3182ce', color: '#fff', borderRadius: '6px', border: 'none', cursor: isSaving ? 'not-allowed' : 'pointer', fontWeight: 500 }}
+                        >
+                            {isSaving ? 'Сохранение...' : 'Сохранить'}
+                        </button>
+                        <button 
+                            onClick={() => setIsEditing(false)}
+                            disabled={isSaving}
+                            style={{ padding: '0.5rem 1rem', background: '#e2e8f0', color: '#2d3748', borderRadius: '6px', border: 'none', cursor: isSaving ? 'not-allowed' : 'pointer', fontWeight: 500 }}
+                        >
+                            Отмена
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    {/* Прогресс бар */}
             {isEvaluating && (
                 <div className={styles.progressContainer}>
                     <div className={styles.progressBarTrack}>
@@ -275,7 +392,7 @@ export default function AiEvaluationBlock({
             )}
 
             {/* Результат */}
-            {evaluationResult && (
+            {evaluationResult && !isEditing && (
                 <div className={styles.resultContainer}>
                     {(type === 'quick' || evaluationResult.estimatedPrice) && (
                         <div className={styles.priceRow}>
@@ -359,7 +476,7 @@ export default function AiEvaluationBlock({
                 3. Процесс не идет (isEvaluating == false)
                 4. Первичная проверка завершена (!isLoadingInitial)
             */}
-            {type === 'deep' && (!evaluationResult || isTeaserMode) && !isEvaluating && !isLoadingInitial && (
+            {type === 'deep' && (!evaluationResult || isTeaserMode) && !isEvaluating && !isLoadingInitial && !isEditing && (
                 <div style={{ marginTop: evaluationResult ? '1rem' : '0' }}>
                     <button onClick={handleEvaluate} className={styles.evaluateButton}>
                         {isTeaserMode ? 'Читать полный анализ' : 'Запустить анализ'}
@@ -368,7 +485,7 @@ export default function AiEvaluationBlock({
             )}
 
             {/* Дисклеймер (показываем только если есть какой-либо результат оценки) */}
-            {evaluationResult && (
+            {evaluationResult && !isEditing && (
                 <div className={styles.disclaimerBox}>
                     <strong>Внимание!</strong> Данный анализ сгенерирован искусственным интеллектом на основе открытых данных на момент публикации. Он носит исключительно ознакомительный характер, может содержать неточности и не является инвестиционной, финансовой или юридической рекомендацией. Перед принятием решения о покупке проводите самостоятельную проверку.
                 </div>
