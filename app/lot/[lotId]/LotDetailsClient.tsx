@@ -1047,7 +1047,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
         )}
 
         {/* Глубокая аналитика (DeepSeek Reasoning Evaluation) */}
-        {(!isFinalStatus(lot.tradeStatus) || lot.reasoningText) && lot.startPrice != null && lot.startPrice > 1000000 && shouldShowPriceEstimate(lot) && (
+        {(lot.reasoningText || user?.isAdmin || (!isFinalStatus(lot.tradeStatus) && lot.startPrice != null && lot.startPrice > 1000000 && shouldShowPriceEstimate(lot))) && (
           <div className={styles.descriptionSection}>
             <AiEvaluationBlock
               type="deep"
