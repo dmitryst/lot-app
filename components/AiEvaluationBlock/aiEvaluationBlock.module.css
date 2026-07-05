@@ -265,7 +265,7 @@
 
 .teaserFade {
   position: relative;
-  max-height: 250px;
+  max-height: none;
   overflow: hidden;
 }
 
