@@ -267,7 +267,9 @@ export default function AdminLotsClient() {
 
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
-                alert(err.message ?? 'Ошибка при сохранении');
+                console.error('Validation or Server Error:', err);
+                const errorMessage = err.message || (err.errors ? JSON.stringify(err.errors) : err.title) || 'Ошибка при сохранении';
+                alert(errorMessage);
                 return;
             }
 
