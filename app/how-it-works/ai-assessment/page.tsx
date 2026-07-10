@@ -47,6 +47,22 @@ export default function AiAssessmentInfoPage() {
           "@type": "Answer",
           "text": "На данный момент результаты детального разбора публикуются в открытом доступе на странице лота для всех пользователей абсолютно бесплатно."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Сколько лотов можно поддержать голосом одновременно?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Обычные пользователи могут одновременно голосовать за 3 лота. Обладатели PRO-подписки — за 10 лотов. Голос можно снять в любой момент и отдать за другой лот."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Где посмотреть, за какие лоты я уже проголосовал?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Все ваши активные голоса собраны в Личном кабинете во вкладке «Мои голоса за ИИ-анализ». Там отображаются карточки лотов — можно быстро перейти на нужный и снять голос, если лимит исчерпан."
+        }
       }
     ]
   };
@@ -103,6 +119,40 @@ export default function AiAssessmentInfoPage() {
               <div className={styles.stepNumber}>4</div>
               <h3>Публикация отчета</h3>
               <p>Развернутый инвест-разбор с оценкой по 10-балльной шкале и стратегиями монетизации (сдача в аренду, флиппинг) публикуется на странице лота. Это экономит вам недели исследований.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2>Лимиты и управление голосами</h2>
+          <p>
+            Голосование бесплатно для всех авторизованных пользователей, но количество одновременных голосов ограничено —
+            так мы просим расставлять приоритеты и голосовать за лоты, которые вам действительно интересны.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
+            <div style={{ backgroundColor: '#f7fafc', padding: '18px 20px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '8px', fontSize: '1.05rem' }}>Лимиты</h3>
+              <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#4a5568' }}>
+                <li><b>Бесплатный тариф:</b> до 3 одновременных голосов</li>
+                <li><b>PRO-подписка:</b> до 10 одновременных голосов</li>
+              </ul>
+            </div>
+            <div style={{ backgroundColor: '#fffff0', padding: '18px 20px', borderRadius: '8px', border: '1px solid #f6e05e' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '8px', fontSize: '1.05rem' }}>Где посмотреть свои голоса</h3>
+              <p style={{ margin: 0, color: '#4a5568' }}>
+                Откройте <Link href="/account?tab=my-votes" style={{ color: '#3182ce', fontWeight: 'bold' }}>Личный кабинет</Link> → вкладка{' '}
+                <b>«Мои голоса за ИИ-анализ»</b>. Там отображаются все лоты, за которые вы сейчас голосуете.
+                Из списка можно перейти на страницу лота и снять голос повторным нажатием кнопки «Мой голос учтён».
+              </p>
+            </div>
+            <div style={{ backgroundColor: '#fff5f5', padding: '18px 20px', borderRadius: '8px', border: '1px solid #feb2b2' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '8px', fontSize: '1.05rem' }}>Если лимит исчерпан</h3>
+              <p style={{ margin: 0, color: '#4a5568' }}>
+                При попытке проголосовать за новый лот вы увидите сообщение о достижении лимита.
+                Чтобы отдать голос за другой объект, зайдите в{' '}
+                <Link href="/account?tab=my-votes" style={{ color: '#3182ce', fontWeight: 'bold' }}>Личный кабинет</Link>{' '}
+                или на страницу менее актуального лота и снимите свой голос — после этого лимит освободится.
+              </p>
             </div>
           </div>
         </section>
@@ -166,11 +216,17 @@ export default function AiAssessmentInfoPage() {
           <h2>Повлияйте на следующий разбор!</h2>
           <p>
             Вам не нужно быть платным подписчиком, чтобы проголосовать. Найдите лот, который вы рассматриваете к покупке, и отдайте свой голос.
-            Если вы достигли лимита голосов, вы всегда можете снять голос с одного лота (на его странице или через ваш Профиль) и отдать его за другой.
+            Управлять активными голосами можно в{' '}
+            <Link href="/account?tab=my-votes" style={{ color: '#3182ce', fontWeight: 'bold' }}>Личном кабинете</Link>.
           </p>
-          <Link href="/" className={styles.ctaButton}>
-            Перейти к поиску лотов
-          </Link>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginTop: '1rem' }}>
+            <Link href="/" className={styles.ctaButton}>
+              Перейти к поиску лотов
+            </Link>
+            <Link href="/account?tab=my-votes" className={styles.ctaButton} style={{ backgroundColor: '#4a5568' }}>
+              Мои голоса за ИИ-анализ
+            </Link>
+          </div>
         </section>
       </div>
     </div>

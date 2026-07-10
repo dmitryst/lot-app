@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import styles from './account.module.css';
@@ -70,14 +70,30 @@ const getDaysWord = (days: number) => {
 
 
 export default function AccountPage() {
+    return (
+        <Suspense fallback={<div className="loading-state">Загрузка...</div>}>
+            <AccountPageContent />
+        </Suspense>
+    );
+}
+
+function AccountPageContent() {
     const { user, loading: authLoading, logout } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'profile' | 'subscription' | 'my-ads' | 'my-votes'>('profile');
     const [myAds, setMyAds] = useState<any[]>([]);
     const [loadingAds, setLoadingAds] = useState(false);
 
     const [myVotes, setMyVotes] = useState<any[]>([]);
     const [loadingVotes, setLoadingVotes] = useState(false);
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab === 'profile' || tab === 'subscription' || tab === 'my-ads' || tab === 'my-votes') {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (authLoading) return;
