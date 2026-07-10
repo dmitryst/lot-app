@@ -119,8 +119,8 @@ export default function AccountPage() {
             });
             if (res.ok) {
                 const data = await res.json();
-                // API возвращает PaginatedResult<LotDto> { data: [...], totalCount: N, ... }
-                setMyVotes(data.data || []);
+                // API возвращает PaginatedResult<LotDto> { items: [...], totalCount: N, ... }
+                setMyVotes(data.items || []);
             }
         } catch (e) {
             console.error('Ошибка загрузки лотов, за которые вы голосовали', e);
