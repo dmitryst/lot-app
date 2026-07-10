@@ -12,6 +12,7 @@ interface PopularLot {
     title: string;
     slug: string;
     viewCount: number;
+    votesCount: number;
     hasEvaluation: boolean;
 }
 
@@ -69,6 +70,7 @@ export default function PopularLotsClient() {
                         <tr>
                             <th>ID</th>
                             <th>Заголовок</th>
+                            <th>Голоса</th>
                             <th>Просмотры</th>
                             <th>Анализ ИИ</th>
                             <th>Действия</th>
@@ -79,6 +81,7 @@ export default function PopularLotsClient() {
                             <tr key={lot.id}>
                                 <td>#{lot.publicId}</td>
                                 <td className={styles.descriptionCell}>{lot.title}</td>
+                                <td style={{ fontWeight: 'bold', color: '#d69e2e' }}>{lot.votesCount || 0}</td>
                                 <td style={{ fontWeight: 'bold' }}>{lot.viewCount}</td>
                                 <td>
                                     {lot.hasEvaluation ? (

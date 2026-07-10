@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import styles from './account.module.css';
+import pageStyles from '../page.module.css';
 import AdCard from '@/components/AdCard/AdCard';
+import { LotItem } from '@/components/LotItem';
 
 const ProfileIcon = () => (
     <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -37,6 +39,13 @@ const AdsIcon = () => (
     </svg>
 );
 
+const VotesIcon = () => (
+    <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+);
+
 // Функция для расчета оставшихся дней триала
 const getTrialDaysLeft = (createdAt?: string) => {
     if (!createdAt) return 0;
@@ -63,9 +72,12 @@ const getDaysWord = (days: number) => {
 export default function AccountPage() {
     const { user, loading: authLoading, logout } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'profile' | 'subscription' | 'my-ads'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'subscription' | 'my-ads' | 'my-votes'>('profile');
     const [myAds, setMyAds] = useState<any[]>([]);
     const [loadingAds, setLoadingAds] = useState(false);
+
+    const [myVotes, setMyVotes] = useState<any[]>([]);
+    const [loadingVotes, setLoadingVotes] = useState(false);
 
     useEffect(() => {
         if (authLoading) return;
@@ -77,6 +89,8 @@ export default function AccountPage() {
     useEffect(() => {
         if (activeTab === 'my-ads' && user) {
             fetchMyAds();
+        } else if (activeTab === 'my-votes' && user) {
+            fetchMyVotes();
         }
     }, [activeTab, user]);
 
@@ -94,6 +108,24 @@ export default function AccountPage() {
             console.error('Ошибка загрузки моих объявлений', e);
         } finally {
             setLoadingAds(false);
+        }
+    };
+
+    const fetchMyVotes = async () => {
+        setLoadingVotes(true);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/voted-lots?page=1&pageSize=50`, {
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const data = await res.json();
+                // API возвращает PaginatedResult<LotDto> { data: [...], totalCount: N, ... }
+                setMyVotes(data.data || []);
+            }
+        } catch (e) {
+            console.error('Ошибка загрузки лотов, за которые вы голосовали', e);
+        } finally {
+            setLoadingVotes(false);
         }
     };
 
@@ -137,6 +169,14 @@ export default function AccountPage() {
                     >
                         <AdsIcon />
                         Мои объявления
+                    </button>
+
+                    <button
+                        className={`${styles.tabLink} ${activeTab === 'my-votes' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('my-votes')}
+                    >
+                        <VotesIcon />
+                        Мои голоса за ИИ-анализ
                     </button>
 
                     <Link href="/alerts" className={styles.tabLink}>
@@ -238,6 +278,28 @@ export default function AccountPage() {
                                 <div className={styles.adsGrid}>
                                     {myAds.map(ad => (
                                         <AdCard key={ad.id} ad={ad} />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {activeTab === 'my-votes' && (
+                        <div>
+                            <h2 className={styles.sectionTitle}>Лоты, ожидающие ИИ-анализа</h2>
+                            <p style={{ color: '#4a5568', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                                Здесь показаны лоты, за которые вы отдали свой голос. Вы можете проголосовать одновременно за 
+                                {user?.isSubscriptionActive && user?.subscriptionEndDate && new Date(user.subscriptionEndDate) > new Date() ? ' 10 ' : ' 3 '} 
+                                лота. Если лимит исчерпан, отмените голос у неактуального лота, зайдя на его страницу, чтобы проголосовать за новый.
+                            </p>
+                            
+                            {loadingVotes ? (
+                                <div>Загрузка...</div>
+                            ) : myVotes.length === 0 ? (
+                                <p style={{ color: '#718096' }}>Вы пока не проголосовали ни за один лот.</p>
+                            ) : (
+                                <div className={pageStyles.lotsGrid}>
+                                    {myVotes.map(lot => (
+                                        <LotItem key={lot.id} lot={lot} />
                                     ))}
                                 </div>
                             )}

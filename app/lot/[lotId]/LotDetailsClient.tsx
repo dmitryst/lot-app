@@ -120,6 +120,11 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavLoading, setIsFavLoading] = useState(true);
 
+  // Состояния для голосования
+  const [isVoted, setIsVoted] = useState(false);
+  const [votesCount, setVotesCount] = useState(lot?.votesCount || 0);
+  const [isVoteLoading, setIsVoteLoading] = useState(true);
+
   // Состояния для договора
   const [hasContractPermission, setHasContractPermission] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
@@ -194,8 +199,25 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       }
     };
 
+    const checkVoteStatus = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot.id}/vote/status`, {
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setIsVoted(data.isVoted);
+        }
+      } catch (e) {
+        console.error('Ошибка проверки статуса голосования', e);
+      } finally {
+        setIsVoteLoading(false);
+      }
+    };
+
     checkFavorite();
     checkContractPermission();
+    checkVoteStatus();
   }, [user, lot]);
 
   // Обработчик клика
@@ -223,6 +245,34 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
       console.error('Ошибка при изменении избранного', e);
     } finally {
       setIsFavLoading(false);
+    }
+  };
+
+  const handleToggleVote = async () => {
+    if (!user) {
+      router.push(`/login?returnUrl=/lot/${lot?.publicId}`);
+      return;
+    }
+
+    setIsVoteLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/lots/${lot?.id}/vote`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setIsVoted(data.isVoted);
+        setVotesCount(data.votesCount);
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || "Ошибка при голосовании");
+      }
+    } catch (e) {
+      console.error('Ошибка при изменении статуса голосования', e);
+    } finally {
+      setIsVoteLoading(false);
     }
   };
 
@@ -644,6 +694,20 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             >
               {isFavorite ? <HeartFilled /> : <HeartOutline />}
               {isFavorite ? 'В избранном' : 'Добавить в избранное'}
+            </button>
+
+            {/* Кнопка голосования */}
+            <button
+              onClick={handleToggleVote}
+              disabled={isVoteLoading}
+              className={`${styles.favoriteButtonDetail} ${isVoted ? styles.isActiveVote : ''}`}
+              style={{ marginTop: '0.75rem', borderColor: isVoted ? '#d69e2e' : '#cbd5e0', color: isVoted ? '#d69e2e' : '#4a5568' }}
+              title="Проголосуйте, если хотите получить детальную оценку ИИ и инсайды от КУ для этого лота"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill={isVoted ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+              {isVoted ? `Мой голос учтен (${votesCount})` : `Голосовать за детальный разбор (${votesCount})`}
             </button>
 
             {hasContractPermission && (
