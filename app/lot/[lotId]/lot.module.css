@@ -826,6 +826,60 @@
   background-color: #fed7d7;
 }
 
+.voteButtonRow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 0.75rem;
+}
+
+.voteButtonDetail {
+  flex: 1;
+  margin-top: 0;
+}
+
+.voteHelpLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #718096;
+  transition: all 0.2s ease-in-out;
+}
+
+.voteHelpLink:hover {
+  color: #3182ce;
+  background-color: #ebf8ff;
+  border-color: #bee3f8;
+}
+
+.voteHelpLinkActive {
+  border-color: #d69e2e;
+  color: #b7791f;
+  background-color: #fffff0;
+}
+
+.voteHelpLinkActive:hover {
+  color: #3182ce;
+  background-color: #ebf8ff;
+  border-color: #bee3f8;
+}
+
+.favoriteButtonDetail.isActiveVote {
+  background-color: #fffff0;
+  border-color: #d69e2e;
+  color: #b7791f;
+}
+
+.favoriteButtonDetail.isActiveVote:hover:not(:disabled) {
+  background-color: #fefcbf;
+  border-color: #d69e2e;
+}
+
 /* =========================================
    КАДАСТРОВАЯ ИНФОРМАЦИЯ (Росреестр)
    ========================================= */
