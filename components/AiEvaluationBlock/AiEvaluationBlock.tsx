@@ -1,6 +1,8 @@
 // components/AiEvaluationBlock/AiEvaluationBlock.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useAuth } from '@/context/AuthContext';
 import styles from './aiEvaluationBlock.module.css';
 
@@ -278,16 +280,13 @@ export default function AiEvaluationBlock({
         ? calculateUpside(evaluationResult.estimatedPrice, currentPrice)
         : null;
 
-    // Рендер Markdown
     const renderMarkdown = (text: string | null | undefined) => {
         if (!text) return null;
-        const parts = text.split(/(\*\*.*?\*\*)/g);
-        return parts.map((part, idx) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={idx}>{part.slice(2, -2)}</strong>;
-            }
-            return part;
-        });
+        return (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {text}
+            </ReactMarkdown>
+        );
     };
 
     const title = type === 'quick' ? 'Экспресс-оценка инвестиционной привлекательности (AI)' : 'Детальная оценка инвестиционной привлекательности (AI)';
@@ -352,11 +351,16 @@ export default function AiEvaluationBlock({
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>Детальный анализ (Reasoning Text, поддерживает Markdown **жирный**)</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#4a5568', marginBottom: '0.25rem' }}>
+                            Детальный анализ (Markdown: заголовки #, таблицы, списки, **жирный**)
+                        </label>
+                        <p style={{ fontSize: '0.8rem', color: '#718096', margin: '0 0 0.5rem' }}>
+                            Вставляйте ответ из Cursor как есть — без Word.
+                        </p>
                         <textarea 
                             value={editReasoningText} 
                             onChange={e => setEditReasoningText(e.target.value)}
-                            style={{ width: '100%', minHeight: '300px', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0' }}
+                            style={{ width: '100%', minHeight: '300px', padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #cbd5e0', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.85rem' }}
                         />
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -453,7 +457,10 @@ export default function AiEvaluationBlock({
                     {/* Резюме */}
                     {evaluationResult.investmentSummary && (
                         <div className={styles.summary}>
-                            <strong>Резюме:</strong> {renderMarkdown(evaluationResult.investmentSummary)}
+                            <strong>Резюме:</strong>{' '}
+                            <span className={styles.markdownInline}>
+                                {renderMarkdown(evaluationResult.investmentSummary)}
+                            </span>
                         </div>
                     )}
 
@@ -461,7 +468,7 @@ export default function AiEvaluationBlock({
                     {type === 'deep' && evaluationResult.reasoningText && (
                         <div className={styles.reasoningContainer}>
                             <h3 className={styles.reasoningSummary}>Детальный анализ</h3>
-                            <div className={`${styles.reasoningText} ${isTeaserMode ? styles.teaserFade : ''}`}>
+                            <div className={`${styles.reasoningText} ${styles.markdownBody} ${isTeaserMode ? styles.teaserFade : ''}`}>
                                 {renderMarkdown(evaluationResult.reasoningText)}
                             </div>
                         </div>

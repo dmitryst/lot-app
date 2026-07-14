@@ -192,10 +192,135 @@
   font-size: 0.9rem;
   line-height: 1.5;
   color: #475569;
-  white-space: pre-wrap;
   max-height: 400px;
   overflow-y: auto;
   border: 1px solid #cbd5e1;
+}
+
+/* Markdown rendering inside reasoning / summary */
+.markdownInline :global(p) {
+  display: inline;
+  margin: 0;
+}
+
+.markdownBody :global(p) {
+  margin: 0 0 0.75em;
+}
+
+.markdownBody :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdownBody :global(h1),
+.markdownBody :global(h2),
+.markdownBody :global(h3),
+.markdownBody :global(h4) {
+  color: #1e293b;
+  font-weight: 700;
+  margin: 1.25em 0 0.5em;
+  line-height: 1.3;
+}
+
+.markdownBody :global(h1:first-child),
+.markdownBody :global(h2:first-child),
+.markdownBody :global(h3:first-child),
+.markdownBody :global(h4:first-child) {
+  margin-top: 0;
+}
+
+.markdownBody :global(h1) { font-size: 1.35rem; }
+.markdownBody :global(h2) { font-size: 1.2rem; }
+.markdownBody :global(h3) { font-size: 1.05rem; }
+.markdownBody :global(h4) { font-size: 0.95rem; }
+
+.markdownBody :global(ul),
+.markdownBody :global(ol) {
+  margin: 0.5em 0 0.75em;
+  padding-left: 1.5em;
+}
+
+.markdownBody :global(li) {
+  margin: 0.25em 0;
+}
+
+.markdownBody :global(li > p) {
+  margin: 0;
+}
+
+.markdownBody :global(strong) {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.markdownBody :global(em) {
+  font-style: italic;
+}
+
+.markdownBody :global(hr) {
+  border: none;
+  border-top: 1px solid #cbd5e1;
+  margin: 1em 0;
+}
+
+.markdownBody :global(blockquote) {
+  margin: 0.75em 0;
+  padding: 0.25em 0 0.25em 0.75em;
+  border-left: 3px solid #94a3b8;
+  color: #64748b;
+}
+
+.markdownBody :global(code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+  background: #e2e8f0;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.markdownBody :global(pre) {
+  overflow-x: auto;
+  background: #e2e8f0;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin: 0.75em 0;
+}
+
+.markdownBody :global(pre code) {
+  background: none;
+  padding: 0;
+}
+
+.markdownBody :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.85rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.markdownBody :global(th),
+.markdownBody :global(td) {
+  border: 1px solid #cbd5e1;
+  padding: 0.4em 0.6em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdownBody :global(th) {
+  background: #e2e8f0;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.markdownBody :global(tr:nth-child(even) td) {
+  background: #f8fafc;
+}
+
+.markdownBody :global(a) {
+  color: #2563eb;
+  text-decoration: underline;
 }
 
 /* --- ТОЧКА УВЕРЕННОСТИ --- */
