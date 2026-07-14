@@ -16,7 +16,7 @@ export interface Announcement {
 export const ANNOUNCEMENTS: Announcement[] = [
     {
         id: 'aiAssessmentPromo_v1',
-        badge: 'Новая фича',
+        badge: 'Новое',
         text: 'Запускаем голосование за детальный ИИ-анализ лотов! Голосуйте, и мы выясним инсайды и оценим риски.',
         linkHref: '/how-it-works/ai-assessment',
         linkText: 'Подробнее →'
