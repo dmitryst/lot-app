@@ -32,6 +32,8 @@ interface AlignmentAttachment {
     isSummarized?: boolean;
     summarizationError?: string | null;
     extractionError?: string | null;
+    documentType?: string | null;
+    documentTypeNote?: string | null;
     selectedForDownload: boolean;
     useForDescription: boolean;
 }
@@ -437,6 +439,9 @@ export default function AdminLotsClient() {
                                                 </div>
                                                 {att.isSummarized && (
                                                     <p className={styles.summarizedBadge}>Текст обобщён ИИ</p>
+                                                )}
+                                                {att.documentTypeNote && !att.isSummarized && (
+                                                    <p className={styles.documentTypeNote}>{att.documentTypeNote}</p>
                                                 )}
                                                 {att.summarizationError && (
                                                     <p className={styles.attachmentError}>{att.summarizationError}</p>
