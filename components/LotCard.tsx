@@ -7,6 +7,7 @@ import styles from './LotCard.module.css';
 import { Lot } from '../types';
 import { useAuth } from '@/context/AuthContext';
 import { formatMoney } from '../utils/format';
+import { getCurrentSchedulePrice } from '@/utils/currentPrice';
 import { getWeightedMarketPrice, getConfidenceLabel } from '@/utils/priceEvaluation';
 
 // Импортируем картинку как статический ресурс.
@@ -173,11 +174,13 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     }
 
     const displayPrice = getWeightedMarketPrice(lot);
+    const currentSchedulePrice = getCurrentSchedulePrice(lot);
+    const priceForUpside = currentSchedulePrice ?? lot.startPrice;
 
-    // Считаем апсайд от displayPrice
+    // Считаем апсайд от displayPrice относительно текущей (или начальной) цены
     let upsidePercent: number | null = null;
-    if (displayPrice && lot.startPrice && lot.startPrice > 0) {
-        upsidePercent = ((displayPrice - lot.startPrice) / lot.startPrice) * 100;
+    if (displayPrice && priceForUpside && priceForUpside > 0) {
+        upsidePercent = ((displayPrice - priceForUpside) / priceForUpside) * 100;
     }
 
 
@@ -264,6 +267,18 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                                 ) : (
                                     <span className={styles.iconUp}><IconArrowUp /></span>
                                 )}
+                            </p>
+                        </div>
+                    ) : currentSchedulePrice != null ? (
+                        <div className={styles.currentPriceContainer}>
+                            <p className={styles.priceDetailFinal}>
+                                <span className={styles.priceLabelCurrent}>Текущая цена:</span>
+                                <span className={styles.priceValueCurrent}>{formatMoney(currentSchedulePrice)}</span>
+                                <span className={styles.iconDown}><IconArrowDown /></span>
+                            </p>
+                            <p className={styles.priceDetailOld}>
+                                <span className={styles.priceLabel}>Начальная цена:</span>
+                                <span className={styles.priceValueOld}>{formatMoney(lot.startPrice)}</span>
                             </p>
                         </div>
                     ) : (

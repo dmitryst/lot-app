@@ -458,6 +458,30 @@
   border: 1px solid #bbf7d0;
 }
 
+.currentPriceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.priceLabelCurrent {
+  font-size: 0.9rem;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.priceValueCurrent {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1d4ed8;
+  font-feature-settings: "tnum";
+}
+
 .priceDetailFinal {
   display: flex;
   align-items: center;

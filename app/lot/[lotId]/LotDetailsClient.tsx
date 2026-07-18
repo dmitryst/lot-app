@@ -17,6 +17,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getDynamicFiltersForCategories } from '@/app/data/constants';
 import { getWeightedMarketPrice, shouldShowPriceEstimate } from '@/utils/priceEvaluation';
+import { getCurrentSchedulePrice, isCurrentPriceScheduleStage } from '@/utils/currentPrice';
 
 // Иконки для кнопки
 const HeartOutline = () => (
@@ -101,14 +102,6 @@ const isFinalStatus = (status?: string | null) => {
     s.includes('не состоял') ||
     s.includes('аннулирован')
   );
-};
-
-// Функция определения активного этапа (примерная логика)
-const isCurrentStage = (startDate: string, endDate: string) => {
-  const now = new Date();
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  return now >= start && now < end;
 };
 
 // Компонент получает данные через пропсы
@@ -524,6 +517,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   // Проверяем, есть ли хоть одна запись с задатком > 0
   const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
 
+  const currentSchedulePrice = getCurrentSchedulePrice(lot);
   const displayPrice = getWeightedMarketPrice(lot);
 
   // Получаем конфигурацию динамических фильтров для категорий лота
@@ -747,14 +741,25 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           </div>
 
           <div className={styles.priceInfo}>
+            {/* Текущая цена по графику снижения (публичное предложение) */}
+            {currentSchedulePrice != null && (
+              <div className={styles.currentPriceBlock}>
+                <span className={styles.currentPriceLabel}>Текущая цена:</span>
+                <span className={styles.currentPriceValue}>
+                  {`${currentSchedulePrice.toLocaleString()} ₽`}
+                  {getPriceDirectionIcon()}
+                </span>
+              </div>
+            )}
+
             {/* Блок для начальной цены */}
             <div>
               <span className={styles.priceLabel}>Начальная цена:</span>
               <span className={styles.priceValue}>
                 {lot.startPrice ? `${lot.startPrice.toLocaleString()} ₽` : 'Не указана'}
 
-                {/* Вставляем иконку */}
-                {getPriceDirectionIcon()}
+                {/* Иконку направления показываем у начальной цены, если текущей нет */}
+                {currentSchedulePrice == null && getPriceDirectionIcon()}
               </span>
             </div>
 
@@ -1118,7 +1123,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
           <div className={styles.descriptionSection}>
             <AiEvaluationBlock
               type="quick"
-              currentPrice={lot.startPrice}
+              currentPrice={currentSchedulePrice ?? lot.startPrice}
               priceConfidence={lot.priceConfidence}
               quickData={{
                 estimatedPrice: displayPrice ?? undefined,
@@ -1134,7 +1139,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
             <AiEvaluationBlock
               type="deep"
               lotPublicId={lot.publicId}
-              currentPrice={lot.startPrice}
+              currentPrice={currentSchedulePrice ?? lot.startPrice}
               initialReasoningText={lot.reasoningText}
               isTeaser={lot.isReasoningTextTeaser}
               initialLiquidityScore={lot.liquidityScore}
@@ -1281,68 +1286,77 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                 </tr>
               </thead>
               <tbody>
-                {lot.priceSchedules.map((schedule) => (
-                  <tr key={schedule.number}>
-                    <td style={{ textAlign: 'center', color: '#888' }}>{schedule.number}</td>
+                {lot.priceSchedules.map((schedule) => {
+                  const isCurrent =
+                    currentSchedulePrice != null &&
+                    isCurrentPriceScheduleStage(schedule.startDate, schedule.endDate);
 
-                    {/* Десктоп: Дата начала */}
-                    <td className={styles.desktopOnly}>{formatDate(schedule.startDate)}</td>
+                  return (
+                    <tr
+                      key={schedule.number}
+                      className={isCurrent ? styles.currentScheduleRow : undefined}
+                    >
+                      <td style={{ textAlign: 'center', color: '#888' }}>{schedule.number}</td>
 
-                    {/* Мобильный: Дата начала + Цена */}
-                    <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
-                      <div className={styles.cellGroup}>
-                        <div className={styles.dateRow}>{formatDate(schedule.startDate)}</div>
-                        <div className={styles.priceRow}>
-                          {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                      {/* Десктоп: Дата начала */}
+                      <td className={styles.desktopOnly}>{formatDate(schedule.startDate)}</td>
+
+                      {/* Мобильный: Дата начала + Цена */}
+                      <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
+                        <div className={styles.cellGroup}>
+                          <div className={styles.dateRow}>{formatDate(schedule.startDate)}</div>
+                          <div className={styles.priceRow}>
+                            {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-
-                    {/* Десктоп: Дата окончания */}
-                    <td className={styles.desktopOnly}>{formatDate(schedule.endDate)}</td>
-
-                    {/* Десктоп: Цена */}
-                    <td className={styles.desktopOnly} style={{ fontWeight: 600 }}>
-                      {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
-                    </td>
-
-                    {/* Мобильный: Дата окончания + Задаток */}
-                    <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
-                      <div className={styles.cellGroup}>
-                        <div className={styles.dateRow}>{formatDate(schedule.endDate)}</div>
-                        {showDepositColumn && (<div className={styles.depositRow}>
-                          {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
-                        </div>)}
-                      </div>
-                    </td>
-
-                    {/* Десктоп: Задаток */}
-                    {showDepositColumn && (
-                      <td className={styles.desktopOnly}>
-                        {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
                       </td>
-                    )}
 
-                    {/* Ранг (Общий) */}
-                    {/* <td className={styles.rankCell}>
-                      {schedule.estimatedRank ? (
-                        <span
-                          className={styles.rankBadge}
-                          style={{
-                            backgroundColor:
-                              schedule.estimatedRank >= 8 ? '#48bb78' :
-                                schedule.estimatedRank >= 5 ? '#ecc94b' :
-                                  '#f56565'
-                          }}
-                        >
-                          {schedule.estimatedRank}
-                        </span>
-                      ) : (
-                        '—'
+                      {/* Десктоп: Дата окончания */}
+                      <td className={styles.desktopOnly}>{formatDate(schedule.endDate)}</td>
+
+                      {/* Десктоп: Цена */}
+                      <td className={styles.desktopOnly} style={{ fontWeight: 600 }}>
+                        {schedule.price?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                      </td>
+
+                      {/* Мобильный: Дата окончания + Задаток */}
+                      <td className={`${styles.mobileOnly} ${styles.mobileDateColumn}`}>
+                        <div className={styles.cellGroup}>
+                          <div className={styles.dateRow}>{formatDate(schedule.endDate)}</div>
+                          {showDepositColumn && (<div className={styles.depositRow}>
+                            {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                          </div>)}
+                        </div>
+                      </td>
+
+                      {/* Десктоп: Задаток */}
+                      {showDepositColumn && (
+                        <td className={styles.desktopOnly}>
+                          {schedule.deposit?.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}
+                        </td>
                       )}
-                    </td> */}
-                  </tr>
-                ))}
+
+                      {/* Ранг (Общий) */}
+                      {/* <td className={styles.rankCell}>
+                        {schedule.estimatedRank ? (
+                          <span
+                            className={styles.rankBadge}
+                            style={{
+                              backgroundColor:
+                                schedule.estimatedRank >= 8 ? '#48bb78' :
+                                  schedule.estimatedRank >= 5 ? '#ecc94b' :
+                                    '#f56565'
+                            }}
+                          >
+                            {schedule.estimatedRank}
+                          </span>
+                        ) : (
+                          '—'
+                        )}
+                      </td> */}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
