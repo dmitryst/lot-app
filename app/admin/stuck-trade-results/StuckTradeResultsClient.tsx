@@ -68,6 +68,12 @@ interface LotEditState {
     selected: boolean;
 }
 
+interface PlatformOption {
+    value: string;
+    label: string;
+    count: number;
+}
+
 interface PaginatedResponse {
     items: StuckBidding[];
     totalCount: number;
@@ -75,6 +81,7 @@ interface PaginatedResponse {
     pageSize: number;
     totalPages: number;
     minAttempts: number;
+    platforms?: PlatformOption[];
 }
 
 const apiBase = process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL;
@@ -113,12 +120,17 @@ export default function StuckTradeResultsClient() {
     const { user, loading } = useAuth();
     const router = useRouter();
     const detailTopRef = useRef<HTMLDivElement | null>(null);
+    const listScrollYRef = useRef(0);
+    const returnBiddingIdRef = useRef<string | null>(null);
+    const shouldRestoreScrollRef = useRef(false);
     const [items, setItems] = useState<StuckBidding[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const [minAttempts, setMinAttempts] = useState(5);
     const [minAttemptsInput, setMinAttemptsInput] = useState('5');
+    const [platform, setPlatform] = useState('');
+    const [platforms, setPlatforms] = useState<PlatformOption[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [statusMessage, setStatusMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -130,15 +142,25 @@ export default function StuckTradeResultsClient() {
     const [isSaving, setIsSaving] = useState(false);
     const [finalizeRemaining, setFinalizeRemaining] = useState(true);
     const [actingId, setActingId] = useState<string | null>(null);
+    const [highlightBiddingId, setHighlightBiddingId] = useState<string | null>(null);
 
     const isDetailMode = isLoadingDetails || !!details;
 
-    const fetchList = useCallback(async (currentPage: number, attempts: number) => {
+    const fetchList = useCallback(async (currentPage: number, attempts: number, platformFilter: string) => {
         setIsLoading(true);
         setErrorMessage(null);
         try {
+            const params = new URLSearchParams({
+                page: String(currentPage),
+                pageSize: '30',
+                minAttempts: String(attempts),
+            });
+            if (platformFilter) {
+                params.set('platform', platformFilter);
+            }
+
             const res = await fetch(
-                `${apiBase}/api/admin/stuck-trade-results?page=${currentPage}&pageSize=30&minAttempts=${attempts}`,
+                `${apiBase}/api/admin/stuck-trade-results?${params}`,
                 { credentials: 'include' }
             );
             if (res.ok) {
@@ -147,6 +169,9 @@ export default function StuckTradeResultsClient() {
                 setTotalPages(data.totalPages);
                 setTotalCount(data.totalCount);
                 setPage(data.page);
+                if (data.platforms) {
+                    setPlatforms(data.platforms);
+                }
             } else {
                 setErrorMessage('Не удалось загрузить список торгов.');
             }
@@ -164,17 +189,43 @@ export default function StuckTradeResultsClient() {
             return;
         }
 
-        if (user?.isAdmin && !isDetailMode) {
-            fetchList(page, minAttempts);
+        // Не перезагружаем список при выходе из разбора — сохраняем позицию.
+        if (user?.isAdmin && !isDetailMode && !shouldRestoreScrollRef.current) {
+            fetchList(page, minAttempts, platform);
         }
-    }, [user, loading, router, fetchList, page, minAttempts, isDetailMode]);
+    }, [user, loading, router, fetchList, page, minAttempts, platform, isDetailMode]);
 
     useEffect(() => {
         if (isDetailMode) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             detailTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
         }
-    }, [isDetailMode, details?.id]);
+
+        if (!shouldRestoreScrollRef.current) return;
+
+        shouldRestoreScrollRef.current = false;
+        const biddingId = returnBiddingIdRef.current;
+        returnBiddingIdRef.current = null;
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (biddingId) {
+                    const row = document.getElementById(`stuck-row-${biddingId}`);
+                    if (row) {
+                        row.scrollIntoView({ block: 'center' });
+                        setHighlightBiddingId(biddingId);
+                        window.setTimeout(
+                            () => setHighlightBiddingId((id) => (id === biddingId ? null : id)),
+                            2000
+                        );
+                        return;
+                    }
+                }
+                window.scrollTo({ top: listScrollYRef.current, behavior: 'auto' });
+            });
+        });
+    }, [isDetailMode]);
 
     const applyMinAttempts = () => {
         const parsed = Math.max(1, parseInt(minAttemptsInput, 10) || 5);
@@ -186,12 +237,16 @@ export default function StuckTradeResultsClient() {
     };
 
     const closeDetails = () => {
+        shouldRestoreScrollRef.current = true;
         setSelectedBiddingId(null);
         setDetails(null);
         setIsLoadingDetails(false);
     };
 
     const openDetails = async (biddingId: string) => {
+        listScrollYRef.current = window.scrollY;
+        returnBiddingIdRef.current = biddingId;
+        shouldRestoreScrollRef.current = false;
         setSelectedBiddingId(biddingId);
         setDetails(null);
         setIsLoadingDetails(true);
@@ -297,14 +352,39 @@ export default function StuckTradeResultsClient() {
             setStatusMessage(
                 `Сохранено: ${data.updatedLots} лот(ов). Финализированы: ${data.isTradeStatusesFinalized ? 'да' : 'нет'}.`
             );
-            closeDetails();
-            await fetchList(page, minAttempts);
+            const savedId = details.id;
+            shouldRestoreScrollRef.current = false;
+            setSelectedBiddingId(null);
+            setDetails(null);
+            setIsLoadingDetails(false);
+            await fetchList(page, minAttempts, platform);
+            restoreListPosition(savedId);
         } catch (e) {
             console.error(e);
             setErrorMessage('Ошибка сети при сохранении.');
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const restoreListPosition = (biddingId: string | null) => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (biddingId) {
+                    const row = document.getElementById(`stuck-row-${biddingId}`);
+                    if (row) {
+                        row.scrollIntoView({ block: 'center' });
+                        setHighlightBiddingId(biddingId);
+                        window.setTimeout(
+                            () => setHighlightBiddingId((id) => (id === biddingId ? null : id)),
+                            2000
+                        );
+                        return;
+                    }
+                }
+                window.scrollTo({ top: listScrollYRef.current, behavior: 'auto' });
+            });
+        });
     };
 
     const forceFinalize = async (biddingId: string) => {
@@ -327,10 +407,17 @@ export default function StuckTradeResultsClient() {
             }
             const data = await res.json();
             setStatusMessage(`Закрыто без данных: ${data.processedLots} лот(ов).`);
-            if (selectedBiddingId === biddingId) {
-                closeDetails();
+            const wasDetail = selectedBiddingId === biddingId;
+            if (wasDetail) {
+                shouldRestoreScrollRef.current = false;
+                setSelectedBiddingId(null);
+                setDetails(null);
+                setIsLoadingDetails(false);
             }
-            await fetchList(page, minAttempts);
+            await fetchList(page, minAttempts, platform);
+            if (wasDetail) {
+                restoreListPosition(biddingId);
+            }
         } catch (e) {
             console.error(e);
             setErrorMessage('Ошибка сети при закрытии торгов.');
@@ -641,6 +728,24 @@ export default function StuckTradeResultsClient() {
                         <button className={styles.btnSecondary} type="button" onClick={applyMinAttempts}>
                             Применить
                         </button>
+                        <label>
+                            Площадка
+                            <select
+                                className={`${styles.select} ${styles.platformSelect}`}
+                                value={platform}
+                                onChange={(e) => {
+                                    setPage(1);
+                                    setPlatform(e.target.value);
+                                }}
+                            >
+                                <option value="">Все площадки</option>
+                                {platforms.map((p) => (
+                                    <option key={p.value} value={p.value}>
+                                        {p.label} ({p.count})
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
                     </div>
 
                     {isLoading ? (
@@ -663,7 +768,11 @@ export default function StuckTradeResultsClient() {
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <tr key={item.id}>
+                                    <tr
+                                        key={item.id}
+                                        id={`stuck-row-${item.id}`}
+                                        className={highlightBiddingId === item.id ? styles.returnRow : undefined}
+                                    >
                                         <td>
                                             <span className={styles.attemptsBadge}>
                                                 {item.statusCheckAttempts}
