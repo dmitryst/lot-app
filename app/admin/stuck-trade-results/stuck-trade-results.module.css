@@ -1,0 +1,306 @@
+.container {
+    max-width: 1280px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.heading {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.subheading {
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.workflowHint {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: #f0f9ff;
+    border-left: 3px solid #2563eb;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.numberInput,
+.select,
+.textInput {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+}
+
+.numberInput {
+    width: 80px;
+}
+
+.textInput {
+    width: 100%;
+    min-width: 140px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table th,
+.table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.table th {
+    background: #f8f9fa;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.attemptsBadge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.metaMuted {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 4px;
+}
+
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.openLink {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.openLink:hover {
+    text-decoration: underline;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 130px;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btnPrimary {
+    background: #2563eb;
+    color: white;
+}
+
+.btnSecondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btnDanger {
+    background: #fff;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled,
+.btnDanger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.pageBtn {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pageBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.statusMessage {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.95rem;
+}
+
+.errorMessage {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.95rem;
+}
+
+.detailPanel {
+    margin-top: 8px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.backBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.platformLinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin: 12px 0 4px;
+}
+
+.platformLinkPrimary {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.platformLinkPrimary:hover {
+    text-decoration: underline;
+}
+
+.detailHeader {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detailTitle {
+    font-size: 1.25rem;
+    margin: 0 0 6px;
+}
+
+.detailMeta {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.bulkBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8fafc;
+}
+
+.lotCard {
+    border: 1px solid #eee;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fafafa;
+}
+
+.lotCardInactive {
+    opacity: 0.55;
+}
+
+.lotCardHeader {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.lotFields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.fieldLabel {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    margin: 12px 0;
+}

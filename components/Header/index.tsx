@@ -18,6 +18,7 @@ export const Header = () => {
     const [moderationCount, setModerationCount] = useState(0);
     const [needsDescriptionCount, setNeedsDescriptionCount] = useState(0);
     const [unmatchedVehicleCount, setUnmatchedVehicleCount] = useState(0);
+    const [stuckTradeResultsCount, setStuckTradeResultsCount] = useState(0);
 
     useEffect(() => {
         if (user?.isAdmin) {
@@ -53,6 +54,17 @@ export const Header = () => {
                 }
             })
             .catch(err => console.error('Ошибка загрузки счетчика неразобранных марок/моделей', err));
+
+            fetch(`${process.env.NEXT_PUBLIC_CSHARP_BACKEND_URL}/api/admin/stuck-trade-results/count?minAttempts=5`, {
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.count === 'number') {
+                    setStuckTradeResultsCount(data.count);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки счетчика зависших результатов торгов', err));
         }
     }, [user]);
 
@@ -139,6 +151,20 @@ export const Header = () => {
                                             )}
                                         </div>
                                         <span className={styles.accountText}>Описания</span>
+                                    </Link>
+                                    <Link href="/admin/stuck-trade-results" className={styles.accountLink} title="Зависшие результаты торгов">
+                                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                            <svg className={styles.accountIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                            </svg>
+                                            {stuckTradeResultsCount > 0 && (
+                                                <span className={styles.badge} style={{ position: 'absolute', top: '-8px', right: '-8px' }}>
+                                                    {stuckTradeResultsCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className={styles.accountText}>Результаты</span>
                                     </Link>
                                     <Link href="/admin/unmatched-vehicle-attributes" className={styles.accountLink} title="Марки и модели">
                                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
