@@ -140,9 +140,26 @@
 }
 
 .currentPriceBlock {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  display: block;
+  width: 100%;
+  margin: 0 0 1rem;
+  padding: 0 0 1rem;
+  border: none;
   border-bottom: 1px solid #e2e8f0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.currentPriceBlock:hover {
+  background-color: #eff6ff;
+}
+
+.currentPriceBlock:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .currentPriceLabel {
@@ -160,6 +177,14 @@
   font-size: 1.75rem;
   font-weight: 700;
   color: #1d4ed8;
+}
+
+.currentPricePeriod {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
 }
 
 .currentScheduleRow {

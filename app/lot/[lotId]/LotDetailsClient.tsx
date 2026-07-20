@@ -17,7 +17,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getDynamicFiltersForCategories } from '@/app/data/constants';
 import { getWeightedMarketPrice, shouldShowPriceEstimate } from '@/utils/priceEvaluation';
-import { getCurrentSchedulePrice, isCurrentPriceScheduleStage } from '@/utils/currentPrice';
+import { getCurrentScheduleStage, isCurrentPriceScheduleStage, formatSchedulePeriod } from '@/utils/currentPrice';
 
 // Иконки для кнопки
 const HeartOutline = () => (
@@ -517,8 +517,15 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
   // Проверяем, есть ли хоть одна запись с задатком > 0
   const showDepositColumn = lot.priceSchedules && lot.priceSchedules.some(s => s.deposit && s.deposit > 0);
 
-  const currentSchedulePrice = getCurrentSchedulePrice(lot);
+  const currentStage = getCurrentScheduleStage(lot);
+  const currentSchedulePrice = currentStage?.price ?? null;
   const displayPrice = getWeightedMarketPrice(lot);
+
+  const scrollToCurrentStage = () => {
+    document
+      .getElementById('current-price-stage')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   // Получаем конфигурацию динамических фильтров для категорий лота
   const dynamicFiltersConfig = useMemo(() => {
@@ -742,14 +749,22 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
 
           <div className={styles.priceInfo}>
             {/* Текущая цена по графику снижения (публичное предложение) */}
-            {currentSchedulePrice != null && (
-              <div className={styles.currentPriceBlock}>
+            {currentStage != null && (
+              <button
+                type="button"
+                className={styles.currentPriceBlock}
+                onClick={scrollToCurrentStage}
+                title="Перейти к текущему этапу в графике"
+              >
                 <span className={styles.currentPriceLabel}>Текущая цена:</span>
                 <span className={styles.currentPriceValue}>
-                  {`${currentSchedulePrice.toLocaleString()} ₽`}
+                  {`${currentStage.price.toLocaleString()} ₽`}
                   {getPriceDirectionIcon()}
                 </span>
-              </div>
+                <span className={styles.currentPricePeriod}>
+                  {formatSchedulePeriod(currentStage.startDate, currentStage.endDate, true)}
+                </span>
+              </button>
             )}
 
             {/* Блок для начальной цены */}
@@ -1294,6 +1309,7 @@ export default function LotDetailsClient({ lot }: { lot: Lot | null }) {
                   return (
                     <tr
                       key={schedule.number}
+                      id={isCurrent ? 'current-price-stage' : undefined}
                       className={isCurrent ? styles.currentScheduleRow : undefined}
                     >
                       <td style={{ textAlign: 'center', color: '#888' }}>{schedule.number}</td>

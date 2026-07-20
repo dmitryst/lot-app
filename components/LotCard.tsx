@@ -7,7 +7,7 @@ import styles from './LotCard.module.css';
 import { Lot } from '../types';
 import { useAuth } from '@/context/AuthContext';
 import { formatMoney } from '../utils/format';
-import { getCurrentSchedulePrice } from '@/utils/currentPrice';
+import { getCurrentScheduleStage, formatSchedulePeriod } from '@/utils/currentPrice';
 import { getWeightedMarketPrice, getConfidenceLabel } from '@/utils/priceEvaluation';
 
 // Импортируем картинку как статический ресурс.
@@ -174,8 +174,8 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
     }
 
     const displayPrice = getWeightedMarketPrice(lot);
-    const currentSchedulePrice = getCurrentSchedulePrice(lot);
-    const priceForUpside = currentSchedulePrice ?? lot.startPrice;
+    const currentStage = getCurrentScheduleStage(lot);
+    const priceForUpside = currentStage?.price ?? lot.startPrice;
 
     // Считаем апсайд от displayPrice относительно текущей (или начальной) цены
     let upsidePercent: number | null = null;
@@ -269,12 +269,15 @@ export default function LotCard({ lot, imageUrl }: LotCardProps) {
                                 )}
                             </p>
                         </div>
-                    ) : currentSchedulePrice != null ? (
+                    ) : currentStage != null ? (
                         <div className={styles.currentPriceContainer}>
                             <p className={styles.priceDetailFinal}>
                                 <span className={styles.priceLabelCurrent}>Текущая цена:</span>
-                                <span className={styles.priceValueCurrent}>{formatMoney(currentSchedulePrice)}</span>
+                                <span className={styles.priceValueCurrent}>{formatMoney(currentStage.price)}</span>
                                 <span className={styles.iconDown}><IconArrowDown /></span>
+                            </p>
+                            <p className={styles.currentPricePeriod}>
+                                {formatSchedulePeriod(currentStage.startDate, currentStage.endDate)}
                             </p>
                             <p className={styles.priceDetailOld}>
                                 <span className={styles.priceLabel}>Начальная цена:</span>
