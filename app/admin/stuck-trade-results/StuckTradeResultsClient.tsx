@@ -74,6 +74,27 @@ interface PlatformOption {
     count: number;
 }
 
+interface PlatformStatusLot {
+    lotId: string;
+    lotNumber?: string | null;
+    publicId: number;
+    platformStatus?: string | null;
+    isFinal: boolean;
+}
+
+interface PlatformStatusPreview {
+    biddingId: string;
+    tradeNumber?: string | null;
+    platformKind?: string | null;
+    platformLabel?: string | null;
+    platformStatus?: string | null;
+    isFinal: boolean;
+    suggestedResultKind?: string | null;
+    source?: string | null;
+    error?: string | null;
+    lots?: PlatformStatusLot[];
+}
+
 interface PaginatedResponse {
     items: StuckBidding[];
     totalCount: number;
@@ -143,6 +164,9 @@ export default function StuckTradeResultsClient() {
     const [finalizeRemaining, setFinalizeRemaining] = useState(true);
     const [actingId, setActingId] = useState<string | null>(null);
     const [highlightBiddingId, setHighlightBiddingId] = useState<string | null>(null);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [platformStatuses, setPlatformStatuses] = useState<Record<string, PlatformStatusPreview>>({});
+    const [isCheckingStatuses, setIsCheckingStatuses] = useState(false);
 
     const isDetailMode = isLoadingDetails || !!details;
 
@@ -172,6 +196,7 @@ export default function StuckTradeResultsClient() {
                 if (data.platforms) {
                     setPlatforms(data.platforms);
                 }
+                setSelectedIds(new Set());
             } else {
                 setErrorMessage('Не удалось загрузить список торгов.');
             }
@@ -227,6 +252,64 @@ export default function StuckTradeResultsClient() {
         });
     }, [isDetailMode]);
 
+    const toggleSelect = (id: string) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === items.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(items.map((i) => i.id)));
+        }
+    };
+
+    const checkPlatformStatuses = async () => {
+        if (selectedIds.size === 0) {
+            alert('Выберите хотя бы одни торги.');
+            return;
+        }
+
+        setIsCheckingStatuses(true);
+        setErrorMessage(null);
+        try {
+            const res = await fetch(`${apiBase}/api/admin/stuck-trade-results/preview-platform-status`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ biddingIds: Array.from(selectedIds) }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                setErrorMessage(err.message ?? 'Не удалось проверить статусы на площадке.');
+                return;
+            }
+
+            const data = await res.json();
+            const next: Record<string, PlatformStatusPreview> = { ...platformStatuses };
+            for (const item of (data.items ?? []) as PlatformStatusPreview[]) {
+                next[item.biddingId] = item;
+            }
+            setPlatformStatuses(next);
+
+            const finalCount = (data.items ?? []).filter((i: PlatformStatusPreview) => i.isFinal).length;
+            setStatusMessage(
+                `Проверено: ${(data.items ?? []).length}. С конечным статусом: ${finalCount}.`
+            );
+        } catch (e) {
+            console.error(e);
+            setErrorMessage('Ошибка сети при проверке статусов.');
+        } finally {
+            setIsCheckingStatuses(false);
+        }
+    };
+
     const applyMinAttempts = () => {
         const parsed = Math.max(1, parseInt(minAttemptsInput, 10) || 5);
         setMinAttemptsInput(String(parsed));
@@ -234,6 +317,8 @@ export default function StuckTradeResultsClient() {
         setMinAttempts(parsed);
         setSelectedBiddingId(null);
         setDetails(null);
+        setPlatformStatuses({});
+        setSelectedIds(new Set());
     };
 
     const closeDetails = () => {
@@ -709,9 +794,9 @@ export default function StuckTradeResultsClient() {
                         Торги с большим числом попыток проверки результатов на Федресурсе ({totalCount})
                     </p>
                     <div className={styles.workflowHint}>
-                        Обычно результаты уже есть на площадке (часто «не состоялись» из‑за отсутствия заявок),
-                        а на Федресурсе сообщения нет. Зафиксируйте результат вручную — повторные вызовы Федресурса
-                        остановятся.
+                        Отфильтруйте по площадке (например ЦДТ), выберите торги и нажмите
+                        «Статусы с площадки» — в колонке появится статус (зелёный = конечный).
+                        Рабирайте в первую очередь конечные, чтобы не открывать лоты впустую.
                     </div>
 
                     <div className={styles.toolbar}>
@@ -736,6 +821,7 @@ export default function StuckTradeResultsClient() {
                                 onChange={(e) => {
                                     setPage(1);
                                     setPlatform(e.target.value);
+                                    setPlatformStatuses({});
                                 }}
                             >
                                 <option value="">Все площадки</option>
@@ -746,6 +832,16 @@ export default function StuckTradeResultsClient() {
                                 ))}
                             </select>
                         </label>
+                        <button
+                            className={styles.btnPrimary}
+                            type="button"
+                            disabled={isCheckingStatuses || selectedIds.size === 0}
+                            onClick={checkPlatformStatuses}
+                        >
+                            {isCheckingStatuses
+                                ? 'Проверка…'
+                                : `Статусы с площадки (${selectedIds.size})`}
+                        </button>
                     </div>
 
                     {isLoading ? (
@@ -758,21 +854,39 @@ export default function StuckTradeResultsClient() {
                         <table className={styles.table}>
                             <thead>
                                 <tr>
+                                    <th className={styles.checkboxCell}>
+                                        <input
+                                            type="checkbox"
+                                            checked={items.length > 0 && selectedIds.size === items.length}
+                                            onChange={toggleSelectAll}
+                                            title="Выбрать все на странице"
+                                        />
+                                    </th>
                                     <th>Попытки</th>
                                     <th>Номер / площадка</th>
                                     <th>Лоты</th>
+                                    <th>Статус на площадке</th>
                                     <th>Проверки</th>
                                     <th>Ссылки</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.map((item) => (
+                                {items.map((item) => {
+                                    const preview = platformStatuses[item.id];
+                                    return (
                                     <tr
                                         key={item.id}
                                         id={`stuck-row-${item.id}`}
                                         className={highlightBiddingId === item.id ? styles.returnRow : undefined}
                                     >
+                                        <td className={styles.checkboxCell}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(item.id)}
+                                                onChange={() => toggleSelect(item.id)}
+                                            />
+                                        </td>
                                         <td>
                                             <span className={styles.attemptsBadge}>
                                                 {item.statusCheckAttempts}
@@ -787,6 +901,53 @@ export default function StuckTradeResultsClient() {
                                         </td>
                                         <td>
                                             активных {item.activeLotsCount} / всего {item.totalLotsCount}
+                                        </td>
+                                        <td>
+                                            {!preview ? (
+                                                <span className={styles.metaMuted}>—</span>
+                                            ) : preview.error && !preview.platformStatus ? (
+                                                <span className={styles.statusError}>{preview.error}</span>
+                                            ) : (
+                                                <>
+                                                    <span
+                                                        className={
+                                                            preview.isFinal
+                                                                ? styles.statusFinal
+                                                                : styles.statusPending
+                                                        }
+                                                    >
+                                                        {preview.platformStatus || '—'}
+                                                        {preview.isFinal ? ' · конечный' : ' · не конечный'}
+                                                    </span>
+                                                    {preview.source && (
+                                                        <div className={styles.statusSource}>
+                                                            {preview.source === 'live'
+                                                                ? 'live с площадки'
+                                                                : 'из каталога'}
+                                                        </div>
+                                                    )}
+                                                    {preview.lots &&
+                                                        preview.lots.length > 1 &&
+                                                        preview.lots.some(
+                                                            (l) =>
+                                                                l.platformStatus &&
+                                                                l.platformStatus !== preview.platformStatus
+                                                        ) && (
+                                                            <ul className={styles.lotStatusList}>
+                                                                {preview.lots.map((lot) => (
+                                                                    <li key={lot.lotId}>
+                                                                        лот {lot.lotNumber || lot.publicId}:{' '}
+                                                                        {lot.platformStatus || '—'}
+                                                                        {lot.isFinal ? ' ✓' : ''}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    {preview.error && (
+                                                        <div className={styles.statusError}>{preview.error}</div>
+                                                    )}
+                                                </>
+                                            )}
                                         </td>
                                         <td>
                                             <div className={styles.metaMuted}>
@@ -836,7 +997,8 @@ export default function StuckTradeResultsClient() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}

@@ -59,10 +59,45 @@
     max-width: 420px;
 }
 
-.returnRow {
-    outline: 2px solid #93c5fd;
-    outline-offset: -2px;
-    background: #eff6ff;
+.statusFinal {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.statusPending {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.statusError {
+    font-size: 0.8rem;
+    color: #b91c1c;
+}
+
+.statusSource {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.lotStatusList {
+    margin: 4px 0 0;
+    padding-left: 16px;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.checkboxCell {
+    width: 36px;
+    vertical-align: middle;
 }
 
 .textInput {
