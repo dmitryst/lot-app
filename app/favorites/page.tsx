@@ -75,7 +75,28 @@ function FavoritesPage() {
             router.push(`/login?returnUrl=/favorites`);
             return;
         }
-        fetchFavoriteLots();
+
+        let isCancelled = false;
+
+        const fetchDataAndScroll = async () => {
+            await fetchFavoriteLots();
+
+            if (isCancelled) return;
+
+            const scrollPosition = sessionStorage.getItem('scrollPosition');
+            if (scrollPosition) {
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, parseInt(scrollPosition, 10));
+                    sessionStorage.removeItem('scrollPosition');
+                });
+            }
+        };
+
+        fetchDataAndScroll();
+
+        return () => {
+            isCancelled = true;
+        };
     }, [user, authLoading, router, fetchFavoriteLots]);
 
     if (authLoading || (loading && user && lots.length === 0)) {
@@ -108,6 +129,14 @@ function FavoritesPage() {
                     </div>
                 ) : (
                     <>
+                        {totalPages > 1 && (
+                            <Pagination
+                                currentPage={page}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
+                        )}
+
                         <div className={pageStyles.lotsGrid}>
                             {lots.map((lot: Lot) => (
                                 <LotItem
